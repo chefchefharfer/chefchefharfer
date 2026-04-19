@@ -1,0 +1,1539 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Chef Chef Harfer — Kits de Cocina a Domicilio</title>
+  <meta name="description" content="Kits de cocina a domicilio en Tepatitlán. Ingredientes frescos, recetas premium. Martes, Jueves y Sábado." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Josefin+Sans:wght@300;400;600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --gold: #C9A84C;
+      --gold-light: #E8C97A;
+      --gold-dim: #8B6E2E;
+      --dark: #0A0A08;
+      --dark-2: #111110;
+      --dark-3: #1A1A17;
+      --dark-4: #242420;
+      --cream: #F5EDD8;
+      --cream-dim: #C8BFA8;
+      --text: #E8E0CC;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--dark);
+      color: var(--text);
+      font-family: 'Josefin Sans', sans-serif;
+      font-weight: 300;
+      letter-spacing: 0.04em;
+      overflow-x: hidden;
+    }
+
+    /* ── GRAIN OVERLAY ── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E");
+      opacity: 0.035;
+      pointer-events: none;
+      z-index: 1000;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 900;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1.4rem 3rem;
+      background: linear-gradient(to bottom, rgba(10,10,8,0.97) 0%, transparent 100%);
+      backdrop-filter: blur(2px);
+    }
+
+    .nav-logo {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.3rem;
+      font-weight: 600;
+      color: var(--gold);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      text-decoration: none;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 2.5rem;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: var(--cream-dim);
+      text-decoration: none;
+      font-size: 0.7rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      transition: color 0.3s;
+    }
+
+    .nav-links a:hover { color: var(--gold); }
+
+    .nav-cta {
+      background: transparent;
+      border: 1px solid var(--gold-dim);
+      color: var(--gold) !important;
+      padding: 0.5rem 1.2rem;
+      transition: background 0.3s, border-color 0.3s !important;
+    }
+
+    .nav-cta:hover {
+      background: var(--gold) !important;
+      color: var(--dark) !important;
+      border-color: var(--gold) !important;
+    }
+
+    /* ── HERO ── */
+    #hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+      padding: 6rem 2rem 4rem;
+    }
+
+    .hero-bg {
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 60% 60% at 70% 40%, rgba(201,168,76,0.08) 0%, transparent 70%),
+        radial-gradient(ellipse 40% 50% at 20% 80%, rgba(201,168,76,0.05) 0%, transparent 60%),
+        var(--dark);
+    }
+
+    .hero-line {
+      position: absolute;
+      top: 50%;
+      left: 0; right: 0;
+      height: 1px;
+      background: linear-gradient(to right, transparent, var(--gold-dim), transparent);
+      opacity: 0.3;
+      transform: translateY(-60px);
+    }
+
+    .hero-content {
+      position: relative;
+      text-align: center;
+      max-width: 800px;
+      animation: fadeUp 1.2s ease both;
+    }
+
+    .hero-eyebrow {
+      font-size: 0.65rem;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 1.5rem;
+      display: block;
+    }
+
+    .hero-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(3.5rem, 9vw, 7rem);
+      font-weight: 300;
+      line-height: 0.95;
+      color: var(--cream);
+      margin-bottom: 1rem;
+      letter-spacing: -0.01em;
+    }
+
+    .hero-title em {
+      font-style: italic;
+      color: var(--gold);
+    }
+
+    .hero-sub {
+      font-size: 0.75rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--cream-dim);
+      margin: 2rem auto 3rem;
+      max-width: 420px;
+      line-height: 2;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .btn-primary {
+      background: var(--gold);
+      color: var(--dark);
+      padding: 0.9rem 2.4rem;
+      font-family: 'Josefin Sans', sans-serif;
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      border: none;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-block;
+      transition: background 0.3s, transform 0.2s;
+    }
+
+    .btn-primary:hover {
+      background: var(--gold-light);
+      transform: translateY(-2px);
+    }
+
+    .btn-outline {
+      background: transparent;
+      color: var(--cream-dim);
+      padding: 0.9rem 2.4rem;
+      font-family: 'Josefin Sans', sans-serif;
+      font-size: 0.7rem;
+      font-weight: 400;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      border: 1px solid rgba(201,168,76,0.3);
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-block;
+      transition: border-color 0.3s, color 0.3s;
+    }
+
+    .btn-outline:hover {
+      border-color: var(--gold);
+      color: var(--gold);
+    }
+
+    .hero-badges {
+      display: flex;
+      gap: 2.5rem;
+      justify-content: center;
+      margin-top: 4rem;
+      flex-wrap: wrap;
+    }
+
+    .badge {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .badge-icon { font-size: 1.4rem; }
+
+    .badge-label {
+      font-size: 0.6rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--cream-dim);
+    }
+
+    /* ── DIVIDER ── */
+    .divider {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      padding: 0 3rem;
+      margin: 0 auto;
+      max-width: 1100px;
+    }
+
+    .divider-line {
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(to right, transparent, var(--gold-dim));
+    }
+
+    .divider-line.rev { background: linear-gradient(to left, transparent, var(--gold-dim)); }
+
+    .divider-diamond {
+      width: 6px; height: 6px;
+      background: var(--gold);
+      transform: rotate(45deg);
+      flex-shrink: 0;
+    }
+
+    /* ── COMO FUNCIONA ── */
+    #como-funciona {
+      padding: 7rem 2rem;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .section-label {
+      font-size: 0.62rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 1rem;
+      display: block;
+    }
+
+    .section-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(2rem, 5vw, 3.5rem);
+      font-weight: 300;
+      color: var(--cream);
+      margin-bottom: 4rem;
+      line-height: 1.1;
+    }
+
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 0;
+    }
+
+    .step {
+      padding: 2.5rem 2rem;
+      border-left: 1px solid rgba(201,168,76,0.15);
+      position: relative;
+      transition: background 0.3s;
+    }
+
+    .step:hover { background: rgba(201,168,76,0.03); }
+
+    .step-num {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 4rem;
+      font-weight: 300;
+      color: rgba(201,168,76,0.15);
+      line-height: 1;
+      margin-bottom: 1rem;
+    }
+
+    .step-title {
+      font-size: 0.7rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 0.8rem;
+    }
+
+    .step-desc {
+      font-size: 0.85rem;
+      color: var(--cream-dim);
+      line-height: 1.8;
+    }
+
+    /* ── MENU ── */
+    #menu {
+      padding: 7rem 2rem;
+      background: var(--dark-2);
+    }
+
+    .menu-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .menu-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      margin-bottom: 4rem;
+      flex-wrap: wrap;
+      gap: 1.5rem;
+    }
+
+    .tier-filters {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .tier-btn {
+      background: transparent;
+      border: 1px solid rgba(201,168,76,0.2);
+      color: var(--cream-dim);
+      padding: 0.4rem 1rem;
+      font-family: 'Josefin Sans', sans-serif;
+      font-size: 0.62rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .tier-btn.active, .tier-btn:hover {
+      background: var(--gold);
+      color: var(--dark);
+      border-color: var(--gold);
+    }
+
+    .menu-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 1.5px;
+    }
+
+    .dish-card {
+      background: var(--dark-3);
+      overflow: hidden;
+      position: relative;
+      cursor: pointer;
+      transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+
+    .dish-card:hover { transform: translateY(-4px); }
+    .dish-card:hover .dish-img { transform: scale(1.05); }
+    .dish-card:hover .dish-overlay { opacity: 1; }
+
+    .dish-img-wrap {
+      height: 220px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .dish-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      background: var(--dark-4);
+    }
+
+    /* Placeholder mientras no hay imagen */
+    .dish-img-placeholder {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--dark-4);
+      font-size: 3rem;
+    }
+
+    .dish-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(10,10,8,0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .dish-overlay-btn {
+      background: var(--gold);
+      color: var(--dark);
+      padding: 0.7rem 1.6rem;
+      font-family: 'Josefin Sans', sans-serif;
+      font-size: 0.65rem;
+      font-weight: 600;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      border: none;
+      cursor: pointer;
+      text-decoration: none;
+    }
+
+    .dish-tier-badge {
+      position: absolute;
+      top: 1rem; right: 1rem;
+      background: rgba(10,10,8,0.85);
+      border: 1px solid var(--gold-dim);
+      color: var(--gold);
+      font-size: 0.55rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      padding: 0.3rem 0.6rem;
+    }
+
+    .dish-info {
+      padding: 1.5rem;
+    }
+
+    .dish-code {
+      font-size: 0.55rem;
+      letter-spacing: 0.2em;
+      color: var(--gold-dim);
+      text-transform: uppercase;
+      margin-bottom: 0.4rem;
+    }
+
+    .dish-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.4rem;
+      font-weight: 400;
+      color: var(--cream);
+      margin-bottom: 0.5rem;
+      line-height: 1.2;
+    }
+
+    .dish-desc {
+      font-size: 0.75rem;
+      color: var(--cream-dim);
+      line-height: 1.7;
+      margin-bottom: 1.2rem;
+    }
+
+    .dish-pricing {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+    }
+
+    .price-option {
+      display: flex;
+      flex-direction: column;
+      gap: 0.1rem;
+    }
+
+    .price-label {
+      font-size: 0.55rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--gold-dim);
+    }
+
+    .price-value {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.2rem;
+      color: var(--gold);
+      font-weight: 600;
+    }
+
+    .price-divider {
+      width: 1px;
+      height: 30px;
+      background: rgba(201,168,76,0.2);
+    }
+
+    /* ── PAGOS ── */
+    #pagos {
+      padding: 7rem 2rem;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .pagos-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 1px;
+      margin-top: 4rem;
+      background: rgba(201,168,76,0.1);
+    }
+
+    .pago-card {
+      background: var(--dark-2);
+      padding: 2.5rem 2rem;
+      text-align: center;
+      transition: background 0.3s;
+    }
+
+    .pago-card:hover { background: var(--dark-3); }
+
+    .pago-icon { font-size: 2rem; margin-bottom: 1rem; }
+
+    .pago-title {
+      font-size: 0.65rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 0.8rem;
+    }
+
+    .pago-desc {
+      font-size: 0.78rem;
+      color: var(--cream-dim);
+      line-height: 1.8;
+      margin-bottom: 1.5rem;
+    }
+
+    .pago-action {
+      display: inline-block;
+      background: transparent;
+      border: 1px solid var(--gold-dim);
+      color: var(--gold);
+      padding: 0.6rem 1.4rem;
+      font-family: 'Josefin Sans', sans-serif;
+      font-size: 0.62rem;
+      font-weight: 600;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.3s;
+    }
+
+    .pago-action:hover {
+      background: var(--gold);
+      color: var(--dark);
+      border-color: var(--gold);
+    }
+
+    /* OpenPay link - fácil de actualizar */
+    #openpay-link {
+      /* ACTUALIZA ESTE HREF CADA SEMANA */
+      /* Reemplaza el href del <a id="openpay-btn"> en el HTML */
+    }
+
+    /* ── RESEÑAS ── */
+    #resenas {
+      padding: 7rem 2rem;
+      background: var(--dark-2);
+      overflow: hidden;
+    }
+
+    .resenas-inner { max-width: 1100px; margin: 0 auto; }
+
+    .reviews-track {
+      display: flex;
+      gap: 1.5rem;
+      margin-top: 3rem;
+      overflow-x: auto;
+      padding-bottom: 1rem;
+      scrollbar-width: none;
+    }
+
+    .reviews-track::-webkit-scrollbar { display: none; }
+
+    .review-card {
+      background: var(--dark-3);
+      border: 1px solid rgba(201,168,76,0.1);
+      padding: 2rem;
+      min-width: 300px;
+      max-width: 340px;
+      flex-shrink: 0;
+      position: relative;
+    }
+
+    .review-stars {
+      color: var(--gold);
+      font-size: 0.8rem;
+      letter-spacing: 0.1em;
+      margin-bottom: 1rem;
+    }
+
+    .review-text {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.05rem;
+      font-style: italic;
+      color: var(--cream);
+      line-height: 1.7;
+      margin-bottom: 1.5rem;
+    }
+
+    .review-author {
+      font-size: 0.62rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--gold-dim);
+    }
+
+    .review-dish {
+      font-size: 0.58rem;
+      color: rgba(200,191,168,0.5);
+      margin-top: 0.2rem;
+      letter-spacing: 0.1em;
+    }
+
+    /* ── ENTREGA ── */
+    #entrega {
+      padding: 7rem 2rem;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .entrega-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4rem;
+      margin-top: 4rem;
+      align-items: start;
+    }
+
+    .entrega-dias {
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+    }
+
+    .dia-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1.2rem 1.5rem;
+      background: var(--dark-3);
+      transition: background 0.3s;
+    }
+
+    .dia-row.activo { background: var(--dark-4); border-left: 2px solid var(--gold); }
+    .dia-row:hover { background: var(--dark-4); }
+
+    .dia-nombre {
+      font-size: 0.7rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--cream);
+    }
+
+    .dia-badge {
+      font-size: 0.58rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      padding: 0.25rem 0.6rem;
+    }
+
+    .dia-badge.disponible {
+      background: rgba(201,168,76,0.15);
+      color: var(--gold);
+      border: 1px solid var(--gold-dim);
+    }
+
+    .dia-badge.no { color: rgba(200,191,168,0.3); }
+
+    .entrega-notas {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    .nota {
+      padding: 1.5rem;
+      background: var(--dark-3);
+      border-left: 2px solid rgba(201,168,76,0.3);
+    }
+
+    .nota-title {
+      font-size: 0.62rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 0.5rem;
+    }
+
+    .nota-text {
+      font-size: 0.8rem;
+      color: var(--cream-dim);
+      line-height: 1.7;
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      padding: 4rem 3rem 2rem;
+      border-top: 1px solid rgba(201,168,76,0.1);
+    }
+
+    .footer-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr;
+      gap: 3rem;
+      margin-bottom: 3rem;
+    }
+
+    .footer-brand {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.6rem;
+      font-weight: 300;
+      color: var(--gold);
+      letter-spacing: 0.08em;
+      margin-bottom: 1rem;
+    }
+
+    .footer-tagline {
+      font-size: 0.75rem;
+      color: var(--cream-dim);
+      line-height: 1.8;
+      max-width: 280px;
+    }
+
+    .footer-col-title {
+      font-size: 0.6rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--gold-dim);
+      margin-bottom: 1.2rem;
+    }
+
+    .footer-links {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.7rem;
+    }
+
+    .footer-links a {
+      color: var(--cream-dim);
+      text-decoration: none;
+      font-size: 0.78rem;
+      transition: color 0.3s;
+    }
+
+    .footer-links a:hover { color: var(--gold); }
+
+    .footer-bottom {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 1.5rem;
+      border-top: 1px solid rgba(201,168,76,0.08);
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .footer-copy {
+      font-size: 0.62rem;
+      color: rgba(200,191,168,0.4);
+      letter-spacing: 0.1em;
+    }
+
+    /* ── WHATSAPP FAB ── */
+    .wa-fab {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      width: 56px;
+      height: 56px;
+      background: #25D366;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+      box-shadow: 0 4px 20px rgba(37,211,102,0.35);
+      z-index: 800;
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+
+    .wa-fab:hover {
+      transform: scale(1.1);
+      box-shadow: 0 6px 28px rgba(37,211,102,0.5);
+    }
+
+    .wa-fab svg { width: 28px; height: 28px; fill: white; }
+
+    /* ── MODAL ── */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(10,10,8,0.92);
+      z-index: 950;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s;
+    }
+
+    .modal-backdrop.open {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .modal {
+      background: var(--dark-3);
+      border: 1px solid rgba(201,168,76,0.2);
+      max-width: 480px;
+      width: 100%;
+      padding: 3rem;
+      position: relative;
+      transform: translateY(20px);
+      transition: transform 0.3s;
+    }
+
+    .modal-backdrop.open .modal { transform: translateY(0); }
+
+    .modal-close {
+      position: absolute;
+      top: 1rem; right: 1rem;
+      background: none;
+      border: none;
+      color: var(--cream-dim);
+      font-size: 1.2rem;
+      cursor: pointer;
+      line-height: 1;
+    }
+
+    .modal-dish-code {
+      font-size: 0.58rem;
+      letter-spacing: 0.2em;
+      color: var(--gold-dim);
+      text-transform: uppercase;
+      margin-bottom: 0.5rem;
+    }
+
+    .modal-dish-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2rem;
+      color: var(--cream);
+      margin-bottom: 0.5rem;
+    }
+
+    .modal-tier {
+      font-size: 0.6rem;
+      letter-spacing: 0.18em;
+      color: var(--gold);
+      text-transform: uppercase;
+      margin-bottom: 1.5rem;
+    }
+
+    .modal-sizes {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1px;
+      margin-bottom: 2rem;
+    }
+
+    .size-opt {
+      background: var(--dark-4);
+      padding: 1.2rem;
+      cursor: pointer;
+      border: 2px solid transparent;
+      transition: border-color 0.2s;
+      text-align: center;
+    }
+
+    .size-opt.selected { border-color: var(--gold); }
+    .size-opt:hover { border-color: var(--gold-dim); }
+
+    .size-label {
+      font-size: 0.6rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--cream-dim);
+      margin-bottom: 0.4rem;
+    }
+
+    .size-price {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.5rem;
+      color: var(--gold);
+    }
+
+    .modal-btn {
+      width: 100%;
+      background: var(--gold);
+      color: var(--dark);
+      padding: 1rem;
+      font-family: 'Josefin Sans', sans-serif;
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      border: none;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .modal-btn:hover { background: var(--gold-light); }
+
+    /* ── ANIMATIONS ── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 768px) {
+      nav { padding: 1.2rem 1.5rem; }
+      .nav-links { display: none; }
+      .entrega-grid { grid-template-columns: 1fr; }
+      .footer-inner { grid-template-columns: 1fr; }
+      .hero-title { font-size: clamp(2.8rem, 12vw, 4rem); }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <a class="nav-logo" href="#hero">Chef Chef Harfer</a>
+    <ul class="nav-links">
+      <li><a href="#como-funciona">Cómo funciona</a></li>
+      <li><a href="#menu">Menú</a></li>
+      <li><a href="#resenas">Reseñas</a></li>
+      <li><a href="#entrega">Entrega</a></li>
+      <li><a href="#pagos" class="nav-cta">Pedir ahora</a></li>
+    </ul>
+  </nav>
+
+  <!-- HERO -->
+  <section id="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-line"></div>
+    <div class="hero-content">
+      <span class="hero-eyebrow">Tepatitlán · Martes, Jueves & Sábado</span>
+      <h1 class="hero-title">
+        Cocina<br><em>gourmet</em><br>en tu casa
+      </h1>
+      <p class="hero-sub">Kits de ingredientes frescos y recetas premium,<br>listos para cocinar sin complicaciones</p>
+      <div class="hero-actions">
+        <a href="#menu" class="btn-primary">Ver el menú</a>
+        <a href="#como-funciona" class="btn-outline">¿Cómo funciona?</a>
+      </div>
+      <div class="hero-badges">
+        <div class="badge">
+          <span class="badge-icon">🌿</span>
+          <span class="badge-label">Ingredientes frescos</span>
+        </div>
+        <div class="badge">
+          <span class="badge-icon">📦</span>
+          <span class="badge-label">Todo incluido</span>
+        </div>
+        <div class="badge">
+          <span class="badge-icon">🏠</span>
+          <span class="badge-label">A domicilio</span>
+        </div>
+        <div class="badge">
+          <span class="badge-icon">👨‍🍳</span>
+          <span class="badge-label">Receta paso a paso</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- DIVIDER -->
+  <div class="divider">
+    <div class="divider-line"></div>
+    <div class="divider-diamond"></div>
+    <div class="divider-line rev"></div>
+  </div>
+
+  <!-- COMO FUNCIONA -->
+  <section id="como-funciona">
+    <span class="section-label">El proceso</span>
+    <h2 class="section-title">Tan simple<br>como cocinar</h2>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">01</div>
+        <div class="step-title">Elige</div>
+        <p class="step-desc">Explora el menú y selecciona tus recetas favoritas. Disponible en porciones para 2 o 4 personas.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">02</div>
+        <div class="step-title">Pide</div>
+        <p class="step-desc">Haz tu pedido aquí mismo o por WhatsApp. Recibimos pedidos hasta un día antes de tu fecha de entrega.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">03</div>
+        <div class="step-title">Recibe</div>
+        <p class="step-desc">Te entregamos todo fresco, limpio y porcionado, listo para cocinar. Martes, Jueves o Sábado.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">04</div>
+        <div class="step-title">Disfruta</div>
+        <p class="step-desc">Sigue la receta paso a paso y sorprende a los tuyos con un platillo de restaurante hecho en casa.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- MENU -->
+  <section id="menu">
+    <div class="menu-inner">
+      <div class="menu-header">
+        <div>
+          <span class="section-label">Nuestros platillos</span>
+          <h2 class="section-title">El menú</h2>
+        </div>
+        <div class="tier-filters">
+          <button class="tier-btn active" onclick="filtrarMenu('todos', this)">Todos</button>
+          <button class="tier-btn" onclick="filtrarMenu('Económica', this)">Económica</button>
+          <button class="tier-btn" onclick="filtrarMenu('Premium', this)">Premium</button>
+          <button class="tier-btn" onclick="filtrarMenu('Deluxe', this)">Deluxe</button>
+        </div>
+      </div>
+
+      <div class="menu-grid" id="menuGrid">
+
+        <!-- 001 Tiras de Res -->
+        <div class="dish-card" data-tier="Económica" onclick="abrirModal(this)">
+          <div class="dish-img-wrap">
+            <!-- REEMPLAZA src con tu foto: <img src="fotos/001-tiras-de-res.jpg" ...> -->
+            <div class="dish-img-placeholder">🥩</div>
+            <div class="dish-overlay">
+              <span class="dish-overlay-btn">Pedir este kit</span>
+            </div>
+            <span class="dish-tier-badge">Económica</span>
+          </div>
+          <div class="dish-info">
+            <div class="dish-code">001</div>
+            <h3 class="dish-name">Tiras de Res</h3>
+            <p class="dish-desc">Tiras de res tiernas marinadas, listas para saltear. Un clásico reconfortante para toda la familia.</p>
+            <div class="dish-pricing">
+              <div class="price-option">
+                <span class="price-label">2 porciones</span>
+                <!-- ACTUALIZA TU PRECIO -->
+                <span class="price-value" data-price2="0">$—</span>
+              </div>
+              <div class="price-divider"></div>
+              <div class="price-option">
+                <span class="price-label">4 porciones</span>
+                <span class="price-value" data-price4="0">$—</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 002 Rib Eye -->
+        <div class="dish-card" data-tier="Deluxe" onclick="abrirModal(this)">
+          <div class="dish-img-wrap">
+            <div class="dish-img-placeholder">🥩</div>
+            <div class="dish-overlay">
+              <span class="dish-overlay-btn">Pedir este kit</span>
+            </div>
+            <span class="dish-tier-badge">Deluxe</span>
+          </div>
+          <div class="dish-info">
+            <div class="dish-code">002</div>
+            <h3 class="dish-name">Rib Eye</h3>
+            <p class="dish-desc">El rey de los cortes. Rib eye premium con todo lo necesario para una experiencia de parrilla perfecta.</p>
+            <div class="dish-pricing">
+              <div class="price-option">
+                <span class="price-label">2 porciones</span>
+                <span class="price-value" data-price2="0">$—</span>
+              </div>
+              <div class="price-divider"></div>
+              <div class="price-option">
+                <span class="price-label">4 porciones</span>
+                <span class="price-value" data-price4="0">$—</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 003 Salmón al Miso -->
+        <div class="dish-card" data-tier="Premium" onclick="abrirModal(this)">
+          <div class="dish-img-wrap">
+            <div class="dish-img-placeholder">🐟</div>
+            <div class="dish-overlay">
+              <span class="dish-overlay-btn">Pedir este kit</span>
+            </div>
+            <span class="dish-tier-badge">Premium</span>
+          </div>
+          <div class="dish-info">
+            <div class="dish-code">003</div>
+            <h3 class="dish-name">Salmón al Miso</h3>
+            <p class="dish-desc">Filete de salmón con marinada de miso tradicional. Sabores japoneses auténticos en tu cocina.</p>
+            <div class="dish-pricing">
+              <div class="price-option">
+                <span class="price-label">2 porciones</span>
+                <span class="price-value" data-price2="0">$—</span>
+              </div>
+              <div class="price-divider"></div>
+              <div class="price-option">
+                <span class="price-label">4 porciones</span>
+                <span class="price-value" data-price4="0">$—</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 004 Pollo Honey BBQ -->
+        <div class="dish-card" data-tier="Económica" onclick="abrirModal(this)">
+          <div class="dish-img-wrap">
+            <div class="dish-img-placeholder">🍗</div>
+            <div class="dish-overlay">
+              <span class="dish-overlay-btn">Pedir este kit</span>
+            </div>
+            <span class="dish-tier-badge">Económica</span>
+          </div>
+          <div class="dish-info">
+            <div class="dish-code">004</div>
+            <h3 class="dish-name">Pollo Honey BBQ</h3>
+            <p class="dish-desc">Pieza de pollo bañada en nuestra salsa honey BBQ artesanal. Favorito de la familia, irresistible.</p>
+            <div class="dish-pricing">
+              <div class="price-option">
+                <span class="price-label">2 porciones</span>
+                <span class="price-value" data-price2="0">$—</span>
+              </div>
+              <div class="price-divider"></div>
+              <div class="price-option">
+                <span class="price-label">4 porciones</span>
+                <span class="price-value" data-price4="0">$—</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 005 Camarones Guajillo -->
+        <div class="dish-card" data-tier="Premium" onclick="abrirModal(this)">
+          <div class="dish-img-wrap">
+            <div class="dish-img-placeholder">🦐</div>
+            <div class="dish-overlay">
+              <span class="dish-overlay-btn">Pedir este kit</span>
+            </div>
+            <span class="dish-tier-badge">Premium</span>
+          </div>
+          <div class="dish-info">
+            <div class="dish-code">005</div>
+            <h3 class="dish-name">Camarones Guajillo</h3>
+            <p class="dish-desc">Camarones frescos con salsa de chile guajillo. Sabor mexicano auténtico con un toque picante perfecto.</p>
+            <div class="dish-pricing">
+              <div class="price-option">
+                <span class="price-label">2 porciones</span>
+                <span class="price-value" data-price2="269">$269</span>
+              </div>
+              <div class="price-divider"></div>
+              <div class="price-option">
+                <span class="price-label">4 porciones</span>
+                <span class="price-value" data-price4="538">$538</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 006 Caldo de Pollo -->
+        <div class="dish-card" data-tier="Económica" onclick="abrirModal(this)">
+          <div class="dish-img-wrap">
+            <div class="dish-img-placeholder">🍲</div>
+            <div class="dish-overlay">
+              <span class="dish-overlay-btn">Pedir este kit</span>
+            </div>
+            <span class="dish-tier-badge">Económica</span>
+          </div>
+          <div class="dish-info">
+            <div class="dish-code">006</div>
+            <h3 class="dish-name">Caldo de Pollo</h3>
+            <p class="dish-desc">El abrazo en un tazón. Caldo de pollo reconfortante con verduras frescas y todos los ingredientes listos.</p>
+            <div class="dish-pricing">
+              <div class="price-option">
+                <span class="price-label">2 porciones</span>
+                <span class="price-value" data-price2="209">$209</span>
+              </div>
+              <div class="price-divider"></div>
+              <div class="price-option">
+                <span class="price-label">4 porciones</span>
+                <span class="price-value" data-price4="418">$418</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 007 Spaghetti Boloñesa -->
+        <div class="dish-card" data-tier="Económica" onclick="abrirModal(this)">
+          <div class="dish-img-wrap">
+            <div class="dish-img-placeholder">🍝</div>
+            <div class="dish-overlay">
+              <span class="dish-overlay-btn">Pedir este kit</span>
+            </div>
+            <span class="dish-tier-badge">Económica</span>
+          </div>
+          <div class="dish-info">
+            <div class="dish-code">007</div>
+            <h3 class="dish-name">Spaghetti Boloñesa</h3>
+            <p class="dish-desc">Pasta italiana con salsa boloñesa de cocción lenta. Ingredientes frescos para el clásico perfecto.</p>
+            <div class="dish-pricing">
+              <div class="price-option">
+                <span class="price-label">2 porciones</span>
+                <span class="price-value" data-price2="0">$—</span>
+              </div>
+              <div class="price-divider"></div>
+              <div class="price-option">
+                <span class="price-label">4 porciones</span>
+                <span class="price-value" data-price4="0">$—</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 008 Ceviche de Chicharrón -->
+        <div class="dish-card" data-tier="Premium" onclick="abrirModal(this)">
+          <div class="dish-img-wrap">
+            <div class="dish-img-placeholder">🌮</div>
+            <div class="dish-overlay">
+              <span class="dish-overlay-btn">Pedir este kit</span>
+            </div>
+            <span class="dish-tier-badge">Premium</span>
+          </div>
+          <div class="dish-info">
+            <div class="dish-code">008</div>
+            <h3 class="dish-name">Ceviche de Chicharrón</h3>
+            <p class="dish-desc">Una fusión única: ceviche de chicharrón fresco con limón, cebolla morada y chile serrano. Refrescante y adictivo.</p>
+            <div class="dish-pricing">
+              <div class="price-option">
+                <span class="price-label">2 porciones</span>
+                <span class="price-value" data-price2="239">$239</span>
+              </div>
+              <div class="price-divider"></div>
+              <div class="price-option">
+                <span class="price-label">4 porciones</span>
+                <span class="price-value" data-price4="478">$478</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /menu-grid -->
+    </div>
+  </section>
+
+  <!-- PAGOS -->
+  <section id="pagos">
+    <span class="section-label">Sin complicaciones</span>
+    <h2 class="section-title">¿Cómo<br>quieres pagar?</h2>
+    <div class="pagos-grid">
+
+      <div class="pago-card">
+        <div class="pago-icon">💳</div>
+        <div class="pago-title">Mercado Pago</div>
+        <p class="pago-desc">Tarjeta de crédito, débito, o saldo Mercado Pago. Rápido y seguro, sin salir de la página.</p>
+        <!-- REEMPLAZA el href con tu link de Mercado Pago -->
+        <a href="https://link.mercadopago.com.mx/TU_LINK_AQUI" target="_blank" class="pago-action">Pagar con MP</a>
+      </div>
+
+      <div class="pago-card">
+        <div class="pago-icon">🔗</div>
+        <div class="pago-title">OpenPay</div>
+        <p class="pago-desc">Link de pago semanal. Tarjeta, transferencia o efectivo en tiendas de conveniencia.</p>
+        <!-- ACTUALIZA ESTE HREF CADA SEMANA con tu nuevo link de OpenPay -->
+        <a id="openpay-btn" href="#" target="_blank" class="pago-action">Ir al link de pago</a>
+      </div>
+
+      <div class="pago-card">
+        <div class="pago-icon">💬</div>
+        <div class="pago-title">WhatsApp</div>
+        <p class="pago-desc">Escríbenos, te mandamos los datos bancarios para transferencia directa. Sin comisiones.</p>
+        <!-- REEMPLAZA con tu número de WhatsApp -->
+        <a href="https://wa.me/521TUNUMERO?text=Hola%2C%20quiero%20hacer%20un%20pedido%20de%20Chef%20Chef%20Harfer" target="_blank" class="pago-action">Abrir WhatsApp</a>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- RESEÑAS -->
+  <section id="resenas">
+    <div class="resenas-inner">
+      <span class="section-label">Lo que dicen</span>
+      <h2 class="section-title">Nuestros<br>clientes</h2>
+      <div class="reviews-track">
+
+        <div class="review-card">
+          <div class="review-stars">★★★★★</div>
+          <p class="review-text">"Excelente calidad, los ingredientes llegaron súper frescos y la receta estuvo muy clara. Ya pedí por tercera vez."</p>
+          <div class="review-author">— Nombre Cliente</div>
+          <div class="review-dish">Kit Camarones Guajillo</div>
+        </div>
+
+        <div class="review-card">
+          <div class="review-stars">★★★★★</div>
+          <p class="review-text">"Me encantó que venía todo medido y listo. Nunca había cocinado así y quedó delicioso. Mi familia quedó impresionada."</p>
+          <div class="review-author">— Nombre Cliente</div>
+          <div class="review-dish">Kit Pollo Honey BBQ</div>
+        </div>
+
+        <div class="review-card">
+          <div class="review-stars">★★★★★</div>
+          <p class="review-text">"La entrega puntual, el empaque muy limpio y presentable. El salmón al miso fue toda una experiencia. 100% recomendado."</p>
+          <div class="review-author">— Nombre Cliente</div>
+          <div class="review-dish">Kit Salmón al Miso</div>
+        </div>
+
+        <div class="review-card">
+          <div class="review-stars">★★★★★</div>
+          <p class="review-text">"El caldo de pollo me recordó al de mi mamá, pero con todos los ingredientes ya listos. Una maravilla para días de frío."</p>
+          <div class="review-author">— Nombre Cliente</div>
+          <div class="review-dish">Kit Caldo de Pollo</div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ENTREGA -->
+  <section id="entrega">
+    <span class="section-label">Logística</span>
+    <h2 class="section-title">Días y<br>horarios</h2>
+    <div class="entrega-grid">
+      <div class="entrega-dias">
+        <div class="dia-row">
+          <span class="dia-nombre">Lunes</span>
+          <span class="dia-badge no">No disponible</span>
+        </div>
+        <div class="dia-row activo">
+          <span class="dia-nombre">Martes</span>
+          <span class="dia-badge disponible">Entrega</span>
+        </div>
+        <div class="dia-row">
+          <span class="dia-nombre">Miércoles</span>
+          <span class="dia-badge no">No disponible</span>
+        </div>
+        <div class="dia-row activo">
+          <span class="dia-nombre">Jueves</span>
+          <span class="dia-badge disponible">Entrega</span>
+        </div>
+        <div class="dia-row">
+          <span class="dia-nombre">Viernes</span>
+          <span class="dia-badge no">No disponible</span>
+        </div>
+        <div class="dia-row activo">
+          <span class="dia-nombre">Sábado</span>
+          <span class="dia-badge disponible">Entrega</span>
+        </div>
+        <div class="dia-row">
+          <span class="dia-nombre">Domingo</span>
+          <span class="dia-badge no">No disponible</span>
+        </div>
+      </div>
+
+      <div class="entrega-notas">
+        <div class="nota">
+          <div class="nota-title">🕐 Horario de pedidos</div>
+          <p class="nota-text">Pedidos con un día de anticipación. Entregas en horario matutino, generalmente antes del mediodía.</p>
+        </div>
+        <div class="nota">
+          <div class="nota-title">📍 Zona de entrega</div>
+          <p class="nota-text">Tepatitlán de Morelos y zona metropolitana. Escríbenos por WhatsApp para confirmar si llegamos a tu colonia.</p>
+        </div>
+        <div class="nota">
+          <div class="nota-title">📦 ¿Qué incluye el kit?</div>
+          <p class="nota-text">Todos los ingredientes frescos, porcionados y etiquetados, más la receta impresa paso a paso.</p>
+        </div>
+        <div class="nota">
+          <div class="nota-title">❄️ Conservación</div>
+          <p class="nota-text">Los kits se entregan refrigerados. Cocina el mismo día o refrigera máximo 48 horas.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-inner">
+      <div>
+        <div class="footer-brand">Chef Chef Harfer</div>
+        <p class="footer-tagline">Kits de cocina a domicilio en Tepatitlán. Ingredientes frescos, recetas premium, experiencia gourmet en tu hogar.</p>
+      </div>
+      <div>
+        <div class="footer-col-title">Navegación</div>
+        <ul class="footer-links">
+          <li><a href="#menu">Menú</a></li>
+          <li><a href="#como-funciona">Cómo funciona</a></li>
+          <li><a href="#entrega">Días de entrega</a></li>
+          <li><a href="#resenas">Reseñas</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="footer-col-title">Contacto</div>
+        <ul class="footer-links">
+          <!-- REEMPLAZA con tu número -->
+          <li><a href="https://wa.me/521TUNUMERO" target="_blank">WhatsApp</a></li>
+          <li><a href="https://instagram.com/chefchefharfer" target="_blank">Instagram</a></li>
+          <li><a href="mailto:hola@chefchefharfer.mx">Email</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span class="footer-copy">© 2026 Chef Chef Harfer · Tepatitlán, Jalisco · Todos los derechos reservados</span>
+      <span class="footer-copy">chefchefharfer.mx</span>
+    </div>
+  </footer>
+
+  <!-- WHATSAPP FAB -->
+  <a class="wa-fab" href="https://wa.me/521TUNUMERO?text=Hola%2C%20quiero%20hacer%20un%20pedido" target="_blank" title="Pedir por WhatsApp">
+    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+    </svg>
+  </a>
+
+  <!-- MODAL PEDIDO -->
+  <div class="modal-backdrop" id="modalBackdrop" onclick="cerrarModal(event)">
+    <div class="modal">
+      <button class="modal-close" onclick="cerrarModalBtn()">✕</button>
+      <div class="modal-dish-code" id="modalCode"></div>
+      <h3 class="modal-dish-name" id="modalName"></h3>
+      <div class="modal-tier" id="modalTier"></div>
+      <div class="modal-sizes">
+        <div class="size-opt selected" id="size2" onclick="selectSize(2)">
+          <div class="size-label">2 porciones</div>
+          <div class="size-price" id="modalPrice2"></div>
+        </div>
+        <div class="size-opt" id="size4" onclick="selectSize(4)">
+          <div class="size-label">4 porciones</div>
+          <div class="size-price" id="modalPrice4"></div>
+        </div>
+      </div>
+      <button class="modal-btn" onclick="pedirPorWhatsApp()">Pedir por WhatsApp →</button>
+    </div>
+  </div>
+
+  <script>
+    // ── FILTRO DE MENU ──
+    function filtrarMenu(tier, btn) {
+      document.querySelectorAll('.tier-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      document.querySelectorAll('.dish-card').forEach(card => {
+        if (tier === 'todos' || card.dataset.tier === tier) {
+          card.style.display = '';
+        } else {
+          card.style.display = 'none';
+        }
+      });
+    }
+
+    // ── MODAL ──
+    let selectedSize = 2;
+    let currentDish = {};
+
+    function abrirModal(card) {
+      const name = card.querySelector('.dish-name').textContent;
+      const code = card.querySelector('.dish-code').textContent;
+      const tier = card.querySelector('.dish-tier-badge').textContent;
+      const price2 = card.querySelector('[data-price2]').dataset.price2;
+      const price4 = card.querySelector('[data-price4]').dataset.price4;
+
+      currentDish = { name, code, tier, price2, price4 };
+      selectedSize = 2;
+
+      document.getElementById('modalCode').textContent = code;
+      document.getElementById('modalName').textContent = name;
+      document.getElementById('modalTier').textContent = tier;
+      document.getElementById('modalPrice2').textContent = price2 > 0 ? '$' + price2 : '$—';
+      document.getElementById('modalPrice4').textContent = price4 > 0 ? '$' + price4 : '$—';
+
+      document.getElementById('size2').classList.add('selected');
+      document.getElementById('size4').classList.remove('selected');
+      document.getElementById('modalBackdrop').classList.add('open');
+    }
+
+    function selectSize(size) {
+      selectedSize = size;
+      document.getElementById('size2').classList.toggle('selected', size === 2);
+      document.getElementById('size4').classList.toggle('selected', size === 4);
+    }
+
+    function cerrarModal(e) {
+      if (e.target === document.getElementById('modalBackdrop')) {
+        document.getElementById('modalBackdrop').classList.remove('open');
+      }
+    }
+
+    function cerrarModalBtn() {
+      document.getElementById('modalBackdrop').classList.remove('open');
+    }
+
+    function pedirPorWhatsApp() {
+      const price = selectedSize === 2 ? currentDish.price2 : currentDish.price4;
+      const priceText = price > 0 ? `$${price} MXN` : '(precio a confirmar)';
+      const msg = encodeURIComponent(
+        `Hola! Quiero pedir el Kit ${currentDish.code} - ${currentDish.name} para ${selectedSize} porciones (${priceText}). ¿Me pueden confirmar disponibilidad?`
+      );
+      // REEMPLAZA TUNUMERO con tu número de WhatsApp (formato: 523411234567)
+      window.open(`https://wa.me/521TUNUMERO?text=${msg}`, '_blank');
+    }
+  </script>
+</body>
+</html>
