@@ -1138,7 +1138,7 @@ footer .social-links a:hover { color: white; }
 
 
 /* ========================================
-   MENU TIENDA ESTILO PRO
+   MENU TIENDA ESTILO PROAN
    ======================================== */
 
 /* Header */
@@ -2832,15 +2832,16 @@ footer .social-links a:hover { color: white; }
 var WA_NUMBER = '523782901365';
 var RESEND_KEY = 're_d7qfs2N9_H4xsdhQRTYDVXLkeQHQX56he';
 
+var BASE_IMG = 'https://chefchefharfer.github.io/chefchefharfer/';
 var MENU = [
-  { id:'001', nombre:'Tiras de Res en Salsa de Jengibre con Arroz Esponjoso',                          proteina:'Res',     badge:'badge-res',     precio2p:229,       img:'001 - Tiras de Res en Salsa.jpg'},
-  { id:'002', nombre:'Rib Eye Steak con Mantequilla de Alcaparras, Pure de Coliflor y Cebolla Caramelizada', proteina:'Res',     badge:'badge-res',     precio2p:279, img:'002 - Rib Eye Steak con Mantequilla.jpg'},
-  { id:'003', nombre:'Salmon al Miso con Arroz de Coliflor y Espinacas al Sesamo',                     proteina:'Salmon',  badge:'badge-salmon',  precio2p:329,       img:'003 - Miso Salmon con Arroz.jpg'},
-  { id:'004', nombre:'Filete de Pollo Honey Barbecue con Papas y Crispy Onions',                        proteina:'Pollo',   badge:'badge-pollo',   precio2p:229       img:'004 - Filete de Pollo Honey bbq.jpg'},
-  { id:'005', nombre:'Camarones en Glaseado de Chile Guajillo y Mantequilla',                           proteina:'Camaron', badge:'badge-camaron', precio2p:269       img:'005 - Camarones en Glaseado.jpg'},
-  { id:'006', nombre:'Caldo de Pollo con Arroz Rojo Casero',                                            proteina:'Pollo',   badge:'badge-pollo',   precio2p:209       img:'006 - Caldo de Pollo con Arroz Rojo.jpg'},
-  { id:'007', nombre:'Spaghetti Bolonesa Clasico con Parmesano',                                        proteina:'Pasta',   badge:'badge-pasta',   precio2p:279       img:'007 - Spaghetti Boloñesa Clásico.jpg'},
-  { id:'008', nombre:'Ceviche de Chicharron',                                                           proteina:'Cerdo',   badge:'badge-cerdo',   precio2p:239       img:'008 - Ceviche de chicharron.jpg'}
+  { id:'001', nombre:'Tiras de Res en Salsa de Jengibre con Arroz Esponjoso',                          proteina:'Res',     badge:'badge-res',     precio2p:229, img:BASE_IMG+'001%20-%20Tiras%20de%20Res%20en%20Salsa%20.jpg' },
+  { id:'002', nombre:'Rib Eye Steak con Mantequilla de Alcaparras, Pure de Coliflor y Cebolla Caramelizada', proteina:'Res', badge:'badge-res',   precio2p:279, img:BASE_IMG+'002%20-%20Rib%20Eye%20Steak%20con%20Mantequilla%20.jpg' },
+  { id:'003', nombre:'Salmon al Miso con Arroz de Coliflor y Espinacas al Sesamo',                     proteina:'Salmon',  badge:'badge-salmon',  precio2p:329, img:BASE_IMG+'003%20-%20Miso%20Salmon%20con%20Arroz%20.jpg' },
+  { id:'004', nombre:'Filete de Pollo Honey Barbecue con Papas y Crispy Onions',                        proteina:'Pollo',   badge:'badge-pollo',   precio2p:229, img:BASE_IMG+'004%20-%20Filete%20de%20Pollo%20Honey%20bbq.jpg' },
+  { id:'005', nombre:'Camarones en Glaseado de Chile Guajillo y Mantequilla',                           proteina:'Camaron', badge:'badge-camaron', precio2p:269, img:BASE_IMG+'005%20-%20Camarones%20en%20Glaseado.jpg' },
+  { id:'006', nombre:'Caldo de Pollo con Arroz Rojo Casero',                                            proteina:'Pollo',   badge:'badge-pollo',   precio2p:209, img:BASE_IMG+'006%20-%20Caldo%20de%20Pollo%20con%20Arroz%20Rojo.jpg' },
+  { id:'007', nombre:'Spaghetti Bolonesa Clasico con Parmesano',                                        proteina:'Pasta',   badge:'badge-pasta',   precio2p:279, img:BASE_IMG+'007%20-%20Spaghetti%20Bolo%C3%B1esa%20Cl%C3%A1sico%20.jpg' },
+  { id:'008', nombre:'Ceviche de Chicharron',                                                           proteina:'Cerdo',   badge:'badge-cerdo',   precio2p:239, img:BASE_IMG+'008%20-%20Ceviche%20de%20chicharron.jpg' }
 ];
 
 var currentUser = null;
@@ -2940,277 +2941,6 @@ async function handleRegister() {
   loginSuccess();
   showToast('Cuenta creada! Hola, ' + nombre.split(' ')[0] + '.', 'welcome');
 }
-
-// === NOTION ===
-
-// === CORREO ===
-async function enviarCorreoBienvenida(user) {
-  var nombre = user.nombre.split(' ')[0];
-  var html = '<html><body style="font-family:Arial,sans-serif;background:#f4f1ec;padding:20px">' +
-    '<div style="max-width:500px;margin:0 auto;background:#fff;border-radius:12px;overflow:hidden">' +
-    '<div style="background:#067c49;padding:28px 32px;text-align:center">' +
-    '<h1 style="color:#fff;margin:0;font-size:20px">Chef Chef Harfer</h1>' +
-    '<p style="color:rgba(255,255,255,0.8);margin:4px 0 0;font-size:11px;letter-spacing:2px">MEAL KITS A DOMICILIO</p>' +
-    '</div>' +
-    '<div style="padding:32px">' +
-    '<h2 style="color:#111;font-size:18px;margin:0 0 12px">Hola, ' + nombre + '!</h2>' +
-    '<p style="color:#555;line-height:1.7;margin:0 0 14px">Ya puedes hacer tus pedidos de meal kits a domicilio. Ingredientes frescos, recetas listas, entregados en Tepatitlan.</p>' +
-    '<div style="background:#eaf6f0;border-left:3px solid #067c49;padding:14px 18px;border-radius:6px;margin:0 0 16px">' +
-    '<p style="color:#067c49;font-weight:700;margin:0 0 4px;font-size:12px">Como funciona</p>' +
-    '<p style="color:#333;font-size:13px;line-height:1.5;margin:0">Elige tu kit en la app, envianos tu pedido por WhatsApp y te mandamos el link de pago seguro.</p>' +
-    '</div>' +
-    '<p style="color:#555;font-size:13px;margin:0 0 20px">Entregamos martes, jueves y sabado. Pedidos cierran a las 12pm del dia previo.</p>' +
-    '<div style="text-align:center">' +
-    '<a href="https://chefchefharfer.mx" style="background:#067c49;color:#fff;padding:12px 28px;border-radius:8px;text-decoration:none;font-weight:700;font-size:13px">Ver el menu</a>' +
-    '</div></div>' +
-    '<div style="padding:16px;text-align:center;border-top:1px solid #eee">' +
-    '<p style="color:#aaa;font-size:11px;margin:0">Chef Chef Harfer - Tepatitlan de Morelos, Jalisco</p>' +
-    '</div></div></body></html>';
-
-  var body = JSON.stringify({
-    from: 'Chef Chef Harfer <hola@mail.chefchefharfer.mx>',
-    to: [user.email],
-    subject: 'Hola ' + nombre + ', bienvenido a Chef Chef Harfer',
-    html: html
-  });
-
-  // Attempt 1: standard fetch (works on desktop/non-CORS-blocked contexts)
-  try {
-    var r1 = await fetch('https://api.resend.com/emails', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer re_d7qfs2N9_H4xsdhQRTYDVXLkeQHQX56he' },
-      body: body
-    });
-    var d1 = await r1.json();
-    console.log('Email enviado:', d1.id || JSON.stringify(d1));
-    if (d1.id) return;
-  } catch(e1) {
-    console.warn('Resend directo bloqueado por CORS:', e1.message);
-  }
-
-  // Attempt 2: no-cors (silently sends, no response - works on some mobile browsers)
-  try {
-    await fetch('https://api.resend.com/emails', {
-      method: 'POST',
-      mode: 'no-cors',
-      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer re_d7qfs2N9_H4xsdhQRTYDVXLkeQHQX56he' },
-      body: body
-    });
-    console.log('Email enviado (no-cors)');
-  } catch(e2) {
-    console.warn('Email no-cors error:', e2.message);
-  }
-}
-
-
-// === NOTION ===
-
-
-
-
-
-
-
-// === CORREO ===
-async function enviarCorreoBienvenida(user) {
-  var nombre = user.nombre.split(' ')[0];
-  var html = '<html><body style="font-family:Arial,sans-serif;background:#f4f1ec;padding:20px">' +
-    '<div style="max-width:500px;margin:0 auto;background:#fff;border-radius:12px;overflow:hidden">' +
-    '<div style="background:#067c49;padding:28px 32px;text-align:center">' +
-    '<h1 style="color:#fff;margin:0;font-size:20px">Chef Chef Harfer</h1>' +
-    '<p style="color:rgba(255,255,255,0.8);margin:4px 0 0;font-size:11px;letter-spacing:2px">MEAL KITS A DOMICILIO</p>' +
-    '</div>' +
-    '<div style="padding:32px">' +
-    '<h2 style="color:#111;font-size:18px;margin:0 0 12px">Hola, ' + nombre + '!</h2>' +
-    '<p style="color:#555;line-height:1.7;margin:0 0 14px">Ya puedes hacer tus pedidos de meal kits a domicilio. Ingredientes frescos, recetas listas, entregados en Tepatitlan.</p>' +
-    '<div style="background:#eaf6f0;border-left:3px solid #067c49;padding:14px 18px;border-radius:6px;margin:0 0 16px">' +
-    '<p style="color:#067c49;font-weight:700;margin:0 0 4px;font-size:12px">Como funciona</p>' +
-    '<p style="color:#333;font-size:13px;line-height:1.5;margin:0">Elige tu kit en la app, envianos tu pedido por WhatsApp y te mandamos el link de pago seguro.</p>' +
-    '</div>' +
-    '<p style="color:#555;font-size:13px;margin:0 0 20px">Entregamos martes, jueves y sabado. Pedidos cierran a las 12pm del dia previo.</p>' +
-    '<div style="text-align:center">' +
-    '<a href="https://chefchefharfer.mx" style="background:#067c49;color:#fff;padding:12px 28px;border-radius:8px;text-decoration:none;font-weight:700;font-size:13px">Ver el menu</a>' +
-    '</div></div>' +
-    '<div style="padding:16px;text-align:center;border-top:1px solid #eee">' +
-    '<p style="color:#aaa;font-size:11px;margin:0">Chef Chef Harfer - Tepatitlan de Morelos, Jalisco</p>' +
-    '</div></div></body></html>';
-
-  var body = JSON.stringify({
-    from: 'Chef Chef Harfer <hola@mail.chefchefharfer.mx>',
-    to: [user.email],
-    subject: 'Hola ' + nombre + ', bienvenido a Chef Chef Harfer',
-    html: html
-  });
-
-  // Attempt 1: standard fetch (works on desktop/non-CORS-blocked contexts)
-  try {
-    var r1 = await fetch('https://api.resend.com/emails', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer re_d7qfs2N9_H4xsdhQRTYDVXLkeQHQX56he' },
-      body: body
-    });
-    var d1 = await r1.json();
-    console.log('Email enviado:', d1.id || JSON.stringify(d1));
-    if (d1.id) return;
-  } catch(e1) {
-    console.warn('Resend directo bloqueado por CORS:', e1.message);
-  }
-
-  // Attempt 2: no-cors (silently sends, no response - works on some mobile browsers)
-  try {
-    await fetch('https://api.resend.com/emails', {
-      method: 'POST',
-      mode: 'no-cors',
-      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer re_d7qfs2N9_H4xsdhQRTYDVXLkeQHQX56he' },
-      body: body
-    });
-    console.log('Email enviado (no-cors)');
-  } catch(e2) {
-    console.warn('Email no-cors error:', e2.message);
-  }
-}
-
-
-// === NOTION ===
-
-
-
-
-
-
-// === CORREO ===
-async function enviarCorreoBienvenida(user) {
-  var nombre = user.nombre.split(' ')[0];
-  var html = '<html><body style="font-family:Arial,sans-serif;background:#f4f1ec;padding:20px">' +
-    '<div style="max-width:500px;margin:0 auto;background:#fff;border-radius:12px;overflow:hidden">' +
-    '<div style="background:#067c49;padding:28px 32px;text-align:center">' +
-    '<h1 style="color:#fff;margin:0;font-size:20px">Chef Chef Harfer</h1>' +
-    '<p style="color:rgba(255,255,255,0.8);margin:4px 0 0;font-size:11px;letter-spacing:2px">MEAL KITS A DOMICILIO</p>' +
-    '</div>' +
-    '<div style="padding:32px">' +
-    '<h2 style="color:#111;font-size:18px;margin:0 0 12px">Hola, ' + nombre + '!</h2>' +
-    '<p style="color:#555;line-height:1.7;margin:0 0 14px">Ya puedes hacer tus pedidos de meal kits a domicilio. Ingredientes frescos, recetas listas, entregados en Tepatitlan.</p>' +
-    '<div style="background:#eaf6f0;border-left:3px solid #067c49;padding:14px 18px;border-radius:6px;margin:0 0 16px">' +
-    '<p style="color:#067c49;font-weight:700;margin:0 0 4px;font-size:12px">Como funciona</p>' +
-    '<p style="color:#333;font-size:13px;line-height:1.5;margin:0">Elige tu kit en la app, envianos tu pedido por WhatsApp y te mandamos el link de pago seguro.</p>' +
-    '</div>' +
-    '<p style="color:#555;font-size:13px;margin:0 0 20px">Entregamos martes, jueves y sabado. Pedidos cierran a las 12pm del dia previo.</p>' +
-    '<div style="text-align:center">' +
-    '<a href="https://chefchefharfer.mx" style="background:#067c49;color:#fff;padding:12px 28px;border-radius:8px;text-decoration:none;font-weight:700;font-size:13px">Ver el menu</a>' +
-    '</div></div>' +
-    '<div style="padding:16px;text-align:center;border-top:1px solid #eee">' +
-    '<p style="color:#aaa;font-size:11px;margin:0">Chef Chef Harfer - Tepatitlan de Morelos, Jalisco</p>' +
-    '</div></div></body></html>';
-
-  var body = JSON.stringify({
-    from: 'Chef Chef Harfer <hola@mail.chefchefharfer.mx>',
-    to: [user.email],
-    subject: 'Hola ' + nombre + ', bienvenido a Chef Chef Harfer',
-    html: html
-  });
-
-  // Attempt 1: standard fetch (works on desktop/non-CORS-blocked contexts)
-  try {
-    var r1 = await fetch('https://api.resend.com/emails', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer re_d7qfs2N9_H4xsdhQRTYDVXLkeQHQX56he' },
-      body: body
-    });
-    var d1 = await r1.json();
-    console.log('Email enviado:', d1.id || JSON.stringify(d1));
-    if (d1.id) return;
-  } catch(e1) {
-    console.warn('Resend directo bloqueado por CORS:', e1.message);
-  }
-
-  // Attempt 2: no-cors (silently sends, no response - works on some mobile browsers)
-  try {
-    await fetch('https://api.resend.com/emails', {
-      method: 'POST',
-      mode: 'no-cors',
-      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer re_d7qfs2N9_H4xsdhQRTYDVXLkeQHQX56he' },
-      body: body
-    });
-    console.log('Email enviado (no-cors)');
-  } catch(e2) {
-    console.warn('Email no-cors error:', e2.message);
-  }
-}
-
-
-// === NOTION ===
-
-
-
-
-// === CORREO ===
-async function enviarCorreoBienvenida(user) {
-  var nombre = user.nombre.split(' ')[0];
-  // Use Anthropic API with web_search tool to trigger server-side Resend call
-  // This bypasses CORS since Anthropic servers make the actual HTTP request
-  var emailPrompt = 'TASK: Send a welcome email using Resend API. ' +
-    'Make this exact HTTP POST request: ' +
-    'URL: https://api.resend.com/emails ' +
-    'Headers: {"Content-Type":"application/json","Authorization":"Bearer re_d7qfs2N9_H4xsdhQRTYDVXLkeQHQX56he"} ' +
-    'Body: {"from":"Chef Chef Harfer <hola@mail.chefchefharfer.mx>",' +
-    '"to":["' + user.email + '"],' +
-    '"subject":"Hola ' + nombre + ', bienvenido a Chef Chef Harfer",' +
-    '"html":"<html><body style=font-family:Arial,background:#f4f1ec,padding:20px><div style=max-width:500px,margin:0 auto,background:#fff,border-radius:12px,overflow:hidden><div style=background:#067c49,padding:28px,text-align:center><h1 style=color:#fff,margin:0>Chef Chef Harfer<\/h1><p style=color:rgba(255,255,255,0.8),font-size:11px>MEAL KITS A DOMICILIO<\/p><\/div><div style=padding:32px><h2 style=color:#111>Hola ' + nombre + '!<\/h2><p style=color:#555,line-height:1.7>Ya puedes hacer tus pedidos de meal kits. Ingredientes frescos, recetas listas, entregados en Tepatitlan.<\/p><p style=color:#555,font-size:13px>Entregamos martes, jueves y sabado.<\/p><div style=text-align:center,margin-top:24px><a href=https:\/\/chefchefharfer.mx style=background:#067c49,color:#fff,padding:12px 28px,border-radius:8px,text-decoration:none,font-weight:700>Ver el menu<\/a><\/div><\/div><\/div><\/body><\/html>"} ' +
-    'Report the response status and id.';
-
-  try {
-    var r = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 300,
-        tools: [{ type: 'web_search_20250305', name: 'web_search' }],
-        messages: [{ role: 'user', content: emailPrompt }]
-      })
-    });
-    var d = await r.json();
-    console.log('Email proxy result:', JSON.stringify(d).substring(0, 300));
-  } catch(e) {
-    console.warn('Email error:', e.message);
-  }
-}
-
-
-// === NOTION ===
-
-
-
-
-// === CORREO ===
-async function enviarCorreoBienvenida(user) {
-  var nombre = user.nombre.split(' ')[0];
-  // Use Anthropic API as server-side proxy to send email via Resend (bypasses CORS)
-  var prompt = 'Send a welcome email using the Resend API. ' +
-    'Make a POST request to https://api.resend.com/emails with these exact parameters: ' +
-    'Authorization header: Bearer re_d7qfs2N9_H4xsdhQRTYDVXLkeQHQX56he, ' +
-    'from: Chef Chef Harfer <hola@mail.chefchefharfer.mx>, ' +
-    'to: ' + user.email + ', ' +
-    'subject: Hola ' + nombre + ' ya eres parte de Chef Chef Harfer, ' +
-    'html: <html><body style="font-family:Arial;background:#f4f1ec;padding:40px"><div style="max-width:540px;margin:0 auto;background:#fff;border-radius:16px;overflow:hidden"><div style="background:#067c49;padding:32px 40px;text-align:center"><h1 style="color:#fff;font-size:22px;margin:0">Chef Chef Harfer</h1><p style="color:rgba(255,255,255,0.7);font-size:11px;letter-spacing:2px;margin:4px 0 0">MEAL KITS A DOMICILIO</p></div><div style="padding:36px 40px"><h2 style="color:#111;font-size:20px">Hola ' + nombre + '!</h2><p style="color:#555;line-height:1.7">Ya puedes hacer tus pedidos de meal kits. Ingredientes frescos, recetas listas, entregados a tu puerta en Tepatitlan.</p><div style="background:#eaf6f0;border-left:3px solid #067c49;border-radius:8px;padding:16px 20px;margin:20px 0"><p style="color:#067c49;font-weight:700;margin:0 0 6px">Como funciona</p><p style="color:#333;font-size:13px;line-height:1.6;margin:0">Elige tu kit en la app y envianos tu solicitud por WhatsApp. Te mandamos el link de pago seguro.</p></div><p style="color:#555;font-size:13px">Entregamos martes jueves y sabado. Pedidos cierran a las 12pm del dia previo.</p><div style="text-align:center;margin-top:24px"><a href="https://chefchefharfer.mx" style="background:#067c49;color:#fff;padding:13px 30px;border-radius:8px;text-decoration:none;font-weight:700">Ver el menu</a></div></div><div style="padding:20px 40px;text-align:center;border-top:1px solid #eee"><p style="color:#aaa;font-size:11px;margin:0">Chef Chef Harfer - Tepatitlan de Morelos Jalisco</p></div></div></body></html>. ' +
-    'Return the response from Resend API.';
-  try {
-    var res = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 500,
-        messages: [{ role: 'user', content: prompt }]
-      })
-    });
-    var data = await res.json();
-    console.log('Email via proxy:', JSON.stringify(data).substring(0, 200));
-  } catch(e) {
-    console.warn('Email proxy error:', e.message);
-  }
-}
-
 
 // === NOTION ===
 async function guardarClienteNotion(user) {
@@ -3384,7 +3114,13 @@ function guardarDirPanel() {
 
 // === IMAGEN ===
 function getImgSrc(id) {
-  try { return localStorage.getItem('cch_img_' + id) || ''; } catch(e) { return ''; }
+  // Try localStorage first (uploaded locally), then fall back to GitHub URL
+  try {
+    var local = localStorage.getItem('cch_img_' + id);
+    if (local) return local;
+  } catch(e) {}
+  var platillo = MENU.find(function(p) { return p.id === id; });
+  return platillo ? platillo.img : '';
 }
 function subirImgPlatillo(id, e) {
   var file = e.target.files[0];
@@ -3791,7 +3527,7 @@ async function abrirWhatsApp() {
   try { await guardarPedidoNotion(u, items, total, orderId, diaSeleccionado, direccion); } catch(e) { console.warn('Notion:', e.message); }
   hideLoading();
 
-  var msg = 'Hola! Quiero hacer un pedido.\n\n';
+  var msg = 'Hola! Quiero hacer un pedido de Chef Chef Harfer.\n\n';
   msg += 'Pedido #' + orderId + '\n';
   msg += 'Nombre: ' + u.nombre + '\n';
   msg += 'Tel: ' + u.phone + '\n';
