@@ -3539,12 +3539,12 @@ async function abrirWhatsApp() {
   try { await guardarPedidoNotion(u, items, total, orderId, diaSeleccionado, direccion); } catch(e) { console.warn('Notion:', e.message); }
   hideLoading();
 
-  var msg = 'Hola! Quiero hacer un pedido de Chef Chef Harfer.\n\n';
-  msg += 'Pedido #' + orderId + '\n';
-  msg += 'Nombre: ' + u.nombre + '\n';
-  msg += 'Tel: ' + u.phone + '\n';
-  msg += 'Entrega: ' + diaSeleccionado + ' - ' + turnoLabel + '\n';
-  if (direccion) msg += 'Direccion: ' + direccion + '\n';
+  var msg = 'Hola! Quiero hacer un pedido.\n\n';
+  msg += '*Pedido: #*' + orderId + '\n';
+  msg += '*Nombre:* ' + u.nombre + '\n';
+  msg += '*Tel:* ' + u.phone + '\n';
+  msg += '*Entrega:* ' + diaSeleccionado + ' - ' + turnoLabel + '\n';
+  if (direccion) msg += '*Direccion:* ' + direccion + '\n';
   msg += '\nPlatillos:\n';
   items.forEach(function(i) {
     var precio = i.porciones === 4 ? i.platillo.precio2p * 2 : i.platillo.precio2p;
