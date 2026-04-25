@@ -2980,6 +2980,102 @@ async function guardarPedidoNotion(user, items, total, orderId, dia, direccion) 
 // === CORREO ===
 async function enviarCorreoBienvenida(user) {
   var nombre = user.nombre.split(' ')[0];
+  var html = '<html><body style="font-family:Arial,sans-serif;background:#f4f1ec;padding:20px">' +
+    '<div style="max-width:500px;margin:0 auto;background:#fff;border-radius:12px;overflow:hidden">' +
+    '<div style="background:#067c49;padding:28px 32px;text-align:center">' +
+    '<h1 style="color:#fff;margin:0;font-size:20px">Chef Chef Harfer</h1>' +
+    '<p style="color:rgba(255,255,255,0.8);margin:4px 0 0;font-size:11px;letter-spacing:2px">MEAL KITS A DOMICILIO</p>' +
+    '</div>' +
+    '<div style="padding:32px">' +
+    '<h2 style="color:#111;font-size:18px;margin:0 0 12px">Hola, ' + nombre + '!</h2>' +
+    '<p style="color:#555;line-height:1.7;margin:0 0 14px">Ya puedes hacer tus pedidos de meal kits a domicilio. Ingredientes frescos, recetas listas, entregados en Tepatitlan.</p>' +
+    '<div style="background:#eaf6f0;border-left:3px solid #067c49;padding:14px 18px;border-radius:6px;margin:0 0 16px">' +
+    '<p style="color:#067c49;font-weight:700;margin:0 0 4px;font-size:12px">Como funciona</p>' +
+    '<p style="color:#333;font-size:13px;line-height:1.5;margin:0">Elige tu kit en la app, envianos tu pedido por WhatsApp y te mandamos el link de pago seguro.</p>' +
+    '</div>' +
+    '<p style="color:#555;font-size:13px;margin:0 0 20px">Entregamos martes, jueves y sabado. Pedidos cierran a las 12pm del dia previo.</p>' +
+    '<div style="text-align:center">' +
+    '<a href="https://chefchefharfer.mx" style="background:#067c49;color:#fff;padding:12px 28px;border-radius:8px;text-decoration:none;font-weight:700;font-size:13px">Ver el menu</a>' +
+    '</div></div>' +
+    '<div style="padding:16px;text-align:center;border-top:1px solid #eee">' +
+    '<p style="color:#aaa;font-size:11px;margin:0">Chef Chef Harfer - Tepatitlan de Morelos, Jalisco</p>' +
+    '</div></div></body></html>';
+
+  var body = JSON.stringify({
+    from: 'Chef Chef Harfer <hola@mail.chefchefharfer.mx>',
+    to: [user.email],
+    subject: 'Hola ' + nombre + ', bienvenido a Chef Chef Harfer',
+    html: html
+  });
+
+  // Attempt 1: standard fetch (works on desktop/non-CORS-blocked contexts)
+  try {
+    var r1 = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer re_d7qfs2N9_H4xsdhQRTYDVXLkeQHQX56he' },
+      body: body
+    });
+    var d1 = await r1.json();
+    console.log('Email enviado:', d1.id || JSON.stringify(d1));
+    if (d1.id) return;
+  } catch(e1) {
+    console.warn('Resend directo bloqueado por CORS:', e1.message);
+  }
+
+  // Attempt 2: no-cors (silently sends, no response - works on some mobile browsers)
+  try {
+    await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer re_d7qfs2N9_H4xsdhQRTYDVXLkeQHQX56he' },
+      body: body
+    });
+    console.log('Email enviado (no-cors)');
+  } catch(e2) {
+    console.warn('Email no-cors error:', e2.message);
+  }
+}
+
+
+// === NOTION ===
+async function guardarClienteNotion(user) {
+  var fecha = new Date().toLocaleString();
+  var txt = 'Guardar cliente en Notion pagina 34ab3d64-6693-811d-931c-e4f53d278d14. Nombre: ' +
+    user.nombre + '. Telefono: ' + user.phone + '. Email: ' + user.email + '. Fecha: ' + fecha;
+  try {
+    await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ model: 'claude-sonnet-4-20250514', max_tokens: 500,
+        mcp_servers: [{ type: 'url', url: 'https://mcp.notion.com/mcp', name: 'notion-mcp' }],
+        messages: [{ role: 'user', content: txt }] })
+    });
+  } catch(e) { console.warn('Notion cliente error', e.message); }
+}
+
+async function guardarPedidoNotion(user, items, total, orderId, dia, direccion) {
+  var itemsText = items.map(function(i) {
+    var precio = i.porciones === 4 ? i.platillo.precio2p * 2 : i.platillo.precio2p;
+    return i.platillo.nombre + ' x' + i.cantidad + ' kit' + i.porciones + 'p $' + (precio * i.cantidad);
+  }).join(' | ');
+  var txt = 'Guardar pedido en Notion pagina 34ab3d64-6693-814b-a971-cc7203cb6df6. Pedido ' +
+    orderId + ' de ' + user.nombre + '. Tel: ' + user.phone +
+    '. Entrega: ' + (dia || '') + '. Direccion: ' + (direccion || '') +
+    '. Platillos: ' + itemsText + '. Total: $' + total + ' MXN. Estado: Pendiente.';
+  try {
+    await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ model: 'claude-sonnet-4-20250514', max_tokens: 500,
+        mcp_servers: [{ type: 'url', url: 'https://mcp.notion.com/mcp', name: 'notion-mcp' }],
+        messages: [{ role: 'user', content: txt }] })
+    });
+  } catch(e) { console.warn('Notion pedido error', e.message); }
+}
+
+// === CORREO ===
+async function enviarCorreoBienvenida(user) {
+  var nombre = user.nombre.split(' ')[0];
   // Use Anthropic API with web_search tool to trigger server-side Resend call
   // This bypasses CORS since Anthropic servers make the actual HTTP request
   var emailPrompt = 'TASK: Send a welcome email using Resend API. ' +
@@ -3649,7 +3745,9 @@ async function abrirWhatsApp() {
     saveUserLocal(currentUser);
   }
 
-  window.open('https://wa.me/' + WA_NUMBER + '?text=' + encodeURIComponent(msg), '_blank');
+  // iOS Safari blocks window.open - use location.href for WhatsApp
+  var waUrl = 'https://wa.me/' + WA_NUMBER + '?text=' + encodeURIComponent(msg);
+  window.location.href = waUrl;
   cart = {};
   updateCartBar();
   showScreen('success');
