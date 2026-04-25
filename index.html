@@ -2942,40 +2942,7 @@ async function handleRegister() {
 }
 
 // === NOTION ===
-async function guardarClienteNotion(user) {
-  var fecha = new Date().toLocaleString('es-MX');
-  var pageTitle = user.nombre + ' - ' + user.phone;
-  var pageContent = '## Datos personales\n' +
-    '- Nombre: ' + user.nombre + '\n' +
-    '- Telefono: ' + user.phone + '\n' +
-    '- Email: ' + (user.email || '') + '\n' +
-    '- Fecha de registro: ' + fecha + '\n\n' +
-    '## Preferencias\n' +
-    '- Dia preferido: Sin definir\n' +
-    '- Turno: Sin definir\n' +
-    '- Direccion: Sin definir\n\n' +
-    '## Historial\n' +
-    '- Total de pedidos: 0';
 
-  var txt = 'Create a new Notion page under parent page 34ab3d64-6693-811d-931c-e4f53d278d14. ' +
-    'Title: "' + pageTitle + '". ' +
-    'Content: ' + pageContent;
-
-  try {
-    var res = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 800,
-        mcp_servers: [{ type: 'url', url: 'https://mcp.notion.com/mcp', name: 'notion-mcp' }],
-        messages: [{ role: 'user', content: txt }]
-      })
-    });
-    var data = await res.json();
-    console.log('Notion cliente guardado:', data.content ? data.content[0].text.substring(0,100) : 'ok');
-  } catch(e) { console.warn('Notion cliente error', e.message); }
-}
 // === CORREO ===
 async function enviarCorreoBienvenida(user) {
   var nombre = user.nombre.split(' ')[0];
@@ -3037,64 +3004,144 @@ async function enviarCorreoBienvenida(user) {
 
 
 // === NOTION ===
-async function guardarClienteNotion(user) {
-  var fecha = new Date().toLocaleString();
-  var txt = 'Guardar cliente en Notion pagina 34ab3d64-6693-811d-931c-e4f53d278d14. Nombre: ' +
-    user.nombre + '. Telefono: ' + user.phone + '. Email: ' + user.email + '. Fecha: ' + fecha;
+
+
+
+
+
+
+
+// === CORREO ===
+async function enviarCorreoBienvenida(user) {
+  var nombre = user.nombre.split(' ')[0];
+  var html = '<html><body style="font-family:Arial,sans-serif;background:#f4f1ec;padding:20px">' +
+    '<div style="max-width:500px;margin:0 auto;background:#fff;border-radius:12px;overflow:hidden">' +
+    '<div style="background:#067c49;padding:28px 32px;text-align:center">' +
+    '<h1 style="color:#fff;margin:0;font-size:20px">Chef Chef Harfer</h1>' +
+    '<p style="color:rgba(255,255,255,0.8);margin:4px 0 0;font-size:11px;letter-spacing:2px">MEAL KITS A DOMICILIO</p>' +
+    '</div>' +
+    '<div style="padding:32px">' +
+    '<h2 style="color:#111;font-size:18px;margin:0 0 12px">Hola, ' + nombre + '!</h2>' +
+    '<p style="color:#555;line-height:1.7;margin:0 0 14px">Ya puedes hacer tus pedidos de meal kits a domicilio. Ingredientes frescos, recetas listas, entregados en Tepatitlan.</p>' +
+    '<div style="background:#eaf6f0;border-left:3px solid #067c49;padding:14px 18px;border-radius:6px;margin:0 0 16px">' +
+    '<p style="color:#067c49;font-weight:700;margin:0 0 4px;font-size:12px">Como funciona</p>' +
+    '<p style="color:#333;font-size:13px;line-height:1.5;margin:0">Elige tu kit en la app, envianos tu pedido por WhatsApp y te mandamos el link de pago seguro.</p>' +
+    '</div>' +
+    '<p style="color:#555;font-size:13px;margin:0 0 20px">Entregamos martes, jueves y sabado. Pedidos cierran a las 12pm del dia previo.</p>' +
+    '<div style="text-align:center">' +
+    '<a href="https://chefchefharfer.mx" style="background:#067c49;color:#fff;padding:12px 28px;border-radius:8px;text-decoration:none;font-weight:700;font-size:13px">Ver el menu</a>' +
+    '</div></div>' +
+    '<div style="padding:16px;text-align:center;border-top:1px solid #eee">' +
+    '<p style="color:#aaa;font-size:11px;margin:0">Chef Chef Harfer - Tepatitlan de Morelos, Jalisco</p>' +
+    '</div></div></body></html>';
+
+  var body = JSON.stringify({
+    from: 'Chef Chef Harfer <hola@mail.chefchefharfer.mx>',
+    to: [user.email],
+    subject: 'Hola ' + nombre + ', bienvenido a Chef Chef Harfer',
+    html: html
+  });
+
+  // Attempt 1: standard fetch (works on desktop/non-CORS-blocked contexts)
   try {
-    await fetch('https://api.anthropic.com/v1/messages', {
+    var r1 = await fetch('https://api.resend.com/emails', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ model: 'claude-sonnet-4-20250514', max_tokens: 500,
-        mcp_servers: [{ type: 'url', url: 'https://mcp.notion.com/mcp', name: 'notion-mcp' }],
-        messages: [{ role: 'user', content: txt }] })
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer re_d7qfs2N9_H4xsdhQRTYDVXLkeQHQX56he' },
+      body: body
     });
-  } catch(e) { console.warn('Notion cliente error', e.message); }
+    var d1 = await r1.json();
+    console.log('Email enviado:', d1.id || JSON.stringify(d1));
+    if (d1.id) return;
+  } catch(e1) {
+    console.warn('Resend directo bloqueado por CORS:', e1.message);
+  }
+
+  // Attempt 2: no-cors (silently sends, no response - works on some mobile browsers)
+  try {
+    await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer re_d7qfs2N9_H4xsdhQRTYDVXLkeQHQX56he' },
+      body: body
+    });
+    console.log('Email enviado (no-cors)');
+  } catch(e2) {
+    console.warn('Email no-cors error:', e2.message);
+  }
 }
 
-async function guardarPedidoNotion(user, items, total, orderId, dia, direccion) {
-  var turnoLabel = turnoSeleccionado === 'Manana' ? 'Manana (10am-1pm)' : 'Tarde (4pm-7pm)';
-  var itemLines = items.map(function(i) {
-    var precio = i.porciones === 4 ? i.platillo.precio2p * 2 : i.platillo.precio2p;
-    return '- ' + i.platillo.nombre + ' x' + i.cantidad + ' (Kit ' + i.porciones + 'p) = $' + (precio * i.cantidad);
-  }).join('\n');
 
-  var pageTitle = 'Pedido #' + orderId + ' - ' + user.nombre;
-  var pageContent = '## Datos del cliente\n' +
-    '- Nombre: ' + user.nombre + '\n' +
-    '- Telefono: ' + user.phone + '\n' +
-    '- Email: ' + (user.email || '') + '\n\n' +
-    '## Entrega\n' +
-    '- Dia: ' + (dia || '') + '\n' +
-    '- Turno: ' + turnoLabel + '\n' +
-    '- Direccion: ' + (direccion || 'No especificada') + '\n\n' +
-    '## Platillos\n' + itemLines + '\n\n' +
-    '## Total\n' +
-    '$' + total + ' MXN\n\n' +
-    '## Estado\n' +
-    'Pendiente de pago\n\n' +
-    '## Fecha\n' +
-    new Date().toLocaleString('es-MX');
+// === NOTION ===
 
-  var txt = 'Create a new Notion page under parent page 34ab3d64-6693-814b-a971-cc7203cb6df6. ' +
-    'Title: "' + pageTitle + '". ' +
-    'Content: ' + pageContent;
 
+
+
+
+
+// === CORREO ===
+async function enviarCorreoBienvenida(user) {
+  var nombre = user.nombre.split(' ')[0];
+  var html = '<html><body style="font-family:Arial,sans-serif;background:#f4f1ec;padding:20px">' +
+    '<div style="max-width:500px;margin:0 auto;background:#fff;border-radius:12px;overflow:hidden">' +
+    '<div style="background:#067c49;padding:28px 32px;text-align:center">' +
+    '<h1 style="color:#fff;margin:0;font-size:20px">Chef Chef Harfer</h1>' +
+    '<p style="color:rgba(255,255,255,0.8);margin:4px 0 0;font-size:11px;letter-spacing:2px">MEAL KITS A DOMICILIO</p>' +
+    '</div>' +
+    '<div style="padding:32px">' +
+    '<h2 style="color:#111;font-size:18px;margin:0 0 12px">Hola, ' + nombre + '!</h2>' +
+    '<p style="color:#555;line-height:1.7;margin:0 0 14px">Ya puedes hacer tus pedidos de meal kits a domicilio. Ingredientes frescos, recetas listas, entregados en Tepatitlan.</p>' +
+    '<div style="background:#eaf6f0;border-left:3px solid #067c49;padding:14px 18px;border-radius:6px;margin:0 0 16px">' +
+    '<p style="color:#067c49;font-weight:700;margin:0 0 4px;font-size:12px">Como funciona</p>' +
+    '<p style="color:#333;font-size:13px;line-height:1.5;margin:0">Elige tu kit en la app, envianos tu pedido por WhatsApp y te mandamos el link de pago seguro.</p>' +
+    '</div>' +
+    '<p style="color:#555;font-size:13px;margin:0 0 20px">Entregamos martes, jueves y sabado. Pedidos cierran a las 12pm del dia previo.</p>' +
+    '<div style="text-align:center">' +
+    '<a href="https://chefchefharfer.mx" style="background:#067c49;color:#fff;padding:12px 28px;border-radius:8px;text-decoration:none;font-weight:700;font-size:13px">Ver el menu</a>' +
+    '</div></div>' +
+    '<div style="padding:16px;text-align:center;border-top:1px solid #eee">' +
+    '<p style="color:#aaa;font-size:11px;margin:0">Chef Chef Harfer - Tepatitlan de Morelos, Jalisco</p>' +
+    '</div></div></body></html>';
+
+  var body = JSON.stringify({
+    from: 'Chef Chef Harfer <hola@mail.chefchefharfer.mx>',
+    to: [user.email],
+    subject: 'Hola ' + nombre + ', bienvenido a Chef Chef Harfer',
+    html: html
+  });
+
+  // Attempt 1: standard fetch (works on desktop/non-CORS-blocked contexts)
   try {
-    var res = await fetch('https://api.anthropic.com/v1/messages', {
+    var r1 = await fetch('https://api.resend.com/emails', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 800,
-        mcp_servers: [{ type: 'url', url: 'https://mcp.notion.com/mcp', name: 'notion-mcp' }],
-        messages: [{ role: 'user', content: txt }]
-      })
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer re_d7qfs2N9_H4xsdhQRTYDVXLkeQHQX56he' },
+      body: body
     });
-    var data = await res.json();
-    console.log('Notion pedido guardado:', data.content ? data.content[0].text.substring(0,100) : 'ok');
-  } catch(e) { console.warn('Notion pedido error', e.message); }
+    var d1 = await r1.json();
+    console.log('Email enviado:', d1.id || JSON.stringify(d1));
+    if (d1.id) return;
+  } catch(e1) {
+    console.warn('Resend directo bloqueado por CORS:', e1.message);
+  }
+
+  // Attempt 2: no-cors (silently sends, no response - works on some mobile browsers)
+  try {
+    await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer re_d7qfs2N9_H4xsdhQRTYDVXLkeQHQX56he' },
+      body: body
+    });
+    console.log('Email enviado (no-cors)');
+  } catch(e2) {
+    console.warn('Email no-cors error:', e2.message);
+  }
 }
+
+
+// === NOTION ===
+
+
+
 
 // === CORREO ===
 async function enviarCorreoBienvenida(user) {
@@ -3131,64 +3178,9 @@ async function enviarCorreoBienvenida(user) {
 
 
 // === NOTION ===
-async function guardarClienteNotion(user) {
-  var fecha = new Date().toLocaleString();
-  var txt = 'Guardar cliente en Notion pagina 34ab3d64-6693-811d-931c-e4f53d278d14. Nombre: ' +
-    user.nombre + '. Telefono: ' + user.phone + '. Email: ' + user.email + '. Fecha: ' + fecha;
-  try {
-    await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ model: 'claude-sonnet-4-20250514', max_tokens: 500,
-        mcp_servers: [{ type: 'url', url: 'https://mcp.notion.com/mcp', name: 'notion-mcp' }],
-        messages: [{ role: 'user', content: txt }] })
-    });
-  } catch(e) { console.warn('Notion cliente error', e.message); }
-}
 
-async function guardarPedidoNotion(user, items, total, orderId, dia, direccion) {
-  var turnoLabel = turnoSeleccionado === 'Manana' ? 'Manana (10am-1pm)' : 'Tarde (4pm-7pm)';
-  var itemLines = items.map(function(i) {
-    var precio = i.porciones === 4 ? i.platillo.precio2p * 2 : i.platillo.precio2p;
-    return '- ' + i.platillo.nombre + ' x' + i.cantidad + ' (Kit ' + i.porciones + 'p) = $' + (precio * i.cantidad);
-  }).join('\n');
 
-  var pageTitle = 'Pedido #' + orderId + ' - ' + user.nombre;
-  var pageContent = '## Datos del cliente\n' +
-    '- Nombre: ' + user.nombre + '\n' +
-    '- Telefono: ' + user.phone + '\n' +
-    '- Email: ' + (user.email || '') + '\n\n' +
-    '## Entrega\n' +
-    '- Dia: ' + (dia || '') + '\n' +
-    '- Turno: ' + turnoLabel + '\n' +
-    '- Direccion: ' + (direccion || 'No especificada') + '\n\n' +
-    '## Platillos\n' + itemLines + '\n\n' +
-    '## Total\n' +
-    '$' + total + ' MXN\n\n' +
-    '## Estado\n' +
-    'Pendiente de pago\n\n' +
-    '## Fecha\n' +
-    new Date().toLocaleString('es-MX');
 
-  var txt = 'Create a new Notion page under parent page 34ab3d64-6693-814b-a971-cc7203cb6df6. ' +
-    'Title: "' + pageTitle + '". ' +
-    'Content: ' + pageContent;
-
-  try {
-    var res = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 800,
-        mcp_servers: [{ type: 'url', url: 'https://mcp.notion.com/mcp', name: 'notion-mcp' }],
-        messages: [{ role: 'user', content: txt }]
-      })
-    });
-    var data = await res.json();
-    console.log('Notion pedido guardado:', data.content ? data.content[0].text.substring(0,100) : 'ok');
-  } catch(e) { console.warn('Notion pedido error', e.message); }
-}
 
 // === CORREO ===
 async function enviarCorreoBienvenida(user) {
@@ -3222,62 +3214,60 @@ async function enviarCorreoBienvenida(user) {
 
 // === NOTION ===
 async function guardarClienteNotion(user) {
-  var fecha = new Date().toLocaleString();
-  var txt = 'Guardar cliente en Notion pagina 34ab3d64-6693-811d-931c-e4f53d278d14. Nombre: ' +
-    user.nombre + '. Telefono: ' + user.phone + '. Email: ' + user.email + '. Fecha: ' + fecha;
   try {
-    await fetch('https://api.anthropic.com/v1/messages', {
+    var res = await fetch('https://api.notion.com/v1/pages', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ model: 'claude-sonnet-4-20250514', max_tokens: 500,
-        mcp_servers: [{ type: 'url', url: 'https://mcp.notion.com/mcp', name: 'notion-mcp' }],
-        messages: [{ role: 'user', content: txt }] })
+      headers: {
+        'Authorization': 'Bearer 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',
+        'Content-Type': 'application/json',
+        'Notion-Version': '2022-06-28'
+      },
+      body: JSON.stringify({
+        parent: { page_id: '34ab3d64-6693-811d-931c-e4f53d278d14' },
+        properties: { title: [{ text: { content: user.nombre + ' - ' + user.phone } }] },
+        children: [
+          {object:'block',type:'bulleted_list_item',bulleted_list_item:{rich_text:[{type:'text',text:{content:'Nombre: ' + user.nombre}}]}},
+          {object:'block',type:'bulleted_list_item',bulleted_list_item:{rich_text:[{type:'text',text:{content:'Telefono: ' + user.phone}}]}},
+          {object:'block',type:'bulleted_list_item',bulleted_list_item:{rich_text:[{type:'text',text:{content:'Email: ' + (user.email||'')}}]}},
+          {object:'block',type:'bulleted_list_item',bulleted_list_item:{rich_text:[{type:'text',text:{content:'Registro: ' + new Date().toLocaleString('es-MX')}}]}}
+        ]
+      })
     });
-  } catch(e) { console.warn('Notion cliente error', e.message); }
+    var d = await res.json();
+    console.log('Notion cliente OK:', d.id);
+  } catch(e) { console.warn('Notion cliente error:', e.message); }
 }
 
 async function guardarPedidoNotion(user, items, total, orderId, dia, direccion) {
   var turnoLabel = turnoSeleccionado === 'Manana' ? 'Manana (10am-1pm)' : 'Tarde (4pm-7pm)';
-  var itemLines = items.map(function(i) {
+  var itemsText = items.map(function(i) {
     var precio = i.porciones === 4 ? i.platillo.precio2p * 2 : i.platillo.precio2p;
-    return '- ' + i.platillo.nombre + ' x' + i.cantidad + ' (Kit ' + i.porciones + 'p) = $' + (precio * i.cantidad);
-  }).join('\n');
-
-  var pageTitle = 'Pedido #' + orderId + ' - ' + user.nombre;
-  var pageContent = '## Datos del cliente\n' +
-    '- Nombre: ' + user.nombre + '\n' +
-    '- Telefono: ' + user.phone + '\n' +
-    '- Email: ' + (user.email || '') + '\n\n' +
-    '## Entrega\n' +
-    '- Dia: ' + (dia || '') + '\n' +
-    '- Turno: ' + turnoLabel + '\n' +
-    '- Direccion: ' + (direccion || 'No especificada') + '\n\n' +
-    '## Platillos\n' + itemLines + '\n\n' +
-    '## Total\n' +
-    '$' + total + ' MXN\n\n' +
-    '## Estado\n' +
-    'Pendiente de pago\n\n' +
-    '## Fecha\n' +
-    new Date().toLocaleString('es-MX');
-
-  var txt = 'Create a new Notion page under parent page 34ab3d64-6693-814b-a971-cc7203cb6df6. ' +
-    'Title: "' + pageTitle + '". ' +
-    'Content: ' + pageContent;
-
+    return i.platillo.nombre + ' x' + i.cantidad + ' (Kit ' + i.porciones + 'p) $' + (precio * i.cantidad);
+  }).join(', ');
   try {
-    var res = await fetch('https://api.anthropic.com/v1/messages', {
+    var res = await fetch('https://api.notion.com/v1/pages', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Authorization': 'Bearer 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',
+        'Content-Type': 'application/json',
+        'Notion-Version': '2022-06-28'
+      },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 800,
-        mcp_servers: [{ type: 'url', url: 'https://mcp.notion.com/mcp', name: 'notion-mcp' }],
-        messages: [{ role: 'user', content: txt }]
+        parent: { page_id: '34ab3d64-6693-814b-a971-cc7203cb6df6' },
+        properties: { title: [{ text: { content: 'Pedido #' + orderId + ' - ' + user.nombre } }] },
+        children: [
+          {object:'block',type:'bulleted_list_item',bulleted_list_item:{rich_text:[{type:'text',text:{content:'Cliente: ' + user.nombre + ' | Tel: ' + user.phone}}]}},
+          {object:'block',type:'bulleted_list_item',bulleted_list_item:{rich_text:[{type:'text',text:{content:'Entrega: ' + (dia||'') + ' - ' + turnoLabel}}]}},
+          {object:'block',type:'bulleted_list_item',bulleted_list_item:{rich_text:[{type:'text',text:{content:'Direccion: ' + (direccion||'Sin especificar')}}]}},
+          {object:'block',type:'bulleted_list_item',bulleted_list_item:{rich_text:[{type:'text',text:{content:'Platillos: ' + itemsText}}]}},
+          {object:'block',type:'bulleted_list_item',bulleted_list_item:{rich_text:[{type:'text',text:{content:'Total: $' + total + ' MXN | Estado: Pendiente'}}]}},
+          {object:'block',type:'bulleted_list_item',bulleted_list_item:{rich_text:[{type:'text',text:{content:'Fecha: ' + new Date().toLocaleString('es-MX')}}]}}
+        ]
       })
     });
-    var data = await res.json();
-    console.log('Notion pedido guardado:', data.content ? data.content[0].text.substring(0,100) : 'ok');
-  } catch(e) { console.warn('Notion pedido error', e.message); }
+    var d = await res.json();
+    console.log('Notion pedido OK:', d.id);
+  } catch(e) { console.warn('Notion pedido error:', e.message); }
 }
 
 // === CORREO ===
