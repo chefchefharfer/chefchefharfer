@@ -2943,40 +2943,39 @@ async function handleRegister() {
 
 // === NOTION ===
 async function guardarClienteNotion(user) {
-  var fecha = new Date().toLocaleString();
-  var txt = 'Guardar cliente en Notion pagina 34ab3d64-6693-811d-931c-e4f53d278d14. Nombre: ' +
-    user.nombre + '. Telefono: ' + user.phone + '. Email: ' + user.email + '. Fecha: ' + fecha;
+  var fecha = new Date().toLocaleString('es-MX');
+  var pageTitle = user.nombre + ' - ' + user.phone;
+  var pageContent = '## Datos personales\n' +
+    '- Nombre: ' + user.nombre + '\n' +
+    '- Telefono: ' + user.phone + '\n' +
+    '- Email: ' + (user.email || '') + '\n' +
+    '- Fecha de registro: ' + fecha + '\n\n' +
+    '## Preferencias\n' +
+    '- Dia preferido: Sin definir\n' +
+    '- Turno: Sin definir\n' +
+    '- Direccion: Sin definir\n\n' +
+    '## Historial\n' +
+    '- Total de pedidos: 0';
+
+  var txt = 'Create a new Notion page under parent page 34ab3d64-6693-811d-931c-e4f53d278d14. ' +
+    'Title: "' + pageTitle + '". ' +
+    'Content: ' + pageContent;
+
   try {
-    await fetch('https://api.anthropic.com/v1/messages', {
+    var res = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ model: 'claude-sonnet-4-20250514', max_tokens: 500,
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 800,
         mcp_servers: [{ type: 'url', url: 'https://mcp.notion.com/mcp', name: 'notion-mcp' }],
-        messages: [{ role: 'user', content: txt }] })
+        messages: [{ role: 'user', content: txt }]
+      })
     });
+    var data = await res.json();
+    console.log('Notion cliente guardado:', data.content ? data.content[0].text.substring(0,100) : 'ok');
   } catch(e) { console.warn('Notion cliente error', e.message); }
 }
-
-async function guardarPedidoNotion(user, items, total, orderId, dia, direccion) {
-  var itemsText = items.map(function(i) {
-    var precio = i.porciones === 4 ? i.platillo.precio2p * 2 : i.platillo.precio2p;
-    return i.platillo.nombre + ' x' + i.cantidad + ' kit' + i.porciones + 'p $' + (precio * i.cantidad);
-  }).join(' | ');
-  var txt = 'Guardar pedido en Notion pagina 34ab3d64-6693-814b-a971-cc7203cb6df6. Pedido ' +
-    orderId + ' de ' + user.nombre + '. Tel: ' + user.phone +
-    '. Entrega: ' + (dia || '') + '. Direccion: ' + (direccion || '') +
-    '. Platillos: ' + itemsText + '. Total: $' + total + ' MXN. Estado: Pendiente.';
-  try {
-    await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ model: 'claude-sonnet-4-20250514', max_tokens: 500,
-        mcp_servers: [{ type: 'url', url: 'https://mcp.notion.com/mcp', name: 'notion-mcp' }],
-        messages: [{ role: 'user', content: txt }] })
-    });
-  } catch(e) { console.warn('Notion pedido error', e.message); }
-}
-
 // === CORREO ===
 async function enviarCorreoBienvenida(user) {
   var nombre = user.nombre.split(' ')[0];
@@ -3054,22 +3053,46 @@ async function guardarClienteNotion(user) {
 }
 
 async function guardarPedidoNotion(user, items, total, orderId, dia, direccion) {
-  var itemsText = items.map(function(i) {
+  var turnoLabel = turnoSeleccionado === 'Manana' ? 'Manana (10am-1pm)' : 'Tarde (4pm-7pm)';
+  var itemLines = items.map(function(i) {
     var precio = i.porciones === 4 ? i.platillo.precio2p * 2 : i.platillo.precio2p;
-    return i.platillo.nombre + ' x' + i.cantidad + ' kit' + i.porciones + 'p $' + (precio * i.cantidad);
-  }).join(' | ');
-  var txt = 'Guardar pedido en Notion pagina 34ab3d64-6693-814b-a971-cc7203cb6df6. Pedido ' +
-    orderId + ' de ' + user.nombre + '. Tel: ' + user.phone +
-    '. Entrega: ' + (dia || '') + '. Direccion: ' + (direccion || '') +
-    '. Platillos: ' + itemsText + '. Total: $' + total + ' MXN. Estado: Pendiente.';
+    return '- ' + i.platillo.nombre + ' x' + i.cantidad + ' (Kit ' + i.porciones + 'p) = $' + (precio * i.cantidad);
+  }).join('\n');
+
+  var pageTitle = 'Pedido #' + orderId + ' - ' + user.nombre;
+  var pageContent = '## Datos del cliente\n' +
+    '- Nombre: ' + user.nombre + '\n' +
+    '- Telefono: ' + user.phone + '\n' +
+    '- Email: ' + (user.email || '') + '\n\n' +
+    '## Entrega\n' +
+    '- Dia: ' + (dia || '') + '\n' +
+    '- Turno: ' + turnoLabel + '\n' +
+    '- Direccion: ' + (direccion || 'No especificada') + '\n\n' +
+    '## Platillos\n' + itemLines + '\n\n' +
+    '## Total\n' +
+    '$' + total + ' MXN\n\n' +
+    '## Estado\n' +
+    'Pendiente de pago\n\n' +
+    '## Fecha\n' +
+    new Date().toLocaleString('es-MX');
+
+  var txt = 'Create a new Notion page under parent page 34ab3d64-6693-814b-a971-cc7203cb6df6. ' +
+    'Title: "' + pageTitle + '". ' +
+    'Content: ' + pageContent;
+
   try {
-    await fetch('https://api.anthropic.com/v1/messages', {
+    var res = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ model: 'claude-sonnet-4-20250514', max_tokens: 500,
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 800,
         mcp_servers: [{ type: 'url', url: 'https://mcp.notion.com/mcp', name: 'notion-mcp' }],
-        messages: [{ role: 'user', content: txt }] })
+        messages: [{ role: 'user', content: txt }]
+      })
     });
+    var data = await res.json();
+    console.log('Notion pedido guardado:', data.content ? data.content[0].text.substring(0,100) : 'ok');
   } catch(e) { console.warn('Notion pedido error', e.message); }
 }
 
@@ -3124,22 +3147,46 @@ async function guardarClienteNotion(user) {
 }
 
 async function guardarPedidoNotion(user, items, total, orderId, dia, direccion) {
-  var itemsText = items.map(function(i) {
+  var turnoLabel = turnoSeleccionado === 'Manana' ? 'Manana (10am-1pm)' : 'Tarde (4pm-7pm)';
+  var itemLines = items.map(function(i) {
     var precio = i.porciones === 4 ? i.platillo.precio2p * 2 : i.platillo.precio2p;
-    return i.platillo.nombre + ' x' + i.cantidad + ' kit' + i.porciones + 'p $' + (precio * i.cantidad);
-  }).join(' | ');
-  var txt = 'Guardar pedido en Notion pagina 34ab3d64-6693-814b-a971-cc7203cb6df6. Pedido ' +
-    orderId + ' de ' + user.nombre + '. Tel: ' + user.phone +
-    '. Entrega: ' + (dia || '') + '. Direccion: ' + (direccion || '') +
-    '. Platillos: ' + itemsText + '. Total: $' + total + ' MXN. Estado: Pendiente.';
+    return '- ' + i.platillo.nombre + ' x' + i.cantidad + ' (Kit ' + i.porciones + 'p) = $' + (precio * i.cantidad);
+  }).join('\n');
+
+  var pageTitle = 'Pedido #' + orderId + ' - ' + user.nombre;
+  var pageContent = '## Datos del cliente\n' +
+    '- Nombre: ' + user.nombre + '\n' +
+    '- Telefono: ' + user.phone + '\n' +
+    '- Email: ' + (user.email || '') + '\n\n' +
+    '## Entrega\n' +
+    '- Dia: ' + (dia || '') + '\n' +
+    '- Turno: ' + turnoLabel + '\n' +
+    '- Direccion: ' + (direccion || 'No especificada') + '\n\n' +
+    '## Platillos\n' + itemLines + '\n\n' +
+    '## Total\n' +
+    '$' + total + ' MXN\n\n' +
+    '## Estado\n' +
+    'Pendiente de pago\n\n' +
+    '## Fecha\n' +
+    new Date().toLocaleString('es-MX');
+
+  var txt = 'Create a new Notion page under parent page 34ab3d64-6693-814b-a971-cc7203cb6df6. ' +
+    'Title: "' + pageTitle + '". ' +
+    'Content: ' + pageContent;
+
   try {
-    await fetch('https://api.anthropic.com/v1/messages', {
+    var res = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ model: 'claude-sonnet-4-20250514', max_tokens: 500,
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 800,
         mcp_servers: [{ type: 'url', url: 'https://mcp.notion.com/mcp', name: 'notion-mcp' }],
-        messages: [{ role: 'user', content: txt }] })
+        messages: [{ role: 'user', content: txt }]
+      })
     });
+    var data = await res.json();
+    console.log('Notion pedido guardado:', data.content ? data.content[0].text.substring(0,100) : 'ok');
   } catch(e) { console.warn('Notion pedido error', e.message); }
 }
 
@@ -3190,22 +3237,46 @@ async function guardarClienteNotion(user) {
 }
 
 async function guardarPedidoNotion(user, items, total, orderId, dia, direccion) {
-  var itemsText = items.map(function(i) {
+  var turnoLabel = turnoSeleccionado === 'Manana' ? 'Manana (10am-1pm)' : 'Tarde (4pm-7pm)';
+  var itemLines = items.map(function(i) {
     var precio = i.porciones === 4 ? i.platillo.precio2p * 2 : i.platillo.precio2p;
-    return i.platillo.nombre + ' x' + i.cantidad + ' kit' + i.porciones + 'p $' + (precio * i.cantidad);
-  }).join(' | ');
-  var txt = 'Guardar pedido en Notion pagina 34ab3d64-6693-814b-a971-cc7203cb6df6. Pedido ' +
-    orderId + ' de ' + user.nombre + '. Tel: ' + user.phone +
-    '. Entrega: ' + (dia || '') + '. Direccion: ' + (direccion || '') +
-    '. Platillos: ' + itemsText + '. Total: $' + total + ' MXN. Estado: Pendiente.';
+    return '- ' + i.platillo.nombre + ' x' + i.cantidad + ' (Kit ' + i.porciones + 'p) = $' + (precio * i.cantidad);
+  }).join('\n');
+
+  var pageTitle = 'Pedido #' + orderId + ' - ' + user.nombre;
+  var pageContent = '## Datos del cliente\n' +
+    '- Nombre: ' + user.nombre + '\n' +
+    '- Telefono: ' + user.phone + '\n' +
+    '- Email: ' + (user.email || '') + '\n\n' +
+    '## Entrega\n' +
+    '- Dia: ' + (dia || '') + '\n' +
+    '- Turno: ' + turnoLabel + '\n' +
+    '- Direccion: ' + (direccion || 'No especificada') + '\n\n' +
+    '## Platillos\n' + itemLines + '\n\n' +
+    '## Total\n' +
+    '$' + total + ' MXN\n\n' +
+    '## Estado\n' +
+    'Pendiente de pago\n\n' +
+    '## Fecha\n' +
+    new Date().toLocaleString('es-MX');
+
+  var txt = 'Create a new Notion page under parent page 34ab3d64-6693-814b-a971-cc7203cb6df6. ' +
+    'Title: "' + pageTitle + '". ' +
+    'Content: ' + pageContent;
+
   try {
-    await fetch('https://api.anthropic.com/v1/messages', {
+    var res = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ model: 'claude-sonnet-4-20250514', max_tokens: 500,
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 800,
         mcp_servers: [{ type: 'url', url: 'https://mcp.notion.com/mcp', name: 'notion-mcp' }],
-        messages: [{ role: 'user', content: txt }] })
+        messages: [{ role: 'user', content: txt }]
+      })
     });
+    var data = await res.json();
+    console.log('Notion pedido guardado:', data.content ? data.content[0].text.substring(0,100) : 'ok');
   } catch(e) { console.warn('Notion pedido error', e.message); }
 }
 
