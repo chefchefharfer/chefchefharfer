@@ -2848,6 +2848,7 @@ var currentUser = null;
 var cart = {};
 var loginMode = 'login';
 var diaSeleccionado = null;
+var turnoSeleccionado = null;
 var dirConfirmada = false;
 var cambiandoDir = false;
 var mapaAbierto = false;
@@ -3042,6 +3043,28 @@ async function enviarCorreoBienvenida(user) {
     var data = await res.json();
     console.log('Email result:', JSON.stringify(data));
   } catch(e) { console.warn('Email error:', e.message); }
+}
+
+
+// === LOGO ===
+function cargarLogo(event) {
+  var file = event.target.files[0];
+  if (!file) return;
+  var reader = new FileReader();
+  reader.onload = function(ev) {
+    try { localStorage.setItem('cch_logo', ev.target.result); } catch(e) {}
+    aplicarLogo(ev.target.result);
+  };
+  reader.readAsDataURL(file);
+}
+
+function aplicarLogo(src) {
+  var img = document.getElementById('logo-img');
+  var placeholder = document.getElementById('logo-placeholder');
+  if (!img || !src) return;
+  img.src = src;
+  img.style.display = 'block';
+  if (placeholder) placeholder.style.display = 'none';
 }
 
 // === POST-LOGIN ===
