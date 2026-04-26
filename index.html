@@ -2589,6 +2589,120 @@ footer .social-links a:hover { color: white; }
  </div>
 </nav>
 
+<!-- PANTALLA LOGIN -->
+<div id="login-page" style="min-height:100vh;display:flex;flex-direction:column;">
+
+  <!-- HERO -->
+  <div style="background:linear-gradient(160deg,#f7f5f0 0%,#eceae3 100%);border-bottom:1px solid #e2ddd5;text-align:center;padding:48px 24px 36px;display:flex;flex-direction:column;align-items:center;gap:14px;">
+    <img src="https://chefchefharfer.github.io/chefchefharfer/Logo%20chef%20chef.png" alt="Chef Chef Harfer" style="width:200px;max-width:70vw;height:auto;object-fit:contain;">
+    <p style="font-size:15px;color:#7a7a72;line-height:1.7;margin:0;font-family:'Outfit',sans-serif;">Ingredientes frescos, recetas listas.<br>Solo cocina.</p>
+    <div style="display:inline-flex;align-items:center;gap:6px;border:1.5px solid rgba(6,124,73,0.25);border-radius:100px;padding:7px 18px;font-size:10px;font-weight:700;letter-spacing:2px;color:#067c49;background:rgba(255,255,255,0.7);">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+      TEPATITLAN DE MORELOS
+    </div>
+  </div>
+
+  <!-- FORMULARIO -->
+  <div style="flex:1;display:flex;align-items:flex-start;justify-content:center;padding:24px 16px 80px;">
+    <div style="width:100%;max-width:480px;">
+
+      <!-- Tabs -->
+      <div style="display:flex;background:#f0ede6;border-radius:12px;padding:4px;margin-bottom:20px;border:1.5px solid #e2ddd5;">
+        <div id="opt-login" onclick="selectLoginMode('login')" style="flex:1;text-align:center;padding:10px;font-size:13px;font-weight:700;border-radius:8px;cursor:pointer;background:white;color:#252523;box-shadow:0 1px 6px rgba(0,0,0,0.1);">Ya tengo cuenta</div>
+        <div id="opt-register" onclick="selectLoginMode('register')" style="flex:1;text-align:center;padding:10px;font-size:13px;font-weight:600;border-radius:8px;cursor:pointer;color:#7a7a72;">Soy nuevo</div>
+      </div>
+
+      <!-- Card -->
+      <div style="background:white;border-radius:20px;padding:28px;box-shadow:0 4px 24px rgba(0,0,0,0.08);border:1px solid rgba(0,0,0,0.06);">
+
+        <div style="font-size:11px;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;color:#7a7a72;margin-bottom:4px;" id="login-subtitle-small">Tu acceso</div>
+        <div style="font-size:20px;font-weight:800;color:#111;font-family:'Plus Jakarta Sans',sans-serif;margin-bottom:20px;letter-spacing:-0.3px;" id="login-title-main">Ingresa a tu cuenta</div>
+
+        <!-- LOGIN FORM -->
+        <div id="login-form">
+          <div style="margin-bottom:14px;">
+            <label style="display:block;font-size:11px;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;color:#7a7a72;margin-bottom:7px;">Tu numero de telefono</label>
+            <input type="tel" id="login-phone" placeholder="331 234 5678" maxlength="15" style="width:100%;background:#f7f5f0;border:1.5px solid #e2ddd5;border-radius:12px;color:#252523;font-family:'Outfit',sans-serif;font-size:15px;padding:12px 16px;outline:none;box-sizing:border-box;">
+          </div>
+          <div style="margin-bottom:20px;">
+            <label style="display:block;font-size:11px;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;color:#7a7a72;margin-bottom:7px;">Tu PIN de 4 digitos</label>
+            <input type="password" id="login-pin" placeholder="• • • •" maxlength="4" inputmode="numeric" style="width:100%;background:#f7f5f0;border:1.5px solid #e2ddd5;border-radius:12px;color:#252523;font-family:'Outfit',sans-serif;font-size:18px;padding:12px 16px;outline:none;box-sizing:border-box;letter-spacing:6px;">
+          </div>
+          <button onclick="handleLogin()" style="width:100%;background:#067c49;color:white;border:none;border-radius:12px;padding:15px;font-family:'Plus Jakarta Sans',sans-serif;font-size:15px;font-weight:700;cursor:pointer;margin-bottom:12px;">
+            Ingresar con mi telefono
+          </button>
+          <button onclick="mostrarRecuperacion()" style="width:100%;background:transparent;border:none;font-family:'Outfit',sans-serif;font-size:12px;color:#7a7a72;cursor:pointer;text-decoration:underline;padding:4px;margin-bottom:8px;">
+            Olvide mi PIN
+          </button>
+          <div style="text-align:center;font-size:14px;color:#7a7a72;padding:8px;">
+            ¿Es tu primera vez? <span onclick="selectLoginMode('register')" style="color:#067c49;font-weight:700;cursor:pointer;">Registrate.</span>
+          </div>
+        </div>
+
+        <!-- RECOVERY FORM -->
+        <div id="recovery-form" style="display:none;">
+          <div style="font-size:13px;color:#7a7a72;margin-bottom:16px;line-height:1.6;">Te enviaremos un codigo de 6 digitos por WhatsApp para verificar tu identidad.</div>
+          <div style="margin-bottom:14px;">
+            <label style="display:block;font-size:11px;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;color:#7a7a72;margin-bottom:7px;">Tu numero de telefono</label>
+            <input type="tel" id="recovery-phone" placeholder="331 234 5678" maxlength="15" style="width:100%;background:#f7f5f0;border:1.5px solid #e2ddd5;border-radius:12px;color:#252523;font-family:'Outfit',sans-serif;font-size:15px;padding:12px 16px;outline:none;box-sizing:border-box;">
+          </div>
+          <button onclick="enviarCodigoRecuperacion()" style="width:100%;background:#067c49;color:white;border:none;border-radius:12px;padding:14px;font-family:'Plus Jakarta Sans',sans-serif;font-size:14px;font-weight:700;cursor:pointer;margin-bottom:16px;">
+            Enviar codigo por WhatsApp
+          </button>
+          <div id="recovery-step2" style="display:none;">
+            <div style="margin-bottom:14px;">
+              <label style="display:block;font-size:11px;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;color:#7a7a72;margin-bottom:7px;">Codigo recibido (6 digitos)</label>
+              <input type="text" id="recovery-codigo" placeholder="123456" maxlength="6" inputmode="numeric" style="width:100%;background:#f7f5f0;border:1.5px solid #e2ddd5;border-radius:12px;color:#252523;font-family:'Outfit',sans-serif;font-size:15px;padding:12px 16px;outline:none;box-sizing:border-box;">
+            </div>
+            <div style="margin-bottom:16px;">
+              <label style="display:block;font-size:11px;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;color:#7a7a72;margin-bottom:7px;">Nuevo PIN (4 digitos)</label>
+              <input type="password" id="recovery-new-pin" placeholder="• • • •" maxlength="4" inputmode="numeric" style="width:100%;background:#f7f5f0;border:1.5px solid #e2ddd5;border-radius:12px;color:#252523;font-family:'Outfit',sans-serif;font-size:18px;padding:12px 16px;outline:none;box-sizing:border-box;letter-spacing:6px;">
+            </div>
+            <button onclick="verificarCodigo()" style="width:100%;background:#067c49;color:white;border:none;border-radius:12px;padding:14px;font-family:'Plus Jakarta Sans',sans-serif;font-size:14px;font-weight:700;cursor:pointer;margin-bottom:10px;">
+              Confirmar nuevo PIN
+            </button>
+          </div>
+          <button onclick="ocultarRecuperacion()" style="width:100%;background:transparent;border:1.5px solid #e2ddd5;border-radius:10px;padding:10px;font-family:'Outfit',sans-serif;font-size:13px;color:#7a7a72;cursor:pointer;">
+            Cancelar
+          </button>
+        </div>
+
+        <!-- REGISTER FORM -->
+        <div id="register-form" style="display:none;">
+          <div style="margin-bottom:14px;">
+            <label style="display:block;font-size:11px;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;color:#7a7a72;margin-bottom:7px;">Nombre completo *</label>
+            <input type="text" id="reg-nombre" placeholder="Tu nombre completo" style="width:100%;background:#f7f5f0;border:1.5px solid #e2ddd5;border-radius:12px;color:#252523;font-family:'Outfit',sans-serif;font-size:15px;padding:12px 16px;outline:none;box-sizing:border-box;">
+          </div>
+          <div style="margin-bottom:14px;">
+            <label style="display:block;font-size:11px;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;color:#7a7a72;margin-bottom:7px;">Numero de telefono * <span style="font-size:10px;font-weight:400;">(sera tu acceso)</span></label>
+            <input type="tel" id="reg-phone" placeholder="331 234 5678" maxlength="15" style="width:100%;background:#f7f5f0;border:1.5px solid #e2ddd5;border-radius:12px;color:#252523;font-family:'Outfit',sans-serif;font-size:15px;padding:12px 16px;outline:none;box-sizing:border-box;">
+          </div>
+          <div style="margin-bottom:14px;">
+            <label style="display:block;font-size:11px;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;color:#7a7a72;margin-bottom:7px;">Correo electronico *</label>
+            <input type="email" id="reg-email" placeholder="tucorreo@gmail.com" style="width:100%;background:#f7f5f0;border:1.5px solid #e2ddd5;border-radius:12px;color:#252523;font-family:'Outfit',sans-serif;font-size:15px;padding:12px 16px;outline:none;box-sizing:border-box;">
+          </div>
+          <div style="margin-bottom:20px;">
+            <label style="display:block;font-size:11px;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;color:#7a7a72;margin-bottom:7px;">Crea tu PIN de 4 digitos * <span style="font-size:10px;font-weight:400;">(para entrar)</span></label>
+            <input type="password" id="reg-pin" placeholder="• • • •" maxlength="4" inputmode="numeric" pattern="[0-9]*" style="width:100%;background:#f7f5f0;border:1.5px solid #e2ddd5;border-radius:12px;color:#252523;font-family:'Outfit',sans-serif;font-size:18px;padding:12px 16px;outline:none;box-sizing:border-box;letter-spacing:6px;">
+          </div>
+          <button onclick="handleRegister()" style="width:100%;background:#067c49;color:white;border:none;border-radius:12px;padding:15px;font-family:'Plus Jakarta Sans',sans-serif;font-size:15px;font-weight:700;cursor:pointer;margin-bottom:12px;">
+            Crear mi cuenta →
+          </button>
+          <div style="text-align:center;font-size:14px;color:#7a7a72;padding:8px;">
+            Ya tengo cuenta. <span onclick="selectLoginMode('login')" style="color:#067c49;font-weight:700;cursor:pointer;">Ingresar.</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="screen" id="screen-login" style="display:none;"></div>
+
+
+
+
 <!-- PANEL PERFIL DESLIZABLE -->
 <div id="perfil-overlay" onclick="cerrarPanelPerfil()" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.4);z-index:998;"></div>
 <div id="perfil-panel" style="display:none;position:fixed;top:0;left:0;right:0;z-index:999;background:var(--white);border-radius:0 0 24px 24px;box-shadow:0 8px 40px rgba(0,0,0,0.18);padding:20px 22px 28px;max-width:600px;margin:0 auto;transform:translateY(-100%);transition:transform 0.3s ease;">
@@ -2644,112 +2758,6 @@ footer .social-links a:hover { color: white; }
 <!-- 
  PANTALLA 1: LOGIN / REGISTRO
  -->
-<!-- HERO (fuera del screen) -->
-<div class="hero-new" id="hero-login">
-  <div class="hero-new-inner">
-    <img src="https://chefchefharfer.github.io/chefchefharfer/Logo%20chef%20chef.png" alt="Chef Chef Harfer" class="hero-logo">
-    <p class="hero-new-sub">Ingredientes frescos, recetas listas.<br>Solo cocina.</p>
-    <div class="hero-new-location">
-      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-      TEPATITLAN DE MORELOS
-    </div>
-  </div>
-</div>
-
-<div class="screen active" id="screen-login">
-<div style="max-width:560px;margin:0 auto;padding:24px 14px 100px;">
- <div class="card">
- <div class="login-card-header">
-    <div class="card-title">¡Hola!</div>
-    <div class="card-sub" id="login-subtitle">¿Ya tienes cuenta? Ingresa tu teléfono.</div>
-  </div>
-  <div class="login-mode-tabs">
-    <div class="login-tab selected" id="opt-login" onclick="selectLoginMode('login')">Ya tengo cuenta</div>
-    <div class="login-tab" id="opt-register" onclick="selectLoginMode('register')">Soy nuevo</div>
-  </div>
-
- <!-- LOGIN -->
- <div id="login-form">
- <div class="field">
- <label>Tu número de teléfono</label>
- <input type="tel" id="login-phone" placeholder="331 234 5678" maxlength="15">
- <div class="error-msg">Ingresa un número válido de 10 dígitos</div>
- </div>
- <div class="field">
- <label>Tu PIN de 4 digitos</label>
- <input type="password" id="login-pin" placeholder="&bull; &bull; &bull; &bull;" maxlength="4" inputmode="numeric" pattern="[0-9]*">
- </div>
- <button class="btn btn-primary btn-login-main" onclick="handleLogin()">
- Ingresar con tu telefono
- </button>
- <button class="btn-link-recovery" onclick="mostrarRecuperacion()">
- Olvide mi PIN
- </button>
- <div class="login-register-link">
- ¿Es tu primera vez? <a onclick="selectLoginMode('register')" style="color:var(--green);font-weight:600;cursor:pointer;text-decoration:none;">Registrate.</a>
- </div>
- </div>
-
- <!-- RECUPERACION DE PIN -->
- <div id="recovery-form" style="display:none;margin-top:16px;background:var(--bg);border-radius:14px;padding:20px;border:1.5px solid var(--border);">
-   <div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:4px;">Recuperar PIN</div>
-   <div style="font-size:12px;color:var(--muted);margin-bottom:14px;">Te enviaremos un codigo de verificacion por WhatsApp.</div>
-   <div class="field">
-     <label>Tu numero de telefono</label>
-     <input type="tel" id="recovery-phone" placeholder="331 234 5678" maxlength="15">
-   </div>
-   <button class="btn btn-primary" style="margin-bottom:12px;" onclick="enviarCodigoRecuperacion()">
-     Enviar codigo por WhatsApp
-   </button>
-   <div id="recovery-step2" style="display:none;">
-     <div class="field">
-       <label>Codigo recibido (6 digitos)</label>
-       <input type="text" id="recovery-codigo" placeholder="123456" maxlength="6" inputmode="numeric">
-     </div>
-     <div class="field">
-       <label>Nuevo PIN (4 digitos)</label>
-       <input type="password" id="recovery-new-pin" placeholder="&bull; &bull; &bull; &bull;" maxlength="4" inputmode="numeric">
-     </div>
-     <button class="btn btn-primary" onclick="verificarCodigo()">Confirmar nuevo PIN</button>
-   </div>
-   <button class="btn btn-outline" style="margin-top:10px;" onclick="ocultarRecuperacion()">Cancelar</button>
- </div>
-
- <!-- REGISTRO -->
- <div id="register-form" style="display:none">
- <div class="divider">Crea tu cuenta — es gratis</div>
-
- <div class="field">
- <label>Nombre completo *</label>
- <input type="text" id="reg-nombre" placeholder="Tu nombre completo">
- </div>
-
- <div class="field">
- <label>Número de teléfono * <span style="font-size:11px;font-weight:400;color:var(--muted)">(será tu acceso)</span></label>
- <input type="tel" id="reg-phone" placeholder="331 234 5678" maxlength="15">
- </div>
-
- <div class="field">
- <label>Correo electrónico *</label>
- <input type="email" id="reg-email" placeholder="tucorreo@gmail.com">
- </div>
-
- <div class="field">
- <label>Crea tu PIN de 4 digitos * <span style="font-size:11px;font-weight:400;color:var(--muted)">(lo usaras para entrar)</span></label>
- <input type="password" id="reg-pin" placeholder="• • • •" maxlength="4" inputmode="numeric" pattern="[0-9]*">
- </div>
-
- <button class="btn btn-primary" onclick="handleRegister()" style="margin-top:8px">
- Crear mi cuenta y ver el menú →
- </button>
- <button class="btn btn-outline" onclick="selectLoginMode('login')">
- Ya tengo cuenta
- </button>
- </div>
- </div>
-</div>
-</div>
-
 <!-- 
  PANTALLA 2: MENU TIENDA
  -->
@@ -3211,12 +3219,13 @@ function isValidPhone(p) { return cleanPhone(p).length >= 10; }
 // === UI ===
 function showScreen(id) {
   document.querySelectorAll('.screen').forEach(function(s) { s.classList.remove('active'); });
-  document.getElementById('screen-' + id).classList.add('active');
+  var target = document.getElementById('screen-' + id);
+  if (target) target.classList.add('active');
   document.body.className = 'on-' + id;
-  // Show/hide hero
-  var hero = document.getElementById('hero-login');
-  if (hero) hero.style.display = (id === 'login') ? '' : 'none';
-  // Hide cart pill on envio and success screens
+  // login-page is the real login UI (outside .screen system)
+  var loginPage = document.getElementById('login-page');
+  if (loginPage) loginPage.style.display = (id === 'login') ? 'flex' : 'none';
+  // Hide cart pill
   var pill = document.getElementById('cart-pill');
   if (pill) {
     if (id === 'envio' || id === 'success' || id === 'login' || id === 'perfil') {
@@ -3240,15 +3249,19 @@ function showLoading(text) {
 function hideLoading() { document.getElementById('loading').classList.remove('active'); }
 function selectLoginMode(mode) {
   loginMode = mode;
-  // Update tabs
-  document.getElementById('opt-login').classList.toggle('selected', mode === 'login');
-  document.getElementById('opt-register').classList.toggle('selected', mode === 'register');
-  // Update forms
-  document.getElementById('login-form').style.display = mode === 'login' ? 'block' : 'none';
-  document.getElementById('register-form').style.display = mode === 'register' ? 'block' : 'none';
-  // Update subtitle
-  var sub = document.getElementById('login-subtitle');
-  if (sub) sub.textContent = mode === 'login' ? 'Ya tienes cuenta? Ingresa tu telefono.' : 'Crea tu cuenta gratis en un minuto.';
+  var isLogin = mode === 'login';
+  // Tabs
+  var tabLogin = document.getElementById('opt-login');
+  var tabReg = document.getElementById('opt-register');
+  if (tabLogin) { tabLogin.style.background = isLogin ? 'white' : 'transparent'; tabLogin.style.color = isLogin ? '#252523' : '#7a7a72'; tabLogin.style.boxShadow = isLogin ? '0 1px 6px rgba(0,0,0,0.1)' : 'none'; tabLogin.style.fontWeight = isLogin ? '700' : '600'; }
+  if (tabReg) { tabReg.style.background = !isLogin ? 'white' : 'transparent'; tabReg.style.color = !isLogin ? '#252523' : '#7a7a72'; tabReg.style.boxShadow = !isLogin ? '0 1px 6px rgba(0,0,0,0.1)' : 'none'; tabReg.style.fontWeight = !isLogin ? '700' : '600'; }
+  // Forms
+  var lf = document.getElementById('login-form'); if (lf) lf.style.display = isLogin ? 'block' : 'none';
+  var rf = document.getElementById('register-form'); if (rf) rf.style.display = !isLogin ? 'block' : 'none';
+  var rec = document.getElementById('recovery-form'); if (rec) rec.style.display = 'none';
+  // Title
+  var t = document.getElementById('login-title-main'); if (t) t.textContent = isLogin ? 'Ingresa a tu cuenta' : 'Crea tu cuenta gratis';
+  var s = document.getElementById('login-subtitle-small'); if (s) s.textContent = isLogin ? 'Tu acceso' : 'Registro';
 }
 
 // === LOGIN ===
@@ -3289,13 +3302,16 @@ function handleLogin() {
 var codigoRecuperacion = null;
 
 function mostrarRecuperacion() {
-  document.getElementById('recovery-form').style.display = 'block';
-  document.getElementById('recovery-step2').style.display = 'none';
-  document.getElementById('recovery-phone').value = document.getElementById('login-phone').value || '';
+  var lf = document.getElementById('login-form'); if (lf) lf.style.display = 'none';
+  var rf = document.getElementById('recovery-form'); if (rf) rf.style.display = 'block';
+  var rs = document.getElementById('recovery-step2'); if (rs) rs.style.display = 'none';
+  var rp = document.getElementById('recovery-phone'); var lp = document.getElementById('login-phone');
+  if (rp && lp) rp.value = lp.value || '';
 }
 
 function ocultarRecuperacion() {
-  document.getElementById('recovery-form').style.display = 'none';
+  var rf = document.getElementById('recovery-form'); if (rf) rf.style.display = 'none';
+  var lf = document.getElementById('login-form'); if (lf) lf.style.display = 'block';
   codigoRecuperacion = null;
 }
 
@@ -4168,6 +4184,16 @@ function nuevoPedido() {
 
 window.addEventListener('load', function() {
   document.body.className = 'on-login';
+  // Explicitly show login page
+  var loginPage = document.getElementById('login-page');
+  if (loginPage) loginPage.style.display = 'flex';
+  // Make sure login form is visible
+  var lf = document.getElementById('login-form');
+  if (lf) lf.style.display = 'block';
+  var rf = document.getElementById('register-form');
+  if (rf) rf.style.display = 'none';
+  var recf = document.getElementById('recovery-form');
+  if (recf) recf.style.display = 'none';
   var pill = document.getElementById('cart-pill');
   if (pill) pill.classList.remove('visible');
 });
