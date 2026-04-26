@@ -2584,14 +2584,7 @@ footer .social-links a:hover { color: white; }
 
 
 /* Panel perfil - no bloquear clicks cuando está oculto */
-#perfil-panel,
-#perfil-overlay {
-  pointer-events: none;
-}
-#perfil-panel.abierto,
-#perfil-overlay.abierto {
-  pointer-events: auto !important;
-}
+/* panel perfil movido a screen-perfil */
 
 /* Menu siempre renderizable */
 #screen-menu.active {
@@ -2749,53 +2742,7 @@ footer .social-links a:hover { color: white; }
 
 
 <!-- PANEL PERFIL DESLIZABLE -->
-<div id="perfil-overlay" onclick="cerrarPanelPerfil()" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.4);z-index:998;pointer-events:none;"></div>
-<div id="perfil-panel" style="display:none;position:fixed;top:0;left:0;right:0;z-index:999;background:var(--white);border-radius:0 0 24px 24px;box-shadow:0 8px 40px rgba(0,0,0,0.18);padding:20px 22px 28px;max-width:600px;margin:0 auto;transform:translateY(-100%);transition:transform 0.3s ease;pointer-events:none;">
 
-  <!-- Header del panel -->
-  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
-    <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:17px;font-weight:800;color:var(--black);letter-spacing:-0.3px;">Mi perfil</div>
-    <button onclick="cerrarPanelPerfil()" style="background:var(--bg);border:none;border-radius:50%;width:34px;height:34px;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--muted);">&#215;</button>
-  </div>
-
-  <!-- Datos -->
-  <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:18px;">
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border);">
-      <span style="font-size:13px;color:var(--muted);font-weight:500;">Nombre</span>
-      <span style="font-size:14px;color:var(--text);font-weight:600;" id="panel-nombre">--</span>
-    </div>
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border);">
-      <span style="font-size:13px;color:var(--muted);font-weight:500;">Telefono</span>
-      <span style="font-size:14px;color:var(--text);font-weight:600;" id="panel-tel">--</span>
-    </div>
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border);">
-      <span style="font-size:13px;color:var(--muted);font-weight:500;">Correo</span>
-      <span style="font-size:13px;color:var(--text);font-weight:500;" id="panel-email">--</span>
-    </div>
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border);">
-      <span style="font-size:13px;color:var(--muted);font-weight:500;">Direccion</span>
-      <span style="font-size:13px;color:var(--text);font-weight:500;text-align:right;max-width:55%;" id="panel-dir">Sin guardar</span>
-    </div>
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border);">
-      <span style="font-size:13px;color:var(--muted);font-weight:500;">Dia preferido</span>
-      <span style="font-size:13px;color:var(--text);font-weight:500;" id="panel-dia">Sin preferencia</span>
-    </div>
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;">
-      <span style="font-size:13px;color:var(--muted);font-weight:500;">Turno preferido</span>
-      <span style="font-size:13px;color:var(--text);font-weight:500;" id="panel-turno">Sin preferencia</span>
-    </div>
-  </div>
-
-  <!-- Cambiar direccion -->
-  <div id="panel-dir-form-wrap">
-    <button onclick="mostrarFormDirPanel()" style="background:transparent;border:1.5px solid var(--border);border-radius:10px;padding:9px 16px;font-family:'Outfit',sans-serif;font-size:12px;font-weight:600;color:var(--muted);cursor:pointer;width:100%;transition:all 0.15s;" id="btn-cambiar-dir-panel">Cambiar direccion de entrega</button>
-    <div id="panel-dir-form" style="display:none;margin-top:12px;">
-      <input type="text" id="panel-input-dir" placeholder="Ej: Calle Hidalgo 123, Col. Centro" style="width:100%;padding:12px 14px;border:1.5px solid var(--border);border-radius:10px;font-family:'Outfit',sans-serif;font-size:14px;background:var(--bg);color:var(--text);box-sizing:border-box;margin-bottom:10px;">
-      <button onclick="guardarDirPanel()" style="background:var(--green);color:white;border:none;border-radius:10px;padding:11px;font-family:'Outfit',sans-serif;font-size:13px;font-weight:700;cursor:pointer;width:100%;">Guardar</button>
-    </div>
-  <button onclick="cerrarSesion()" style="margin-top:8px;background:transparent;border:1.5px solid #ffd5d5;border-radius:10px;padding:9px 16px;font-family:'Outfit',sans-serif;font-size:12px;font-weight:600;color:#c1121f;cursor:pointer;width:100%;">Cerrar sesion</button>
-
-</div>
 
 <!-- ALERT -->
 
@@ -3073,6 +3020,26 @@ footer .social-links a:hover { color: white; }
       </div>
     </div>
 
+    <!-- Log de actividad -->
+    <div style="background:white;border-radius:18px;border:1px solid rgba(0,0,0,0.06);overflow:hidden;margin-top:0;">
+      <div style="padding:16px 20px;border-bottom:1px solid #f0ede6;font-family:'Plus Jakarta Sans',sans-serif;font-size:14px;font-weight:800;color:#111;">Actividad reciente</div>
+      <div style="overflow-x:auto;">
+        <table style="width:100%;border-collapse:collapse;font-family:'Outfit',sans-serif;">
+          <thead>
+            <tr style="background:#fafaf8;">
+              <th style="padding:8px 12px;text-align:left;font-size:10px;letter-spacing:1px;color:#aaa;font-weight:700;text-transform:uppercase;">Fecha</th>
+              <th style="padding:8px 12px;text-align:left;font-size:10px;letter-spacing:1px;color:#aaa;font-weight:700;text-transform:uppercase;">Tipo</th>
+              <th style="padding:8px 12px;text-align:left;font-size:10px;letter-spacing:1px;color:#aaa;font-weight:700;text-transform:uppercase;">Usuario</th>
+              <th style="padding:8px 12px;text-align:left;font-size:10px;letter-spacing:1px;color:#aaa;font-weight:700;text-transform:uppercase;">Detalle</th>
+            </tr>
+          </thead>
+          <tbody id="admin-log-tbody">
+            <tr><td colspan="4" style="padding:16px;text-align:center;color:#aaa;font-size:13px;">Cargando...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
     <!-- Boton ir al menu -->
     <button onclick="renderMenu();showScreen('menu');" style="margin-top:16px;background:var(--green);color:white;border:none;border-radius:12px;padding:14px;font-family:'Plus Jakarta Sans',sans-serif;font-size:14px;font-weight:700;cursor:pointer;width:100%;">
       Ver el menu como cliente
@@ -3188,29 +3155,19 @@ function cerrarSesion() {
 
 // === LOG DE ACTIVIDAD ===
 async function registrarActividad(user, tipo, detalle) {
-  var today = new Date().toISOString().split('T')[0];
-  var titulo = tipo + ' - ' + (user ? user.nombre : 'Anonimo');
+  // Log guardado localmente (Notion bloqueado por CORS desde browser)
   try {
-    var res = await fetch('https://api.notion.com/v1/pages', {
-      method: 'POST',
-      headers: {
-        'Authorization': 'Bearer ' + NOTION_TOKEN,
-        'Content-Type': 'application/json',
-        'Notion-Version': '2022-06-28'
-      },
-      body: JSON.stringify({
-        parent: { database_id: LOG_DB_ID },
-        properties: {
-          'Evento': { title: [{ text: { content: titulo } }] },
-          'Usuario': { rich_text: [{ text: { content: user ? user.nombre : '' } }] },
-          'Telefono': { rich_text: [{ text: { content: user ? user.phone : '' } }] },
-          'Tipo': { select: { name: tipo } },
-          'Detalle': { rich_text: [{ text: { content: detalle || '' } }] },
-          'Fecha': { date: { start: today } }
-        }
-      })
+    var logs = JSON.parse(localStorage.getItem('cch_activity_log') || '[]');
+    logs.unshift({
+      tipo: tipo,
+      usuario: user ? user.nombre : 'Anonimo',
+      telefono: user ? user.phone : '',
+      detalle: detalle || '',
+      fecha: new Date().toLocaleString('es-MX')
     });
-  } catch(e) { console.warn('Log error:', e.message); }
+    if (logs.length > 200) logs = logs.slice(0, 200);
+    localStorage.setItem('cch_activity_log', JSON.stringify(logs));
+  } catch(e) {}
 }
 
 // === CONTADOR DE CONEXIONES ===
@@ -3572,70 +3529,30 @@ function goToPerfil() {
 }
 
 function abrirPanelPerfil() {
-  var u = currentUser;
-  if (!u) return;
-  // If already open, close it
-  var panel = document.getElementById('perfil-panel');
-  if (panel && panel.style.display === 'block') {
-    cerrarPanelPerfil();
-    return;
-  }
-  // Fill panel data
-  var fields = {
-    'panel-nombre': u.nombre || '--',
-    'panel-tel': u.phone || '--',
-    'panel-email': u.email || '--',
-    'panel-dir': u.direccion || 'Sin guardar',
-    'panel-dia': u.diaPref || 'Sin preferencia'
-  };
-  Object.keys(fields).forEach(function(id) {
-    var el = document.getElementById(id);
-    if (el) el.textContent = fields[id];
-  });
-  var turnoEl = document.getElementById('panel-turno');
-  if (turnoEl) {
-    if (u.turnoPref === 'Manana') turnoEl.textContent = 'Manana (10am-1pm)';
-    else if (u.turnoPref === 'Tarde') turnoEl.textContent = 'Tarde (4pm-7pm)';
-    else turnoEl.textContent = 'Sin preferencia';
-  }
-  var dirForm = document.getElementById('panel-dir-form');
-  if (dirForm) dirForm.style.display = 'none';
-  var dirInput = document.getElementById('panel-input-dir');
-  if (dirInput) dirInput.value = u.direccion || '';
-  // Show
-  var overlay = document.getElementById('perfil-overlay');
-  if (overlay) { overlay.style.display = 'block'; overlay.classList.add('abierto'); }
-  if (panel) { panel.style.display = 'block'; panel.classList.add('abierto'); }
-  setTimeout(function() { if (panel) panel.style.transform = 'translateY(0)'; }, 10);
+  if (!currentUser) return;
+  showScreen_perfil();
+  showScreen('perfil');
 }
 
 function cerrarPanelPerfil() {
-  var overlay = document.getElementById('perfil-overlay');
-  var panel = document.getElementById('perfil-panel');
-  if (!panel) return;
-  panel.style.transform = 'translateY(-100%)';
-  panel.classList.remove('abierto');
-  if (overlay) overlay.classList.remove('abierto');
-  setTimeout(function() {
-    panel.style.display = 'none';
-    if (overlay) overlay.style.display = 'none';
-  }, 310);
+  showScreen('menu');
 }
 
 function mostrarFormDirPanel() {
-  document.getElementById('panel-dir-form').style.display = 'block';
-  document.getElementById('btn-cambiar-dir-panel').style.display = 'none';
+  var f = document.getElementById('perfil-dir-form');
+  if (f) f.style.display = 'block';
 }
 
 function guardarDirPanel() {
-  var inp = document.getElementById('panel-input-dir');
+  var inp = document.getElementById('perfil-input-dir');
   if (!inp || !inp.value.trim()) { showToast('Escribe una direccion', 'error'); return; }
   if (currentUser) {
     currentUser.direccion = inp.value.trim();
     saveUserLocal(currentUser);
-    document.getElementById('panel-dir').textContent = currentUser.direccion;
-    document.getElementById('panel-dir-form').style.display = 'none';
-    document.getElementById('btn-cambiar-dir-panel').style.display = 'block';
+    var dirEl = document.getElementById('perfil-dir-texto');
+    if (dirEl) dirEl.textContent = currentUser.direccion;
+    var f = document.getElementById('perfil-dir-form');
+    if (f) f.style.display = 'none';
     showToast('Direccion guardada', 'success');
   }
 }
@@ -4216,6 +4133,31 @@ function renderAdmin() {
   if (el2) el2.textContent = conexionesHoy;
   var el3 = document.getElementById('admin-total-usuarios');
   if (el3) el3.textContent = allUsers.length;
+  // Show activity log count
+  try {
+    var logs = JSON.parse(localStorage.getItem('cch_activity_log') || '[]');
+    var logEl = document.getElementById('admin-total-actividad');
+    if (logEl) logEl.textContent = logs.length;
+    // Render activity log
+    var logTbody = document.getElementById('admin-log-tbody');
+    if (logTbody) {
+      logTbody.innerHTML = '';
+      logs.slice(0, 50).forEach(function(l) {
+        var tr = document.createElement('tr');
+        tr.innerHTML = '<td style="padding:8px 12px;border-bottom:1px solid #f0ede6;font-size:12px;color:#555;">' + l.fecha + '</td>' +
+          '<td style="padding:8px 12px;border-bottom:1px solid #f0ede6;font-weight:600;font-size:12px;">' + l.tipo + '</td>' +
+          '<td style="padding:8px 12px;border-bottom:1px solid #f0ede6;font-size:12px;">' + l.usuario + '</td>' +
+          '<td style="padding:8px 12px;border-bottom:1px solid #f0ede6;color:#888;font-size:11px;">' + (l.detalle||'') + '</td>';
+        logTbody.appendChild(tr);
+      });
+      if (!logs.length) {
+        var tr2 = document.createElement('tr');
+        tr2.innerHTML = '<td colspan="4" style="padding:16px;text-align:center;color:#aaa;font-size:13px;">Sin actividad registrada aun</td>';
+        logTbody.appendChild(tr2);
+      }
+    }
+  } catch(e) {}
+
   // Render users table
   var tbody = document.getElementById('admin-users-tbody');
   if (tbody) {
