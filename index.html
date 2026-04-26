@@ -114,8 +114,8 @@ nav {
   text-align: center;
   border-bottom: 1px solid var(--border);
   position: relative;
-  overflow: hidden;
 }
+
 
 /* NUEVO HERO */
 .hero-new {
@@ -2552,6 +2552,18 @@ footer .social-links a:hover { color: white; }
   padding: 8px;
 }
 
+
+/* Fix screen-login layout */
+#screen-login {
+  padding: 0 !important;
+  max-width: 100% !important;
+  overflow: visible !important;
+}
+
+#screen-menu {
+  overflow: visible !important;
+}
+
 </style>
 </head>
 <body>
@@ -2632,10 +2644,8 @@ footer .social-links a:hover { color: white; }
 <!-- 
  PANTALLA 1: LOGIN / REGISTRO
  -->
-<div class="screen active" id="screen-login">
-
-<!-- HERO -->
-<div class="hero-new">
+<!-- HERO (fuera del screen) -->
+<div class="hero-new" id="hero-login">
   <div class="hero-new-inner">
     <img src="https://chefchefharfer.github.io/chefchefharfer/Logo%20chef%20chef.png" alt="Chef Chef Harfer" class="hero-logo">
     <p class="hero-new-sub">Ingredientes frescos, recetas listas.<br>Solo cocina.</p>
@@ -2645,6 +2655,9 @@ footer .social-links a:hover { color: white; }
     </div>
   </div>
 </div>
+
+<div class="screen active" id="screen-login">
+<div style="max-width:560px;margin:0 auto;padding:24px 14px 100px;">
  <div class="card">
  <div class="login-card-header">
     <div class="card-title">¡Hola!</div>
@@ -2734,6 +2747,7 @@ footer .social-links a:hover { color: white; }
  </button>
  </div>
  </div>
+</div>
 </div>
 
 <!-- 
@@ -3199,6 +3213,9 @@ function showScreen(id) {
   document.querySelectorAll('.screen').forEach(function(s) { s.classList.remove('active'); });
   document.getElementById('screen-' + id).classList.add('active');
   document.body.className = 'on-' + id;
+  // Show/hide hero
+  var hero = document.getElementById('hero-login');
+  if (hero) hero.style.display = (id === 'login') ? '' : 'none';
   // Hide cart pill on envio and success screens
   var pill = document.getElementById('cart-pill');
   if (pill) {
