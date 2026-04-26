@@ -117,6 +117,71 @@ nav {
   overflow: hidden;
 }
 
+/* NUEVO HERO */
+.hero-new {
+  background: linear-gradient(160deg, #f7f5f0 0%, #eceae3 100%);
+  border-bottom: 1px solid var(--border);
+  position: relative;
+  overflow: hidden;
+  min-height: 340px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hero-new::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at 10% 20%, rgba(6,124,73,0.06) 0%, transparent 60%),
+    radial-gradient(ellipse at 90% 80%, rgba(189,172,65,0.06) 0%, transparent 60%);
+  pointer-events: none;
+}
+
+.hero-new-inner {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  padding: 48px 24px 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.hero-logo {
+  width: 220px;
+  max-width: 75vw;
+  height: auto;
+  object-fit: contain;
+  margin-bottom: 4px;
+}
+
+.hero-new-sub {
+  font-size: 15px;
+  font-weight: 400;
+  color: var(--muted);
+  line-height: 1.7;
+  margin: 0;
+}
+
+.hero-new-location {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1.5px solid rgba(6,124,73,0.25);
+  border-radius: 100px;
+  padding: 7px 18px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: var(--green);
+  background: rgba(255,255,255,0.7);
+  backdrop-filter: blur(4px);
+  margin-top: 4px;
+}
+
 .hero::before {
   content: '';
   position: absolute;
@@ -2420,6 +2485,73 @@ footer .social-links a:hover { color: white; }
 }
 .btn-envio-cancelar:hover { border-color: var(--green); color: var(--green); }
 
+
+/* ========================================
+   LOGIN REDISEÑO
+   ======================================== */
+
+.login-card-header { margin-bottom: 20px; }
+
+.login-mode-tabs {
+  display: flex;
+  gap: 0;
+  margin-bottom: 24px;
+  background: var(--bg);
+  border-radius: 12px;
+  padding: 4px;
+  border: 1.5px solid var(--border);
+}
+
+.login-tab {
+  flex: 1;
+  text-align: center;
+  padding: 10px 12px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--muted);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.login-tab.selected {
+  background: white;
+  color: var(--text);
+  box-shadow: 0 1px 6px rgba(0,0,0,0.1);
+}
+
+.btn-login-main {
+  font-size: 15px !important;
+  font-weight: 700 !important;
+  padding: 16px !important;
+  border-radius: 14px !important;
+  letter-spacing: 0.2px;
+  margin-top: 4px;
+}
+
+.btn-link-recovery {
+  display: block;
+  text-align: center;
+  font-size: 12px;
+  color: var(--muted);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 6px;
+  text-decoration: underline;
+  font-family: 'Outfit', sans-serif;
+  width: 100%;
+}
+.btn-link-recovery:hover { color: var(--green); }
+
+.login-register-link {
+  text-align: center;
+  font-size: 14px;
+  color: var(--muted);
+  margin-top: 4px;
+  padding: 8px;
+}
+
 </style>
 </head>
 <body>
@@ -2434,7 +2566,7 @@ footer .social-links a:hover { color: white; }
  <a href="https://instagram.com/chefchef.harfer" target="_blank" title="Instagram">
  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="0.5" fill="currentColor"/></svg>
  </a>
- <a href="https://facebook.com/chefchef.harfer" target="_blank" title="Facebook">
+ <a href="https://www.facebook.com/profile.php?id=61582969501407" target="_blank" title="Facebook">
  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
  </a>
  </div>
@@ -2503,25 +2635,25 @@ footer .social-links a:hover { color: white; }
 <div class="screen active" id="screen-login">
 
 <!-- HERO -->
-<div class="hero">
- <div class="hero-eyebrow">Tepatitlan de Morelos</div>
- <h1>Tu <em>meal kit</em><br>a domicilio</h1>
- <p class="hero-sub">Ingredientes frescos, recetas listas.<br>Solo cocina.</p>
+<div class="hero-new">
+  <div class="hero-new-inner">
+    <img src="https://chefchefharfer.github.io/chefchefharfer/Logo%20chef%20chef.png" alt="Chef Chef Harfer" class="hero-logo">
+    <p class="hero-new-sub">Ingredientes frescos, recetas listas.<br>Solo cocina.</p>
+    <div class="hero-new-location">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+      TEPATITLAN DE MORELOS
+    </div>
+  </div>
 </div>
  <div class="card">
- <div class="card-title">¡Hola!</div>
- <div class="card-sub">¿Ya tienes cuenta? Ingresa tu teléfono. ¿Es tu primera vez? Regístrate, solo toma 1 minuto.</div>
-
- <div class="login-split">
- <div class="login-option selected" id="opt-login" onclick="selectLoginMode('login')">
-  <div class="login-label">Ya tengo cuenta</div>
- <div class="login-desc">Ingresa con tu teléfono</div>
- </div>
- <div class="login-option" id="opt-register" onclick="selectLoginMode('register')">
-  <div class="login-label">Soy nuevo</div>
- <div class="login-desc">Registrarme gratis</div>
- </div>
- </div>
+ <div class="login-card-header">
+    <div class="card-title">¡Hola!</div>
+    <div class="card-sub" id="login-subtitle">¿Ya tienes cuenta? Ingresa tu teléfono.</div>
+  </div>
+  <div class="login-mode-tabs">
+    <div class="login-tab selected" id="opt-login" onclick="selectLoginMode('login')">Ya tengo cuenta</div>
+    <div class="login-tab" id="opt-register" onclick="selectLoginMode('register')">Soy nuevo</div>
+  </div>
 
  <!-- LOGIN -->
  <div id="login-form">
@@ -2530,12 +2662,44 @@ footer .social-links a:hover { color: white; }
  <input type="tel" id="login-phone" placeholder="331 234 5678" maxlength="15">
  <div class="error-msg">Ingresa un número válido de 10 dígitos</div>
  </div>
- <button class="btn btn-primary" onclick="handleLogin()">
- Entrar a mi cuenta →
+ <div class="field">
+ <label>Tu PIN de 4 digitos</label>
+ <input type="password" id="login-pin" placeholder="&bull; &bull; &bull; &bull;" maxlength="4" inputmode="numeric" pattern="[0-9]*">
+ </div>
+ <button class="btn btn-primary btn-login-main" onclick="handleLogin()">
+ Ingresar con tu telefono
  </button>
- <button class="btn btn-outline" onclick="selectLoginMode('register')">
- No tengo cuenta, quiero registrarme
+ <button class="btn-link-recovery" onclick="mostrarRecuperacion()">
+ Olvide mi PIN
  </button>
+ <div class="login-register-link">
+ ¿Es tu primera vez? <a onclick="selectLoginMode('register')" style="color:var(--green);font-weight:600;cursor:pointer;text-decoration:none;">Registrate.</a>
+ </div>
+ </div>
+
+ <!-- RECUPERACION DE PIN -->
+ <div id="recovery-form" style="display:none;margin-top:16px;background:var(--bg);border-radius:14px;padding:20px;border:1.5px solid var(--border);">
+   <div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:4px;">Recuperar PIN</div>
+   <div style="font-size:12px;color:var(--muted);margin-bottom:14px;">Te enviaremos un codigo de verificacion por WhatsApp.</div>
+   <div class="field">
+     <label>Tu numero de telefono</label>
+     <input type="tel" id="recovery-phone" placeholder="331 234 5678" maxlength="15">
+   </div>
+   <button class="btn btn-primary" style="margin-bottom:12px;" onclick="enviarCodigoRecuperacion()">
+     Enviar codigo por WhatsApp
+   </button>
+   <div id="recovery-step2" style="display:none;">
+     <div class="field">
+       <label>Codigo recibido (6 digitos)</label>
+       <input type="text" id="recovery-codigo" placeholder="123456" maxlength="6" inputmode="numeric">
+     </div>
+     <div class="field">
+       <label>Nuevo PIN (4 digitos)</label>
+       <input type="password" id="recovery-new-pin" placeholder="&bull; &bull; &bull; &bull;" maxlength="4" inputmode="numeric">
+     </div>
+     <button class="btn btn-primary" onclick="verificarCodigo()">Confirmar nuevo PIN</button>
+   </div>
+   <button class="btn btn-outline" style="margin-top:10px;" onclick="ocultarRecuperacion()">Cancelar</button>
  </div>
 
  <!-- REGISTRO -->
@@ -2555,6 +2719,11 @@ footer .social-links a:hover { color: white; }
  <div class="field">
  <label>Correo electrónico *</label>
  <input type="email" id="reg-email" placeholder="tucorreo@gmail.com">
+ </div>
+
+ <div class="field">
+ <label>Crea tu PIN de 4 digitos * <span style="font-size:11px;font-weight:400;color:var(--muted)">(lo usaras para entrar)</span></label>
+ <input type="password" id="reg-pin" placeholder="• • • •" maxlength="4" inputmode="numeric" pattern="[0-9]*">
  </div>
 
  <button class="btn btn-primary" onclick="handleRegister()" style="margin-top:8px">
@@ -2814,7 +2983,7 @@ footer .social-links a:hover { color: white; }
  <div class="footer-logo">Chef Chef Harfer</div>
  <div class="social-links">
  <a href="https://instagram.com/chefchef.harfer" target="_blank"> Instagram</a>
- <a href="https://facebook.com/chefchef.harfer" target="_blank"> Facebook</a>
+ <a href="https://www.facebook.com/profile.php?id=61582969501407" target="_blank"> Facebook</a>
  <a href="https://wa.me/523782901365" target="_blank"> WhatsApp</a>
  </div>
  <p> Tepatitlán de Morelos, Jalisco · Entregas martes, jueves y sábado</p>
@@ -2891,26 +3060,84 @@ function showLoading(text) {
 function hideLoading() { document.getElementById('loading').classList.remove('active'); }
 function selectLoginMode(mode) {
   loginMode = mode;
+  // Update tabs
   document.getElementById('opt-login').classList.toggle('selected', mode === 'login');
   document.getElementById('opt-register').classList.toggle('selected', mode === 'register');
+  // Update forms
   document.getElementById('login-form').style.display = mode === 'login' ? 'block' : 'none';
   document.getElementById('register-form').style.display = mode === 'register' ? 'block' : 'none';
+  // Update subtitle
+  var sub = document.getElementById('login-subtitle');
+  if (sub) sub.textContent = mode === 'login' ? 'Ya tienes cuenta? Ingresa tu telefono.' : 'Crea tu cuenta gratis en un minuto.';
 }
 
 // === LOGIN ===
 function handleLogin() {
   var phone = document.getElementById('login-phone').value.trim();
+  var pin   = document.getElementById('login-pin').value.trim();
   if (!isValidPhone(phone)) { showToast('Ingresa un numero valido de 10 digitos', 'error'); return; }
+  if (!pin || pin.length !== 4) { showToast('Ingresa tu PIN de 4 digitos', 'error'); return; }
   var user = getUserLocal(phone);
-  if (user) {
-    currentUser = user;
-    loginSuccess();
-    showToast('Hola de nuevo, ' + user.nombre.split(' ')[0] + '!', 'welcome');
-  } else {
+  if (!user) {
     showToast('No encontramos ese numero. Registrate.', 'error');
     selectLoginMode('register');
     document.getElementById('reg-phone').value = phone;
+    return;
   }
+  if (user.pin !== pin) {
+    showToast('PIN incorrecto. Intentalo de nuevo.', 'error');
+    document.getElementById('login-pin').value = '';
+    return;
+  }
+  currentUser = user;
+  loginSuccess();
+  showToast('Hola de nuevo, ' + user.nombre.split(' ')[0] + '!', 'welcome');
+}
+
+// === RECUPERACION DE PIN ===
+var codigoRecuperacion = null;
+
+function mostrarRecuperacion() {
+  document.getElementById('recovery-form').style.display = 'block';
+  document.getElementById('recovery-step2').style.display = 'none';
+  document.getElementById('recovery-phone').value = document.getElementById('login-phone').value || '';
+}
+
+function ocultarRecuperacion() {
+  document.getElementById('recovery-form').style.display = 'none';
+  codigoRecuperacion = null;
+}
+
+function enviarCodigoRecuperacion() {
+  var phone = document.getElementById('recovery-phone').value.trim();
+  if (!isValidPhone(phone)) { showToast('Ingresa un numero valido', 'error'); return; }
+  var user = getUserLocal(phone);
+  if (!user) { showToast('No encontramos ese numero', 'error'); return; }
+  // Generate 6-digit code
+  codigoRecuperacion = Math.floor(100000 + Math.random() * 900000).toString();
+  // Send via WhatsApp
+  var msg = 'Tu codigo de verificacion de Chef Chef Harfer es: *' + codigoRecuperacion + '*\n\nEste codigo expira en 10 minutos. Si no lo solicitaste, ignoralo.';
+  var waUrl = 'https://wa.me/52' + user.phone + '?text=' + encodeURIComponent(msg);
+  window.open(waUrl, '_blank');
+  // Show step 2
+  document.getElementById('recovery-step2').style.display = 'block';
+  showToast('Codigo enviado por WhatsApp', 'success');
+}
+
+function verificarCodigo() {
+  var phone = document.getElementById('recovery-phone').value.trim();
+  var codigo = document.getElementById('recovery-codigo').value.trim();
+  var newPin = document.getElementById('recovery-new-pin').value.trim();
+  if (!codigo || codigo !== codigoRecuperacion) { showToast('Codigo incorrecto', 'error'); return; }
+  if (!newPin || newPin.length !== 4 || !/^[0-9]{4}$/.test(newPin)) { showToast('El nuevo PIN debe ser de 4 digitos', 'error'); return; }
+  var user = getUserLocal(phone);
+  if (!user) { showToast('Error al buscar la cuenta', 'error'); return; }
+  user.pin = newPin;
+  saveUserLocal(user);
+  codigoRecuperacion = null;
+  ocultarRecuperacion();
+  showToast('PIN actualizado correctamente', 'success');
+  document.getElementById('login-phone').value = phone;
 }
 
 // === REGISTRO ===
@@ -2918,16 +3145,18 @@ async function handleRegister() {
   var nombre = document.getElementById('reg-nombre').value.trim();
   var phone  = document.getElementById('reg-phone').value.trim();
   var email  = document.getElementById('reg-email').value.trim();
+  var pin    = document.getElementById('reg-pin').value.trim();
   if (!nombre)              { showToast('Escribe tu nombre completo', 'error'); return; }
   if (!isValidPhone(phone)) { showToast('Numero de telefono invalido', 'error'); return; }
   if (!email || email.indexOf('@') < 0) { showToast('Ingresa un correo valido', 'error'); return; }
-  if (getUserLocal(phone)) {
+  if (!pin || pin.length !== 4 || !/^[0-9]{4}$/.test(pin)) { showToast('El PIN debe ser de 4 digitos numericos', 'error'); return; }
+  if (getUserLocal(cleanPhone(phone))) {
     showToast('Este numero ya tiene cuenta. Inicia sesion.', 'error');
     selectLoginMode('login');
     document.getElementById('login-phone').value = phone;
     return;
   }
-  var user = { nombre: nombre, phone: cleanPhone(phone), email: email, fechaRegistro: new Date().toISOString() };
+  var user = { nombre: nombre, phone: cleanPhone(phone), email: email, pin: pin, fechaRegistro: new Date().toISOString() };
   showLoading('Creando tu cuenta...');
   try { await guardarClienteNotion(user); } catch(e) { console.warn('Notion:', e.message); }
   try { await enviarCorreoBienvenida(user); } catch(e) { console.warn('Email:', e.message); }
@@ -3539,19 +3768,19 @@ async function abrirWhatsApp() {
   try { await guardarPedidoNotion(u, items, total, orderId, diaSeleccionado, direccion); } catch(e) { console.warn('Notion:', e.message); }
   hideLoading();
 
-  var msg = 'Hola! Quiero hacer un pedido.\n\n';
-  msg += '*Pedido: #*' + orderId + '\n';
+  var msg = 'Hola! Quiero hacer un pedido de Chef Chef Harfer.\n\n';
+  msg += '*Pedido #*' + orderId + '\n';
   msg += '*Nombre:* ' + u.nombre + '\n';
   msg += '*Tel:* ' + u.phone + '\n';
   msg += '*Entrega:* ' + diaSeleccionado + ' - ' + turnoLabel + '\n';
   if (direccion) msg += '*Direccion:* ' + direccion + '\n';
-  msg += '\nPlatillos:\n';
+  msg += '\n*Platillos:*\n';
   items.forEach(function(i) {
     var precio = i.porciones === 4 ? i.platillo.precio2p * 2 : i.platillo.precio2p;
     var sub = precio * i.cantidad;
     msg += '- ' + i.platillo.nombre + ' (Kit ' + i.porciones + 'p x' + i.cantidad + ') $' + sub + '\n';
   });
-  msg += '\nTotal: $' + total.toLocaleString('es-MX') + ' MXN\n';
+  msg += '\n*Total: $' + total.toLocaleString('es-MX') + ' MXN*\n';
   msg += 'Solicito el link de pago. Gracias!';
 
   if (currentUser) {
