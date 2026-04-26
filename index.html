@@ -2721,8 +2721,8 @@ footer .social-links a:hover { color: white; }
         <!-- REGISTER FORM -->
         <div id="register-form" style="display:none;">
           <div style="margin-bottom:14px;">
-            <label style="display:block;font-size:11px;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;color:#7a7a72;margin-bottom:7px;">Nombre completo *</label>
-            <input type="text" id="reg-nombre" placeholder="Tu nombre completo" style="width:100%;background:#f7f5f0;border:1.5px solid #e2ddd5;border-radius:12px;color:#252523;font-family:'Outfit',sans-serif;font-size:15px;padding:12px 16px;outline:none;box-sizing:border-box;">
+            <label style="display:block;font-size:11px;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;color:#7a7a72;margin-bottom:7px;">Nombre *</label>
+            <input type="text" id="reg-nombre" placeholder="Tu nombre" style="width:100%;background:#f7f5f0;border:1.5px solid #e2ddd5;border-radius:12px;color:#252523;font-family:'Outfit',sans-serif;font-size:15px;padding:12px 16px;outline:none;box-sizing:border-box;">
           </div>
           <div style="margin-bottom:14px;">
             <label style="display:block;font-size:11px;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;color:#7a7a72;margin-bottom:7px;">Numero de telefono * <span style="font-size:10px;font-weight:400;">(sera tu acceso)</span></label>
@@ -3541,7 +3541,7 @@ async function handleRegister() {
   var phone  = document.getElementById('reg-phone').value.trim();
   var email  = document.getElementById('reg-email').value.trim();
   var pin    = document.getElementById('reg-pin').value.trim();
-  if (!nombre)              { showToast('Escribe tu nombre completo', 'error'); return; }
+  if (!nombre)              { showToast('Escribe tu nombre', 'error'); return; }
   if (!isValidPhone(phone)) { showToast('Numero de telefono invalido', 'error'); return; }
   if (!email || email.indexOf('@') < 0) { showToast('Ingresa un correo valido', 'error'); return; }
   if (!pin || pin.length !== 4 || !/^[0-9]{4}$/.test(pin)) { showToast('El PIN debe ser de 4 digitos numericos', 'error'); return; }
