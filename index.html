@@ -2564,6 +2564,24 @@ footer .social-links a:hover { color: white; }
   overflow: visible !important;
 }
 
+
+/* Garantizar que pantallas activas sean visibles */
+.screen.active {
+  display: block !important;
+}
+#screen-menu.active {
+  display: block !important;
+  background: #111111;
+}
+#screen-envio.active {
+  display: flex !important;
+}
+#login-page {
+  display: flex;
+  flex-direction: column;
+  min-height: calc(100vh - 72px);
+}
+
 </style>
 </head>
 <body>
@@ -3605,7 +3623,7 @@ function getCartCountForItem(id) {
 
 function renderMenu() {
   var grid = document.getElementById('platillos-grid');
-  if (!grid) return;
+  if (!grid) { setTimeout(renderMenu, 100); return; }
   grid.innerHTML = '';
 
   MENU.forEach(function(p) {
