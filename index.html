@@ -2582,6 +2582,29 @@ footer .social-links a:hover { color: white; }
   min-height: calc(100vh - 72px);
 }
 
+
+/* Panel perfil - no bloquear clicks cuando está oculto */
+#perfil-panel[style*="display:none"],
+#perfil-overlay[style*="display:none"] {
+  pointer-events: none !important;
+}
+
+/* Menu siempre renderizable */
+#screen-menu.active {
+  display: block !important;
+  position: relative;
+  z-index: 1;
+}
+
+/* Turno grid igual que dia grid */
+.turno-grid .dia-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 16px 8px 14px;
+}
+
 </style>
 </head>
 <body>
@@ -2600,7 +2623,7 @@ footer .social-links a:hover { color: white; }
  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
  </a>
  </div>
- <div class="nav-user" id="nav-user" style="display:none" onclick="abrirPanelPerfil()">
+ <div class="nav-user" id="nav-user" style="display:none" onclick="abrirPanelPerfil()" style="cursor:pointer;">
  <div class="avatar" id="nav-avatar">?</div>
  <span id="nav-name">Cliente</span>
  </div>
@@ -2722,7 +2745,7 @@ footer .social-links a:hover { color: white; }
 
 
 <!-- PANEL PERFIL DESLIZABLE -->
-<div id="perfil-overlay" onclick="cerrarPanelPerfil()" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.4);z-index:998;"></div>
+<div id="perfil-overlay" onclick="cerrarPanelPerfil()" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.4);z-index:998;pointer-events:auto;"></div>
 <div id="perfil-panel" style="display:none;position:fixed;top:0;left:0;right:0;z-index:999;background:var(--white);border-radius:0 0 24px 24px;box-shadow:0 8px 40px rgba(0,0,0,0.18);padding:20px 22px 28px;max-width:600px;margin:0 auto;transform:translateY(-100%);transition:transform 0.3s ease;">
 
   <!-- Header del panel -->
@@ -3523,15 +3546,19 @@ function loginSuccess() {
   nav.style.display = 'flex';
   document.getElementById('nav-avatar').textContent = currentUser.nombre.charAt(0).toUpperCase();
   document.getElementById('nav-name').textContent = currentUser.nombre.split(' ')[0];
-  document.getElementById('welcome-name').textContent = currentUser.nombre.split(' ')[0];
+  // welcome-name may not exist yet if menu hasn't rendered
   iniciarSessionTimer();
   registrarConexion();
   if (currentUser.phone === ADMIN_PHONE) {
-    renderAdmin();
     showScreen('admin');
+    setTimeout(function() { renderAdmin(); }, 50);
   } else {
-    renderMenu();
     showScreen('menu');
+    setTimeout(function() {
+      var el = document.getElementById('welcome-name');
+      if (el) el.textContent = currentUser.nombre.split(' ')[0];
+      renderMenu();
+    }, 50);
   }
 }
 
@@ -3543,35 +3570,50 @@ function goToPerfil() {
 function abrirPanelPerfil() {
   var u = currentUser;
   if (!u) return;
-  // Fill panel data
-  document.getElementById('panel-nombre').textContent = u.nombre || '--';
-  document.getElementById('panel-tel').textContent = u.phone || '--';
-  document.getElementById('panel-email').textContent = u.email || '--';
-  document.getElementById('panel-dir').textContent = u.direccion || 'Sin guardar';
-  document.getElementById('panel-dia').textContent = u.diaPref || 'Sin preferencia';
-  var turnoEl = document.getElementById('panel-turno');
-  if (u.turnoPref === 'Manana') turnoEl.textContent = 'Manana (10am-1pm)';
-  else if (u.turnoPref === 'Tarde') turnoEl.textContent = 'Tarde (4pm-7pm)';
-  else turnoEl.textContent = 'Sin preferencia';
-  // Reset dir form
-  document.getElementById('panel-dir-form').style.display = 'none';
-  document.getElementById('panel-input-dir').value = u.direccion || '';
-  // Show overlay and panel
-  var overlay = document.getElementById('perfil-overlay');
+  // If already open, close it
   var panel = document.getElementById('perfil-panel');
-  overlay.style.display = 'block';
-  panel.style.display = 'block';
-  setTimeout(function() { panel.style.transform = 'translateY(0)'; }, 10);
+  if (panel && panel.style.display === 'block') {
+    cerrarPanelPerfil();
+    return;
+  }
+  // Fill panel data
+  var fields = {
+    'panel-nombre': u.nombre || '--',
+    'panel-tel': u.phone || '--',
+    'panel-email': u.email || '--',
+    'panel-dir': u.direccion || 'Sin guardar',
+    'panel-dia': u.diaPref || 'Sin preferencia'
+  };
+  Object.keys(fields).forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) el.textContent = fields[id];
+  });
+  var turnoEl = document.getElementById('panel-turno');
+  if (turnoEl) {
+    if (u.turnoPref === 'Manana') turnoEl.textContent = 'Manana (10am-1pm)';
+    else if (u.turnoPref === 'Tarde') turnoEl.textContent = 'Tarde (4pm-7pm)';
+    else turnoEl.textContent = 'Sin preferencia';
+  }
+  var dirForm = document.getElementById('panel-dir-form');
+  if (dirForm) dirForm.style.display = 'none';
+  var dirInput = document.getElementById('panel-input-dir');
+  if (dirInput) dirInput.value = u.direccion || '';
+  // Show
+  var overlay = document.getElementById('perfil-overlay');
+  if (overlay) { overlay.style.display = 'block'; overlay.style.pointerEvents = 'auto'; }
+  if (panel) { panel.style.display = 'block'; panel.style.pointerEvents = 'auto'; }
+  setTimeout(function() { if (panel) panel.style.transform = 'translateY(0)'; }, 10);
 }
 
 function cerrarPanelPerfil() {
   var overlay = document.getElementById('perfil-overlay');
   var panel = document.getElementById('perfil-panel');
+  if (!panel) return;
   panel.style.transform = 'translateY(-100%)';
   setTimeout(function() {
     panel.style.display = 'none';
-    overlay.style.display = 'none';
-  }, 300);
+    if (overlay) overlay.style.display = 'none';
+  }, 310);
 }
 
 function mostrarFormDirPanel() {
@@ -3623,7 +3665,7 @@ function getCartCountForItem(id) {
 
 function renderMenu() {
   var grid = document.getElementById('platillos-grid');
-  if (!grid) { setTimeout(renderMenu, 100); return; }
+  if (!grid) return;
   grid.innerHTML = '';
 
   MENU.forEach(function(p) {
