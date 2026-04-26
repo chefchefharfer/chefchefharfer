@@ -2721,8 +2721,8 @@ footer .social-links a:hover { color: white; }
         <!-- REGISTER FORM -->
         <div id="register-form" style="display:none;">
           <div style="margin-bottom:14px;">
-            <label style="display:block;font-size:11px;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;color:#7a7a72;margin-bottom:7px;">Nombre *</label>
-            <input type="text" id="reg-nombre" placeholder="Tu nombre" style="width:100%;background:#f7f5f0;border:1.5px solid #e2ddd5;border-radius:12px;color:#252523;font-family:'Outfit',sans-serif;font-size:15px;padding:12px 16px;outline:none;box-sizing:border-box;">
+            <label style="display:block;font-size:11px;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;color:#7a7a72;margin-bottom:7px;">Nombre completo *</label>
+            <input type="text" id="reg-nombre" placeholder="Tu nombre completo" style="width:100%;background:#f7f5f0;border:1.5px solid #e2ddd5;border-radius:12px;color:#252523;font-family:'Outfit',sans-serif;font-size:15px;padding:12px 16px;outline:none;box-sizing:border-box;">
           </div>
           <div style="margin-bottom:14px;">
             <label style="display:block;font-size:11px;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;color:#7a7a72;margin-bottom:7px;">Numero de telefono * <span style="font-size:10px;font-weight:400;">(sera tu acceso)</span></label>
@@ -3541,7 +3541,7 @@ async function handleRegister() {
   var phone  = document.getElementById('reg-phone').value.trim();
   var email  = document.getElementById('reg-email').value.trim();
   var pin    = document.getElementById('reg-pin').value.trim();
-  if (!nombre)              { showToast('Escribe tu nombre', 'error'); return; }
+  if (!nombre)              { showToast('Escribe tu nombre completo', 'error'); return; }
   if (!isValidPhone(phone)) { showToast('Numero de telefono invalido', 'error'); return; }
   if (!email || email.indexOf('@') < 0) { showToast('Ingresa un correo valido', 'error'); return; }
   if (!pin || pin.length !== 4 || !/^[0-9]{4}$/.test(pin)) { showToast('El PIN debe ser de 4 digitos numericos', 'error'); return; }
@@ -3668,44 +3668,47 @@ function guardarPedidoNotion(user, items, total, orderId, dia, direccion) {
 }
 
 
-// === CORREO ===
-async function enviarCorreoBienvenida(user) {
-  var nombre = user.nombre.split(' ')[0];
-  var htmlEmail = [
-    '<!DOCTYPE html><html><head><meta charset=UTF-8></head>',
-    '<body style="margin:0;padding:0;background:#f4f1ec;font-family:Arial,sans-serif;">',
-    '<table width=100% cellpadding=0 cellspacing=0 style="padding:40px 0;"><tr><td align=center>',
-    '<table width=540 cellpadding=0 cellspacing=0 style="background:#fff;border-radius:16px;overflow:hidden;">',
-    '<tr><td style="background:#067c49;padding:32px 40px;text-align:center;">',
-    '<div style="font-size:22px;font-weight:800;color:#fff;">Chef Chef Harfer</div>',
-    '<div style="font-size:11px;color:rgba(255,255,255,0.7);margin-top:4px;letter-spacing:2px;">KITS DE COCINA A DOMICILIO</div>',
-    '</td></tr>',
-    '<tr><td style="padding:36px 40px;">',
-    '<p style="font-size:20px;font-weight:700;color:#111;margin:0 0 16px;">Hola, ' + nombre + '!</p>',
-    '<p style="font-size:14px;color:#555;line-height:1.7;margin:0 0 20px;">Ya puedes hacer tus pedidos de kits de cocina. Ingredientes frescos, recetas listas, entregados a tu puerta en Tepatitlan.</p>',
-    '<div style="background:#eaf6f0;border-left:3px solid #067c49;border-radius:8px;padding:16px 20px;margin:20px 0;">',
-    '<p style="font-size:12px;font-weight:700;color:#067c49;margin:0 0 6px;">Como funciona</p>',
-    '<p style="font-size:13px;color:#333;line-height:1.6;margin:0;">Elige tu kit, envianos tu pedido por WhatsApp y te mandamos el link de pago seguro.</p>',
-    '</div>',
-    '<p style="font-size:13px;color:#555;margin:0 0 24px;">Entregamos martes, jueves y sabado. Pedidos cierran a las 12:00 pm del dia previo.</p>',
-    '<div style="text-align:center;"><a href=https://chefchefharfer.mx style="display:inline-block;background:#067c49;color:#fff;font-size:13px;font-weight:700;text-decoration:none;padding:13px 30px;border-radius:8px;">Ver el menu</a></div>',
-    '</td></tr>',
-    '<tr><td style="padding:20px 40px;text-align:center;border-top:1px solid #eee;">',
-    '<p style="font-size:11px;color:#aaa;margin:0;">Chef Chef Harfer - Tepatitlan de Morelos, Jalisco</p>',
-    '</td></tr></table></td></tr></table></body></html>'
-  ].join('');
+// === CORREO VIA NETLIFY ===
+var EMAIL_API = '/api/send-email';
+
+async function enviarEmail(tipo, to, data) {
   try {
-    var res = await fetch('https://api.resend.com/emails', {
+    var res = await fetch(EMAIL_API, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + RESEND_KEY },
-      body: JSON.stringify({ from: 'Chef Chef Harfer <hola@mail.chefchefharfer.mx>', to: [user.email],
-        subject: 'Hola ' + nombre + ', ya eres parte de Chef Chef Harfer', html: htmlEmail })
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ tipo: tipo, to: to, data: data })
     });
-    var data = await res.json();
-    console.log('Email result:', JSON.stringify(data));
-  } catch(e) { console.warn('Email error:', e.message); }
+    var d = await res.json();
+    console.log('Email ' + tipo + ':', d.ok ? 'OK' : JSON.stringify(d));
+    return d.ok;
+  } catch(e) {
+    console.warn('Email error:', e.message);
+    return false;
+  }
 }
 
+async function enviarCorreoBienvenida(user) {
+  if (!user.email) return;
+  return enviarEmail('bienvenida', user.email, { nombre: user.nombre.split(' ')[0] });
+}
+
+async function enviarCodigoRecuperacionEmail(user, codigo) {
+  if (!user.email) return false;
+  return enviarEmail('recuperacion', user.email, { nombre: user.nombre.split(' ')[0], codigo: codigo });
+}
+
+async function enviarConfirmacionPedido(user, pedido) {
+  if (!user.email) return;
+  return enviarEmail('confirmacion', user.email, {
+    nombre: user.nombre.split(' ')[0],
+    orderId: pedido.orderId,
+    dia: pedido.dia,
+    turno: pedido.turno,
+    direccion: pedido.direccion || 'Por confirmar',
+    platillos: pedido.platillos,
+    total: pedido.total
+  });
+}
 
 // === LOGO ===
 function cargarLogo(event) {
@@ -3730,22 +3733,14 @@ function aplicarLogo(src) {
 
 // === POST-LOGIN ===
 function loginSuccess() {
-  // Show nav
-  var navWrap = document.getElementById('nav-user-wrap');
-  if (navWrap) navWrap.style.display = 'block';
   var nav = document.getElementById('nav-user');
-  if (nav) nav.style.display = 'flex';
+  nav.style.display = 'flex';
   document.getElementById('nav-avatar').textContent = currentUser.nombre.charAt(0).toUpperCase();
   document.getElementById('nav-name').textContent = currentUser.nombre.split(' ')[0];
-  // Show/hide admin options
-  var ddAdmin = document.getElementById('nav-dd-admin');
-  var btnVolverAdmin = document.getElementById('btn-volver-admin');
-  var isAdmin = currentUser.phone === ADMIN_PHONE;
-  if (ddAdmin) ddAdmin.style.display = isAdmin ? 'flex' : 'none';
-  if (btnVolverAdmin) btnVolverAdmin.style.display = isAdmin ? 'block' : 'none';
+  // welcome-name may not exist yet if menu hasn't rendered
   iniciarSessionTimer();
   registrarConexion();
-  if (isAdmin) {
+  if (currentUser.phone === ADMIN_PHONE) {
     showScreen('admin');
     setTimeout(function() { renderAdmin(); }, 50);
   } else {
@@ -4403,25 +4398,13 @@ function renderAdmin() {
       clientes.forEach(function(c) {
         var tr = document.createElement('tr');
         tr.style.borderBottom = '1px solid #f0ede6';
-        // Get favorite platillo
-        var favName = '-';
-        if (c.platillosFav) {
-          var favs = Object.entries(c.platillosFav);
-          if (favs.length) {
-            favs.sort(function(a,b){return b[1]-a[1];});
-            favName = favs[0][0].split(' ').slice(0,3).join(' ');
-          }
-        }
         tr.innerHTML =
           '<td style="padding:10px 14px;font-weight:700;color:#111;font-size:13px;">' + (c.nombre||'') + '</td>' +
           '<td style="padding:10px 14px;color:#555;font-size:13px;">' + (c.phone||'') + '</td>' +
           '<td style="padding:10px 14px;color:#555;font-size:12px;">' + (c.email||'') + '</td>' +
           '<td style="padding:10px 14px;color:#888;font-size:12px;">' + (c.direccion||'Sin guardar') + '</td>' +
           '<td style="padding:10px 14px;text-align:center;font-size:13px;font-weight:700;color:#067c49;">' + (c.totalPedidos||0) + '</td>' +
-          '<td style="padding:10px 14px;color:#aaa;font-size:11px;">' + (c.fechaRegistro||'-') + '</td>' +
-          '<td style="padding:10px 14px;color:#555;font-size:11px;">' + (c.ultimoLogin||'-') + '</td>' +
-          '<td style="padding:10px 14px;font-weight:600;color:#067c49;font-size:12px;">$' + (c.totalGastado||0).toLocaleString('es-MX') + '</td>' +
-          '<td style="padding:10px 14px;color:#888;font-size:11px;">' + favName + '</td>';
+          '<td style="padding:10px 14px;color:#aaa;font-size:11px;">' + (c.fechaRegistro||'-') + '</td>';
         tcBody.appendChild(tr);
       });
     }
@@ -4526,8 +4509,10 @@ function nuevoPedido() {
 
 window.addEventListener('load', function() {
   document.body.className = 'on-login';
+  // Explicitly show login page
   var loginPage = document.getElementById('login-page');
   if (loginPage) loginPage.style.display = 'flex';
+  // Make sure login form is visible
   var lf = document.getElementById('login-form');
   if (lf) lf.style.display = 'block';
   var rf = document.getElementById('register-form');
@@ -4536,13 +4521,37 @@ window.addEventListener('load', function() {
   if (recf) recf.style.display = 'none';
   var pill = document.getElementById('cart-pill');
   if (pill) pill.classList.remove('visible');
-  // Close dropdown when clicking outside
-  document.addEventListener('click', function(e) {
-    var wrap = document.getElementById('nav-user-wrap');
-    var dd = document.getElementById('nav-dropdown');
-    if (wrap && dd && !wrap.contains(e.target)) dd.style.display = 'none';
-  });
-});
+});async function enviarCodigoRecuperacion() {
+  var phone = document.getElementById('recovery-phone').value.trim();
+  if (!isValidPhone(phone)) { showToast('Ingresa un numero valido', 'error'); return; }
+  var user = getUserLocal(phone);
+  if (!user) { showToast('No encontramos ese numero', 'error'); return; }
+  if (!user.email) { showToast('No hay correo registrado en esta cuenta', 'error'); return; }
+
+  codigoRecuperacion = Math.floor(100000 + Math.random() * 900000).toString();
+  codigoExpiry = Date.now() + 10 * 60 * 1000;
+
+  var emailDisplay = user.email.replace(/(\S{2})(.+)(@.*)/, function(m,a,b,c){ return a+b.replace(/./g,'*')+c; });
+  var emailHint = document.getElementById('recovery-email-hint');
+  if (emailHint) emailHint.textContent = 'Enviando codigo a ' + emailDisplay + '...';
+
+  showLoading('Enviando codigo...');
+  var sent = await enviarCodigoRecuperacionEmail(user, codigoRecuperacion);
+  hideLoading();
+
+  if (!sent) {
+    showToast('Error al enviar el correo. Intenta de nuevo.', 'error');
+    codigoRecuperacion = null; codigoExpiry = null;
+    return;
+  }
+
+  if (emailHint) emailHint.textContent = 'Codigo enviado a ' + emailDisplay;
+  var step2 = document.getElementById('recovery-step2');
+  if (step2) step2.style.display = 'block';
+  showToast('Codigo enviado a tu correo', 'success');
+}
+
+
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 </body>
