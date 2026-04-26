@@ -2622,7 +2622,7 @@ footer .social-links a:hover { color: white; }
       <input type="text" id="panel-input-dir" placeholder="Ej: Calle Hidalgo 123, Col. Centro" style="width:100%;padding:12px 14px;border:1.5px solid var(--border);border-radius:10px;font-family:'Outfit',sans-serif;font-size:14px;background:var(--bg);color:var(--text);box-sizing:border-box;margin-bottom:10px;">
       <button onclick="guardarDirPanel()" style="background:var(--green);color:white;border:none;border-radius:10px;padding:11px;font-family:'Outfit',sans-serif;font-size:13px;font-weight:700;cursor:pointer;width:100%;">Guardar</button>
     </div>
-  </div>
+  <button onclick="cerrarSesion()" style="margin-top:8px;background:transparent;border:1.5px solid #ffd5d5;border-radius:10px;padding:9px 16px;font-family:'Outfit',sans-serif;font-size:12px;font-weight:600;color:#c1121f;cursor:pointer;width:100%;">Cerrar sesion</button>
 
 </div>
 
@@ -2939,6 +2939,81 @@ footer .social-links a:hover { color: white; }
 
 </div>
 
+<!-- 
+ PANTALLA ADMIN
+ -->
+<div class="screen" id="screen-admin">
+  <div style="max-width:700px;margin:0 auto;">
+
+    <!-- Header -->
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;">
+      <div>
+        <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:22px;font-weight:800;color:#111;letter-spacing:-0.5px;">Panel Admin</div>
+        <div style="font-size:12px;color:#888;margin-top:2px;">Chef Chef Harfer · Solo visible para ti</div>
+      </div>
+      <button onclick="adminLogout()" style="background:transparent;border:1.5px solid var(--border);border-radius:10px;padding:8px 16px;font-family:'Outfit',sans-serif;font-size:12px;font-weight:600;color:var(--muted);cursor:pointer;">Cerrar sesion</button>
+    </div>
+
+    <!-- Stats -->
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:20px;">
+      <div style="background:white;border-radius:16px;padding:20px;border:1px solid rgba(0,0,0,0.06);text-align:center;">
+        <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:32px;font-weight:800;color:var(--green);" id="admin-total-conexiones">0</div>
+        <div style="font-size:11px;color:#888;margin-top:4px;font-weight:500;letter-spacing:0.3px;">CONEXIONES TOTALES</div>
+      </div>
+      <div style="background:white;border-radius:16px;padding:20px;border:1px solid rgba(0,0,0,0.06);text-align:center;">
+        <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:32px;font-weight:800;color:#bdac41;" id="admin-conexiones-hoy">0</div>
+        <div style="font-size:11px;color:#888;margin-top:4px;font-weight:500;letter-spacing:0.3px;">CONEXIONES HOY</div>
+      </div>
+      <div style="background:white;border-radius:16px;padding:20px;border:1px solid rgba(0,0,0,0.06);text-align:center;">
+        <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:32px;font-weight:800;color:#111;" id="admin-total-usuarios">0</div>
+        <div style="font-size:11px;color:#888;margin-top:4px;font-weight:500;letter-spacing:0.3px;">USUARIOS REGISTRADOS</div>
+      </div>
+    </div>
+
+    <!-- Botones acceso rapido -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px;">
+      <a href="https://www.notion.so/34ab3d646693811d931ce4f53d278d14" target="_blank" style="background:white;border:1.5px solid var(--border);border-radius:14px;padding:16px 18px;text-decoration:none;display:flex;align-items:center;gap:10px;">
+        <span style="font-size:20px;">👥</span>
+        <div><div style="font-size:13px;font-weight:700;color:#111;">Clientes</div><div style="font-size:11px;color:#888;">Ver en Notion</div></div>
+      </a>
+      <a href="https://www.notion.so/34ab3d646693814ba971cc7203cb6df6" target="_blank" style="background:white;border:1.5px solid var(--border);border-radius:14px;padding:16px 18px;text-decoration:none;display:flex;align-items:center;gap:10px;">
+        <span style="font-size:20px;">📋</span>
+        <div><div style="font-size:13px;font-weight:700;color:#111;">Pedidos</div><div style="font-size:11px;color:#888;">Ver en Notion</div></div>
+      </a>
+    </div>
+
+    <!-- Tabla de usuarios -->
+    <div style="background:white;border-radius:18px;border:1px solid rgba(0,0,0,0.06);overflow:hidden;">
+      <div style="padding:18px 20px;border-bottom:1px solid #f0ede6;display:flex;align-items:center;justify-content:space-between;">
+        <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:14px;font-weight:800;color:#111;">Usuarios registrados</div>
+        <button onclick="renderAdmin()" style="background:var(--green-pale);border:1px solid var(--green-light);border-radius:8px;padding:6px 12px;font-size:11px;font-weight:600;color:var(--green);cursor:pointer;">Actualizar</button>
+      </div>
+      <div style="overflow-x:auto;">
+        <table style="width:100%;border-collapse:collapse;font-family:'Outfit',sans-serif;font-size:13px;">
+          <thead>
+            <tr style="background:#fafaf8;">
+              <th style="padding:10px 12px;text-align:left;font-size:10px;letter-spacing:1px;color:#aaa;font-weight:700;text-transform:uppercase;">Nombre</th>
+              <th style="padding:10px 12px;text-align:left;font-size:10px;letter-spacing:1px;color:#aaa;font-weight:700;text-transform:uppercase;">Telefono</th>
+              <th style="padding:10px 12px;text-align:left;font-size:10px;letter-spacing:1px;color:#aaa;font-weight:700;text-transform:uppercase;">Email</th>
+              <th style="padding:10px 12px;text-align:left;font-size:10px;letter-spacing:1px;color:#aaa;font-weight:700;text-transform:uppercase;">Direccion</th>
+              <th style="padding:10px 12px;text-align:left;font-size:10px;letter-spacing:1px;color:#aaa;font-weight:700;text-transform:uppercase;">Registro</th>
+            </tr>
+          </thead>
+          <tbody id="admin-users-tbody">
+            <tr><td colspan="5" style="padding:20px;text-align:center;color:#aaa;">Cargando...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Boton ir al menu -->
+    <button onclick="renderMenu();showScreen('menu');" style="margin-top:16px;background:var(--green);color:white;border:none;border-radius:12px;padding:14px;font-family:'Plus Jakarta Sans',sans-serif;font-size:14px;font-weight:700;cursor:pointer;width:100%;">
+      Ver el menu como cliente
+    </button>
+
+  </div>
+</div>
+
 <div class="screen" id="screen-success">
  <div class="card success-card">
  <div class="success-icon"></div>
@@ -2995,6 +3070,94 @@ footer .social-links a:hover { color: white; }
 // === CONFIGURACION ===
 var WA_NUMBER = '523782901365';
 var RESEND_KEY = 're_d7qfs2N9_H4xsdhQRTYDVXLkeQHQX56he';
+var ADMIN_PHONE = '3782901365';
+var ADMIN_PIN = '3423';
+var LOG_DB_ID = '406ce4e4-1ecb-4b8c-b4ee-7671913efdc0';
+var NOTION_TOKEN = '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';
+
+// === SESION CON TIMEOUT ===
+var SESSION_TIMEOUT = 10 * 60 * 1000; // 10 minutos
+var sessionTimer = null;
+
+function resetSessionTimer() {
+  if (!currentUser) return;
+  if (sessionTimer) clearTimeout(sessionTimer);
+  sessionTimer = setTimeout(function() {
+    if (!currentUser) return;
+    var nombre = currentUser.nombre.split(' ')[0];
+    registrarActividad(currentUser, 'Sesion expirada', 'Sesion cerrada por inactividad');
+    currentUser = null;
+    if (sessionTimer) clearTimeout(sessionTimer);
+    sessionTimer = null;
+    // Reset UI
+    var nav = document.getElementById('nav-user');
+    if (nav) nav.style.display = 'none';
+    showScreen('login');
+    showToast('Sesion cerrada por inactividad (10 min)', 'error');
+  }, SESSION_TIMEOUT);
+}
+
+function iniciarSessionTimer() {
+  resetSessionTimer();
+  // Reset timer on any user interaction
+  ['click','touchstart','keydown','scroll','mousemove'].forEach(function(evt) {
+    document.addEventListener(evt, resetSessionTimer, { passive: true });
+  });
+}
+
+function cerrarSesion() {
+  if (currentUser) registrarActividad(currentUser, 'Logout', 'Cerro sesion manualmente');
+  currentUser = null;
+  if (sessionTimer) clearTimeout(sessionTimer);
+  sessionTimer = null;
+  var nav = document.getElementById('nav-user');
+  if (nav) nav.style.display = 'none';
+  cart = {};
+  updateCartBar();
+  cerrarPanelPerfil();
+  showScreen('login');
+  showToast('Sesion cerrada', 'success');
+}
+
+// === LOG DE ACTIVIDAD ===
+async function registrarActividad(user, tipo, detalle) {
+  var today = new Date().toISOString().split('T')[0];
+  var titulo = tipo + ' - ' + (user ? user.nombre : 'Anonimo');
+  try {
+    var res = await fetch('https://api.notion.com/v1/pages', {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer ' + NOTION_TOKEN,
+        'Content-Type': 'application/json',
+        'Notion-Version': '2022-06-28'
+      },
+      body: JSON.stringify({
+        parent: { database_id: LOG_DB_ID },
+        properties: {
+          'Evento': { title: [{ text: { content: titulo } }] },
+          'Usuario': { rich_text: [{ text: { content: user ? user.nombre : '' } }] },
+          'Telefono': { rich_text: [{ text: { content: user ? user.phone : '' } }] },
+          'Tipo': { select: { name: tipo } },
+          'Detalle': { rich_text: [{ text: { content: detalle || '' } }] },
+          'Fecha': { date: { start: today } }
+        }
+      })
+    });
+  } catch(e) { console.warn('Log error:', e.message); }
+}
+
+// === CONTADOR DE CONEXIONES ===
+function registrarConexion() {
+  try {
+    var count = parseInt(localStorage.getItem('cch_total_conexiones') || '0') + 1;
+    localStorage.setItem('cch_total_conexiones', count.toString());
+    var hoy = new Date().toDateString();
+    var hoyCount = parseInt(localStorage.getItem('cch_conexiones_hoy_date') === hoy
+      ? localStorage.getItem('cch_conexiones_hoy') || '0' : '0') + 1;
+    localStorage.setItem('cch_conexiones_hoy', hoyCount.toString());
+    localStorage.setItem('cch_conexiones_hoy_date', hoy);
+  } catch(e) {}
+}
 
 var BASE_IMG = 'https://chefchefharfer.github.io/chefchefharfer/';
 var MENU = [
@@ -3077,6 +3240,16 @@ function handleLogin() {
   var pin   = document.getElementById('login-pin').value.trim();
   if (!isValidPhone(phone)) { showToast('Ingresa un numero valido de 10 digitos', 'error'); return; }
   if (!pin || pin.length !== 4) { showToast('Ingresa tu PIN de 4 digitos', 'error'); return; }
+  var cleanedPhone = cleanPhone(phone);
+  // Admin access
+  if (cleanedPhone === ADMIN_PHONE && pin === ADMIN_PIN) {
+    var adminUser = getUserLocal(ADMIN_PHONE) || { nombre: 'Administrador', phone: ADMIN_PHONE, email: 'admin@chefchefharfer.mx', pin: ADMIN_PIN };
+    saveUserLocal(adminUser);
+    currentUser = adminUser;
+    loginSuccess();
+    showToast('Bienvenido, Administrador', 'welcome');
+    return;
+  }
   var user = getUserLocal(phone);
   if (!user) {
     showToast('No encontramos ese numero. Registrate.', 'error');
@@ -3090,6 +3263,7 @@ function handleLogin() {
     return;
   }
   currentUser = user;
+  registrarActividad(user, 'Login', 'Inicio de sesion exitoso');
   loginSuccess();
   showToast('Hola de nuevo, ' + user.nombre.split(' ')[0] + '!', 'welcome');
 }
@@ -3163,6 +3337,7 @@ async function handleRegister() {
   try { saveUserLocal(user); } catch(e) {}
   hideLoading();
   currentUser = user;
+  registrarActividad(user, 'Registro', 'Nueva cuenta creada');
   loginSuccess();
   showToast('Cuenta creada! Hola, ' + nombre.split(' ')[0] + '.', 'welcome');
 }
@@ -3298,8 +3473,15 @@ function loginSuccess() {
   document.getElementById('nav-avatar').textContent = currentUser.nombre.charAt(0).toUpperCase();
   document.getElementById('nav-name').textContent = currentUser.nombre.split(' ')[0];
   document.getElementById('welcome-name').textContent = currentUser.nombre.split(' ')[0];
-  renderMenu();
-  showScreen('menu');
+  iniciarSessionTimer();
+  registrarConexion();
+  if (currentUser.phone === ADMIN_PHONE) {
+    renderAdmin();
+    showScreen('admin');
+  } else {
+    renderMenu();
+    showScreen('menu');
+  }
 }
 
 function goToPerfil() {
@@ -3768,12 +3950,16 @@ async function abrirWhatsApp() {
   try { await guardarPedidoNotion(u, items, total, orderId, diaSeleccionado, direccion); } catch(e) { console.warn('Notion:', e.message); }
   hideLoading();
 
-  var msg = 'Hola! Quiero hacer un pedido de Chef Chef Harfer.\n\n';
+  var mapLink = (pinLat && pinLng)
+    ? 'https://www.google.com/maps?q=' + pinLat.toFixed(6) + ',' + pinLng.toFixed(6)
+    : 'Sin ubicacion marcada';
+  var msg = 'Hola! Quiero hacer un pedido.\n\n';
   msg += '*Pedido #*' + orderId + '\n';
   msg += '*Nombre:* ' + u.nombre + '\n';
   msg += '*Tel:* ' + u.phone + '\n';
   msg += '*Entrega:* ' + diaSeleccionado + ' - ' + turnoLabel + '\n';
-  if (direccion) msg += '*Direccion:* ' + direccion + '\n';
+  msg += '*Direccion:* ' + (direccion || 'No especificada') + '\n';
+  msg += '*Ubicacion:* ' + mapLink + '\n';
   msg += '\n*Platillos:*\n';
   items.forEach(function(i) {
     var precio = i.porciones === 4 ? i.platillo.precio2p * 2 : i.platillo.precio2p;
@@ -3906,6 +4092,56 @@ function getDireccionFinal() {
   return inp ? inp.value.trim() : '';
 }
 
+
+// === ADMIN PANEL ===
+function renderAdmin() {
+  if (currentUser.phone !== ADMIN_PHONE) return;
+  // Stats
+  var totalConexiones = localStorage.getItem('cch_total_conexiones') || '0';
+  var hoy = new Date().toDateString();
+  var conexionesHoy = (localStorage.getItem('cch_conexiones_hoy_date') === hoy)
+    ? (localStorage.getItem('cch_conexiones_hoy') || '0') : '0';
+  // Get all users
+  var allUsers = [];
+  try {
+    for (var k in localStorage) {
+      if (k.startsWith('cch_user_')) {
+        try { allUsers.push(JSON.parse(localStorage.getItem(k))); } catch(e) {}
+      }
+    }
+  } catch(e) {}
+  // Render stats
+  var el = document.getElementById('admin-total-conexiones');
+  if (el) el.textContent = totalConexiones;
+  var el2 = document.getElementById('admin-conexiones-hoy');
+  if (el2) el2.textContent = conexionesHoy;
+  var el3 = document.getElementById('admin-total-usuarios');
+  if (el3) el3.textContent = allUsers.length;
+  // Render users table
+  var tbody = document.getElementById('admin-users-tbody');
+  if (tbody) {
+    tbody.innerHTML = '';
+    allUsers.sort(function(a,b) { return (b.fechaRegistro||'').localeCompare(a.fechaRegistro||''); });
+    allUsers.forEach(function(u) {
+      var tr = document.createElement('tr');
+      tr.innerHTML = '<td style="padding:10px 12px;border-bottom:1px solid #f0ede6;font-weight:600;color:#111;">' + (u.nombre||'') + '</td>' +
+        '<td style="padding:10px 12px;border-bottom:1px solid #f0ede6;color:#555;">' + (u.phone||'') + '</td>' +
+        '<td style="padding:10px 12px;border-bottom:1px solid #f0ede6;color:#555;">' + (u.email||'') + '</td>' +
+        '<td style="padding:10px 12px;border-bottom:1px solid #f0ede6;color:#888;font-size:12px;">' + (u.direccion||'o') + '</td>' +
+        '<td style="padding:10px 12px;border-bottom:1px solid #f0ede6;color:#888;font-size:12px;">' + (u.fechaRegistro ? u.fechaRegistro.substring(0,10) : 'o') + '</td>';
+      tbody.appendChild(tr);
+    });
+    if (!allUsers.length) {
+      var tr2 = document.createElement('tr');
+      tr2.innerHTML = '<td colspan="5" style="padding:20px;text-align:center;color:#aaa;">Sin usuarios registrados aun</td>';
+      tbody.appendChild(tr2);
+    }
+  }
+}
+
+function adminLogout() {
+  cerrarSesion();
+}
 function nuevoPedido() {
   cart = {};
   updateCartBar();
