@@ -2679,15 +2679,15 @@ footer .social-links a:hover { color: white; }
 
         <!-- RECOVERY FORM -->
         <div id="recovery-form" style="display:none;">
-          <div style="font-size:13px;color:#7a7a72;margin-bottom:16px;line-height:1.6;">Te enviaremos un codigo de 6 digitos a tu correo registrado.</div>
+          <div style="font-size:13px;color:#7a7a72;margin-bottom:16px;line-height:1.6;">Te enviaremos un codigo de 6 digitos por WhatsApp para verificar tu identidad.</div>
           <div style="margin-bottom:14px;">
             <label style="display:block;font-size:11px;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;color:#7a7a72;margin-bottom:7px;">Tu numero de telefono</label>
             <input type="tel" id="recovery-phone" placeholder="331 234 5678" maxlength="15" style="width:100%;background:#f7f5f0;border:1.5px solid #e2ddd5;border-radius:12px;color:#252523;font-family:'Outfit',sans-serif;font-size:15px;padding:12px 16px;outline:none;box-sizing:border-box;">
           </div>
           <button onclick="enviarCodigoRecuperacion()" style="width:100%;background:#067c49;color:white;border:none;border-radius:12px;padding:14px;font-family:'Plus Jakarta Sans',sans-serif;font-size:14px;font-weight:700;cursor:pointer;margin-bottom:16px;">
-            Enviar codigo a mi correo
+            Enviar codigo por WhatsApp
           </button>
-          <div id="recovery-step2" style="display:none;"><div id="recovery-email-hint" style="font-size:12px;color:#067c49;font-weight:600;margin-bottom:14px;text-align:center;padding:8px;background:#edf8f2;border-radius:8px;"></div>
+          <div id="recovery-step2" style="display:none;">
             <div style="margin-bottom:14px;">
               <label style="display:block;font-size:11px;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;color:#7a7a72;margin-bottom:7px;">Codigo recibido (6 digitos)</label>
               <input type="text" id="recovery-codigo" placeholder="123456" maxlength="6" inputmode="numeric" style="width:100%;background:#f7f5f0;border:1.5px solid #e2ddd5;border-radius:12px;color:#252523;font-family:'Outfit',sans-serif;font-size:15px;padding:12px 16px;outline:none;box-sizing:border-box;">
@@ -2957,6 +2957,169 @@ footer .social-links a:hover { color: white; }
  PANTALLA ADMIN
  -->
 <div class="screen" id="screen-admin">
+<div style="max-width:900px;margin:0 auto;">
+
+  <!-- Header -->
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px;">
+    <div>
+      <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:22px;font-weight:800;color:#111;letter-spacing:-0.5px;">Panel Administrador</div>
+      <div style="font-size:12px;color:#888;margin-top:2px;">Chef Chef Harfer &mdash; Base de datos interna</div>
+    </div>
+    <button onclick="adminLogout()" style="background:transparent;border:1.5px solid #ffd5d5;border-radius:10px;padding:8px 16px;font-family:'Outfit',sans-serif;font-size:12px;font-weight:600;color:#c1121f;cursor:pointer;">Cerrar sesion</button>
+  </div>
+
+  <!-- Stats -->
+  <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:20px;">
+    <div style="background:white;border-radius:14px;padding:16px;border:1px solid rgba(0,0,0,0.06);text-align:center;">
+      <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:26px;font-weight:800;color:#067c49;" id="admin-total-usuarios">0</div>
+      <div style="font-size:10px;color:#888;margin-top:4px;font-weight:600;letter-spacing:0.5px;">CLIENTES</div>
+    </div>
+    <div style="background:white;border-radius:14px;padding:16px;border:1px solid rgba(0,0,0,0.06);text-align:center;">
+      <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:26px;font-weight:800;color:#bdac41;" id="admin-total-pedidos">0</div>
+      <div style="font-size:10px;color:#888;margin-top:4px;font-weight:600;letter-spacing:0.5px;">PEDIDOS</div>
+    </div>
+    <div style="background:white;border-radius:14px;padding:16px;border:1px solid rgba(0,0,0,0.06);text-align:center;">
+      <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:22px;font-weight:800;color:#111;" id="admin-total-ventas">$0</div>
+      <div style="font-size:10px;color:#888;margin-top:4px;font-weight:600;letter-spacing:0.5px;">VENTAS TOTALES</div>
+    </div>
+    <div style="background:white;border-radius:14px;padding:16px;border:1px solid rgba(0,0,0,0.06);text-align:center;">
+      <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:26px;font-weight:800;color:#555;" id="admin-total-conexiones">0</div>
+      <div style="font-size:10px;color:#888;margin-top:4px;font-weight:600;letter-spacing:0.5px;">CONEXIONES</div>
+    </div>
+    <div style="background:white;border-radius:14px;padding:16px;border:1px solid rgba(0,0,0,0.06);text-align:center;">
+      <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:26px;font-weight:800;color:#555;" id="admin-conexiones-hoy">0</div>
+      <div style="font-size:10px;color:#888;margin-top:4px;font-weight:600;letter-spacing:0.5px;">HOY</div>
+    </div>
+  </div>
+
+  <!-- CLIENTES -->
+  <div style="background:white;border-radius:16px;border:1px solid rgba(0,0,0,0.06);overflow:hidden;margin-bottom:16px;">
+    <div style="padding:16px 20px;border-bottom:1px solid #f0ede6;display:flex;align-items:center;justify-content:space-between;">
+      <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:14px;font-weight:800;color:#111;">&#128101; Clientes Registrados</div>
+      <div style="display:flex;gap:8px;">
+        <button onclick="renderAdmin()" style="background:var(--green-pale);border:1px solid var(--green-light);border-radius:8px;padding:6px 12px;font-size:11px;font-weight:600;color:var(--green);cursor:pointer;">Actualizar</button>
+        <button onclick="exportarCSV('clientes')" style="background:#f0ede6;border:1px solid #e2ddd5;border-radius:8px;padding:6px 12px;font-size:11px;font-weight:600;color:#555;cursor:pointer;">Exportar CSV</button>
+      </div>
+    </div>
+    <div style="overflow-x:auto;">
+      <table style="width:100%;border-collapse:collapse;font-family:'Outfit',sans-serif;">
+        <thead>
+          <tr style="background:#fafaf8;">
+            <th style="padding:10px 14px;text-align:left;font-size:10px;letter-spacing:1px;color:#aaa;font-weight:700;text-transform:uppercase;white-space:nowrap;">Nombre</th>
+            <th style="padding:10px 14px;text-align:left;font-size:10px;letter-spacing:1px;color:#aaa;font-weight:700;text-transform:uppercase;white-space:nowrap;">Telefono</th>
+            <th style="padding:10px 14px;text-align:left;font-size:10px;letter-spacing:1px;color:#aaa;font-weight:700;text-transform:uppercase;white-space:nowrap;">Email</th>
+            <th style="padding:10px 14px;text-align:left;font-size:10px;letter-spacing:1px;color:#aaa;font-weight:700;text-transform:uppercase;white-space:nowrap;">Direccion</th>
+            <th style="padding:10px 14px;text-align:center;font-size:10px;letter-spacing:1px;color:#aaa;font-weight:700;text-transform:uppercase;white-space:nowrap;">Pedidos</th>
+            <th style="padding:10px 14px;text-align:left;font-size:10px;letter-spacing:1px;color:#aaa;font-weight:700;text-transform:uppercase;white-space:nowrap;">Registro</th>
+          </tr>
+        </thead>
+        <tbody id="admin-clientes-tbody">
+          <tr><td colspan="6" style="padding:20px;text-align:center;color:#aaa;">Cargando...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- PEDIDOS -->
+  <div style="background:white;border-radius:16px;border:1px solid rgba(0,0,0,0.06);overflow:hidden;margin-bottom:16px;">
+    <div style="padding:16px 20px;border-bottom:1px solid #f0ede6;display:flex;align-items:center;justify-content:space-between;">
+      <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:14px;font-weight:800;color:#111;">&#128203; Pedidos Web</div>
+      <div style="display:flex;gap:8px;">
+        <button onclick="renderAdmin()" style="background:var(--green-pale);border:1px solid var(--green-light);border-radius:8px;padding:6px 12px;font-size:11px;font-weight:600;color:var(--green);cursor:pointer;">Actualizar</button>
+        <button onclick="exportarCSV('pedidos')" style="background:#f0ede6;border:1px solid #e2ddd5;border-radius:8px;padding:6px 12px;font-size:11px;font-weight:600;color:#555;cursor:pointer;">Exportar CSV</button>
+      </div>
+    </div>
+    <div style="overflow-x:auto;">
+      <table style="width:100%;border-collapse:collapse;font-family:'Outfit',sans-serif;">
+        <thead>
+          <tr style="background:#fafaf8;">
+            <th style="padding:10px 14px;text-align:left;font-size:10px;letter-spacing:1px;color:#aaa;font-weight:700;text-transform:uppercase;white-space:nowrap;">#Pedido</th>
+            <th style="padding:10px 14px;text-align:left;font-size:10px;letter-spacing:1px;color:#aaa;font-weight:700;text-transform:uppercase;white-space:nowrap;">Cliente</th>
+            <th style="padding:10px 14px;text-align:left;font-size:10px;letter-spacing:1px;color:#aaa;font-weight:700;text-transform:uppercase;white-space:nowrap;">Entrega</th>
+            <th style="padding:10px 14px;text-align:left;font-size:10px;letter-spacing:1px;color:#aaa;font-weight:700;text-transform:uppercase;white-space:nowrap;">Platillos</th>
+            <th style="padding:10px 14px;text-align:left;font-size:10px;letter-spacing:1px;color:#aaa;font-weight:700;text-transform:uppercase;white-space:nowrap;">Total</th>
+            <th style="padding:10px 14px;text-align:left;font-size:10px;letter-spacing:1px;color:#aaa;font-weight:700;text-transform:uppercase;white-space:nowrap;">Estado</th>
+            <th style="padding:10px 14px;text-align:left;font-size:10px;letter-spacing:1px;color:#aaa;font-weight:700;text-transform:uppercase;white-space:nowrap;">Fecha</th>
+          </tr>
+        </thead>
+        <tbody id="admin-pedidos-tbody">
+          <tr><td colspan="7" style="padding:20px;text-align:center;color:#aaa;">Cargando...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- LOG -->
+  <div style="background:white;border-radius:16px;border:1px solid rgba(0,0,0,0.06);overflow:hidden;margin-bottom:16px;">
+    <div style="padding:16px 20px;border-bottom:1px solid #f0ede6;">
+      <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:14px;font-weight:800;color:#111;">&#128336; Actividad reciente</div>
+    </div>
+    <div style="overflow-x:auto;">
+      <table style="width:100%;border-collapse:collapse;font-family:'Outfit',sans-serif;">
+        <thead>
+          <tr style="background:#fafaf8;">
+            <th style="padding:8px 14px;text-align:left;font-size:10px;letter-spacing:1px;color:#aaa;font-weight:700;text-transform:uppercase;">Fecha</th>
+            <th style="padding:8px 14px;text-align:left;font-size:10px;letter-spacing:1px;color:#aaa;font-weight:700;text-transform:uppercase;">Tipo</th>
+            <th style="padding:8px 14px;text-align:left;font-size:10px;letter-spacing:1px;color:#aaa;font-weight:700;text-transform:uppercase;">Usuario</th>
+            <th style="padding:8px 14px;text-align:left;font-size:10px;letter-spacing:1px;color:#aaa;font-weight:700;text-transform:uppercase;">Detalle</th>
+          </tr>
+        </thead>
+        <tbody id="admin-log-tbody">
+          <tr><td colspan="4" style="padding:20px;text-align:center;color:#aaa;">Sin actividad</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Ir al menu -->
+  <button onclick="renderMenu();showScreen('menu');" style="background:var(--green);color:white;border:none;border-radius:12px;padding:14px;font-family:'Plus Jakarta Sans',sans-serif;font-size:14px;font-weight:700;cursor:pointer;width:100%;">
+    Ver el menu como cliente
+  </button>
+
+</div>
+</div>
+
+<!-- 
+ PANTALLA: CONFIRMACION PREVIA A WHATSAPP
+ -->
+<div class="screen" id="screen-envio">
+
+  <div class="envio-card">
+
+    <div class="envio-icon">
+      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#067c49" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 11.5a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 0.8h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.37a16 16 0 0 0 6.72 6.72l1.73-1.74a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 23 16.92z"/>
+      </svg>
+    </div>
+
+    <div class="envio-titulo">Tu pedido esta listo</div>
+
+    <div class="envio-resumen" id="envio-resumen-texto"></div>
+
+    <div class="envio-instruccion">
+      Al tocar el boton de abajo, te abriremos <strong>WhatsApp</strong> con tu solicitud lista para enviar.<br>
+      Solo presiona <strong>Enviar</strong> en WhatsApp y listo — nosotros te mandamos el link de pago.
+    </div>
+
+    <button class="btn-enviar-wa" id="btn-enviar-wa" onclick="abrirWhatsApp()">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="white">
+        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+      </svg>
+      Enviar solicitud por WhatsApp
+    </button>
+
+    <button class="btn-envio-cancelar" onclick="showScreen('confirm')">
+      Revisar mi pedido
+    </button>
+
+  </div>
+
+</div>
+
+<!-- 
+ PANTALLA ADMIN
+ -->
+<div class="screen" id="screen-admin">
   <div style="max-width:700px;margin:0 auto;">
 
     <!-- Header -->
@@ -3106,8 +3269,7 @@ var WA_NUMBER = '523782901365';
 var RESEND_KEY = 're_d7qfs2N9_H4xsdhQRTYDVXLkeQHQX56he';
 var ADMIN_PHONE = '3782901365';
 var ADMIN_PIN = '3423';
-var LOG_DB_ID = '406ce4e4-1ecb-4b8c-b4ee-7671913efdc0';
-var NOTION_TOKEN = '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';
+// Base de datos interna (localStorage)
 
 // === SESION CON TIMEOUT ===
 var SESSION_TIMEOUT = 10 * 60 * 1000; // 10 minutos
@@ -3302,7 +3464,6 @@ function handleLogin() {
 
 // === RECUPERACION DE PIN ===
 var codigoRecuperacion = null;
-var codigoExpiry = null;
 
 function mostrarRecuperacion() {
   var lf = document.getElementById('login-form'); if (lf) lf.style.display = 'none';
@@ -3318,96 +3479,26 @@ function ocultarRecuperacion() {
   codigoRecuperacion = null;
 }
 
-async function enviarCodigoRecuperacion() {
+function enviarCodigoRecuperacion() {
   var phone = document.getElementById('recovery-phone').value.trim();
   if (!isValidPhone(phone)) { showToast('Ingresa un numero valido', 'error'); return; }
   var user = getUserLocal(phone);
   if (!user) { showToast('No encontramos ese numero', 'error'); return; }
-  if (!user.email) { showToast('No hay correo registrado en esta cuenta', 'error'); return; }
-
-  // Generate 6-digit code with expiry (10 min)
+  // Generate 6-digit code
   codigoRecuperacion = Math.floor(100000 + Math.random() * 900000).toString();
-  codigoExpiry = Date.now() + 10 * 60 * 1000;
-
-  var nombre = user.nombre.split(' ')[0];
-  var htmlEmail = [
-    '<!DOCTYPE html><html><head><meta charset=UTF-8></head>',
-    '<body style="margin:0;padding:0;background:#f4f1ec;font-family:Arial,sans-serif;">',
-    '<table width=100% cellpadding=0 cellspacing=0 style="padding:40px 0;"><tr><td align=center>',
-    '<table width=480 cellpadding=0 cellspacing=0 style="background:#fff;border-radius:16px;overflow:hidden;">',
-    '<tr><td style="background:#067c49;padding:28px 36px;text-align:center;">',
-    '<div style="font-size:20px;font-weight:800;color:#fff;">Chef Chef Harfer</div>',
-    '</td></tr>',
-    '<tr><td style="padding:36px;">',
-    '<p style="font-size:18px;font-weight:700;color:#111;margin:0 0 12px;">Hola, ' + nombre + '</p>',
-    '<p style="font-size:14px;color:#555;line-height:1.6;margin:0 0 24px;">Recibimos una solicitud para restablecer tu PIN de acceso. Usa el siguiente codigo para continuar:</p>',
-    '<div style="background:#f0f9f5;border:2px solid #067c49;border-radius:12px;padding:24px;text-align:center;margin:0 0 24px;">',
-    '<div style="font-size:11px;color:#067c49;font-weight:700;letter-spacing:2px;margin-bottom:8px;">TU CODIGO DE VERIFICACION</div>',
-    '<div style="font-size:40px;font-weight:800;color:#067c49;letter-spacing:12px;">' + codigoRecuperacion + '</div>',
-    '<div style="font-size:12px;color:#888;margin-top:8px;">Expira en 10 minutos</div>',
-    '</div>',
-    '<p style="font-size:13px;color:#888;line-height:1.6;margin:0;">Si no solicitaste este cambio, ignora este correo. Tu PIN actual no ha sido modificado.</p>',
-    '</td></tr>',
-    '<tr><td style="padding:20px 36px;text-align:center;border-top:1px solid #eee;">',
-    '<p style="font-size:11px;color:#aaa;margin:0;">Chef Chef Harfer - Tepatitlan de Morelos, Jalisco</p>',
-    '</td></tr></table></td></tr></table></body></html>'
-  ].join('');
-
-  // Show step 2 immediately (optimistic UI)
-  var emailDisplay = user.email.replace(/(.{2})(.*)(@.*)/, function(m, a, b, c) {
-    return a + b.replace(/./g, '*') + c;
-  });
-
-  var step2 = document.getElementById('recovery-step2');
-  var emailHint = document.getElementById('recovery-email-hint');
-  if (emailHint) emailHint.textContent = 'Codigo enviado a ' + emailDisplay;
-  if (step2) step2.style.display = 'block';
-
-  // Send email via Resend
-  try {
-    var res = await fetch('https://api.resend.com/emails', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer re_d7qfs2N9_H4xsdhQRTYDVXLkeQHQX56he' },
-      body: JSON.stringify({
-        from: 'Chef Chef Harfer <hola@mail.chefchefharfer.mx>',
-        to: [user.email],
-        subject: 'Tu codigo de verificacion - Chef Chef Harfer',
-        html: htmlEmail
-      })
-    });
-    var data = await res.json();
-    if (data.id) {
-      showToast('Codigo enviado a tu correo', 'success');
-    } else {
-      // CORS fallback: no-cors (sends but no response)
-      await fetch('https://api.resend.com/emails', {
-        method: 'POST',
-        mode: 'no-cors',
-        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer re_d7qfs2N9_H4xsdhQRTYDVXLkeQHQX56he' },
-        body: JSON.stringify({
-          from: 'Chef Chef Harfer <hola@mail.chefchefharfer.mx>',
-          to: [user.email],
-          subject: 'Tu codigo de verificacion - Chef Chef Harfer',
-          html: htmlEmail
-        })
-      });
-      showToast('Codigo enviado a tu correo', 'success');
-    }
-  } catch(e) {
-    showToast('Codigo enviado a tu correo', 'success');
-    console.warn('Email recovery:', e.message);
-  }
+  // Send via WhatsApp
+  var msg = 'Tu codigo de verificacion de Chef Chef Harfer es: *' + codigoRecuperacion + '*\n\nEste codigo expira en 10 minutos. Si no lo solicitaste, ignoralo.';
+  var waUrl = 'https://wa.me/52' + user.phone + '?text=' + encodeURIComponent(msg);
+  window.open(waUrl, '_blank');
+  // Show step 2
+  document.getElementById('recovery-step2').style.display = 'block';
+  showToast('Codigo enviado por WhatsApp', 'success');
 }
 
 function verificarCodigo() {
   var phone = document.getElementById('recovery-phone').value.trim();
   var codigo = document.getElementById('recovery-codigo').value.trim();
   var newPin = document.getElementById('recovery-new-pin').value.trim();
-  if (codigoExpiry && Date.now() > codigoExpiry) {
-    showToast('El codigo expiro. Solicita uno nuevo.', 'error');
-    codigoRecuperacion = null; codigoExpiry = null;
-    return;
-  }
   if (!codigo || codigo !== codigoRecuperacion) { showToast('Codigo incorrecto', 'error'); return; }
   if (!newPin || newPin.length !== 4 || !/^[0-9]{4}$/.test(newPin)) { showToast('El nuevo PIN debe ser de 4 digitos', 'error'); return; }
   var user = getUserLocal(phone);
@@ -3415,9 +3506,8 @@ function verificarCodigo() {
   user.pin = newPin;
   saveUserLocal(user);
   codigoRecuperacion = null;
-  codigoExpiry = null;
   ocultarRecuperacion();
-  showToast('PIN actualizado correctamente. Ya puedes iniciar sesion.', 'success');
+  showToast('PIN actualizado correctamente', 'success');
   document.getElementById('login-phone').value = phone;
 }
 
@@ -3439,7 +3529,7 @@ async function handleRegister() {
   }
   var user = { nombre: nombre, phone: cleanPhone(phone), email: email, pin: pin, fechaRegistro: new Date().toISOString() };
   showLoading('Creando tu cuenta...');
-  try { await guardarClienteNotion(user); } catch(e) { console.warn('Notion:', e.message); }
+  guardarClienteNotion(user);
   try { await enviarCorreoBienvenida(user); } catch(e) { console.warn('Email:', e.message); }
   try { saveUserLocal(user); } catch(e) {}
   hideLoading();
@@ -3450,68 +3540,59 @@ async function handleRegister() {
 }
 
 // === NOTION ===
-async function guardarClienteNotion(user) {
-  var today = new Date().toISOString().split('T')[0];
+function guardarClienteNotion(user) {
   try {
-    var res = await fetch('https://api.notion.com/v1/pages', {
-      method: 'POST',
-      headers: {
-        'Authorization': 'Bearer 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',
-        'Content-Type': 'application/json',
-        'Notion-Version': '2022-06-28'
-      },
-      body: JSON.stringify({
-        parent: { database_id: '017bf560-8591-4d68-9195-9e48d9e55da9' },
-        properties: {
-          'Nombre': { title: [{ text: { content: user.nombre } }] },
-          'Telefono': { rich_text: [{ text: { content: user.phone } }] },
-          'Email': { email: user.email || null },
-          'Total pedidos': { number: 0 },
-          'Fecha de registro': { date: { start: today } }
-        }
-      })
-    });
-    var d = await res.json();
-    console.log('Notion cliente OK:', d.id || JSON.stringify(d).substring(0,150));
-  } catch(e) { console.warn('Notion cliente error:', e.message); }
+    var clientes = JSON.parse(localStorage.getItem('cch_db_clientes') || '[]');
+    // Check no duplicate
+    var exists = clientes.find(function(c) { return c.phone === user.phone; });
+    if (!exists) {
+      clientes.push({
+        id: Date.now().toString(),
+        nombre: user.nombre,
+        phone: user.phone,
+        email: user.email || '',
+        direccion: user.direccion || '',
+        diaPref: user.diaPref || '',
+        turnoPref: user.turnoPref || '',
+        fechaRegistro: new Date().toLocaleString('es-MX'),
+        totalPedidos: 0
+      });
+      localStorage.setItem('cch_db_clientes', JSON.stringify(clientes));
+    }
+  } catch(e) { console.warn('DB clientes:', e.message); }
 }
 
-async function guardarPedidoNotion(user, items, total, orderId, dia, direccion) {
-  var turnoLabel = turnoSeleccionado === 'Manana' ? 'Manana (10am-1pm)' : 'Tarde (4pm-7pm)';
-  var itemsText = items.map(function(i) {
-    var precio = i.porciones === 4 ? i.platillo.precio2p * 2 : i.platillo.precio2p;
-    return i.platillo.nombre + ' x' + i.cantidad + ' (Kit ' + i.porciones + 'p) $' + (precio * i.cantidad);
-  }).join(' | ');
-  var today = new Date().toISOString().split('T')[0];
+
+function guardarPedidoNotion(user, items, total, orderId, dia, direccion) {
   try {
-    var res = await fetch('https://api.notion.com/v1/pages', {
-      method: 'POST',
-      headers: {
-        'Authorization': 'Bearer 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',
-        'Content-Type': 'application/json',
-        'Notion-Version': '2022-06-28'
-      },
-      body: JSON.stringify({
-        parent: { database_id: '14bddb46-09a8-4916-a30b-ef6fac640c46' },
-        properties: {
-          'Pedido': { title: [{ text: { content: 'Pedido #' + orderId } }] },
-          'Cliente': { rich_text: [{ text: { content: user.nombre } }] },
-          'Telefono': { rich_text: [{ text: { content: user.phone } }] },
-          'Email': { email: user.email || null },
-          'Platillos': { rich_text: [{ text: { content: itemsText.substring(0, 2000) } }] },
-          'Total MXN': { number: total },
-          'Dia de entrega': { select: { name: dia || '' } },
-          'Turno': { select: { name: turnoLabel } },
-          'Direccion': { rich_text: [{ text: { content: (direccion || '').substring(0, 500) } }] },
-          'Estado': { select: { name: 'Pendiente' } },
-          'Fecha': { date: { start: today } }
-        }
-      })
+    var turnoLabel = turnoSeleccionado === 'Manana' ? 'Manana (10am-1pm)' : 'Tarde (4pm-7pm)';
+    var itemsText = items.map(function(i) {
+      var precio = i.porciones === 4 ? i.platillo.precio2p * 2 : i.platillo.precio2p;
+      return i.platillo.nombre + ' x' + i.cantidad + ' (Kit ' + i.porciones + 'p) $' + (precio * i.cantidad);
+    }).join(' | ');
+    var pedidos = JSON.parse(localStorage.getItem('cch_db_pedidos') || '[]');
+    pedidos.unshift({
+      id: orderId,
+      cliente: user.nombre,
+      phone: user.phone,
+      email: user.email || '',
+      platillos: itemsText,
+      total: total,
+      dia: dia || '',
+      turno: turnoLabel,
+      direccion: direccion || '',
+      estado: 'Pendiente',
+      fecha: new Date().toLocaleString('es-MX')
     });
-    var d = await res.json();
-    console.log('Notion pedido OK:', d.id || JSON.stringify(d).substring(0,150));
-  } catch(e) { console.warn('Notion pedido error:', e.message); }
+    localStorage.setItem('cch_db_pedidos', JSON.stringify(pedidos));
+    // Update total pedidos in clientes DB
+    var clientes = JSON.parse(localStorage.getItem('cch_db_clientes') || '[]');
+    var c = clientes.find(function(x) { return x.phone === user.phone; });
+    if (c) { c.totalPedidos = (c.totalPedidos || 0) + 1; }
+    localStorage.setItem('cch_db_clientes', JSON.stringify(clientes));
+  } catch(e) { console.warn('DB pedidos:', e.message); }
 }
+
 
 // === CORREO ===
 async function enviarCorreoBienvenida(user) {
@@ -4035,7 +4116,7 @@ async function abrirWhatsApp() {
   var turnoLabel = turnoSeleccionado === 'Manana' ? 'Manana (10am-1pm)' : 'Tarde (4pm-7pm)';
 
   showLoading('Registrando tu pedido...');
-  try { await guardarPedidoNotion(u, items, total, orderId, diaSeleccionado, direccion); } catch(e) { console.warn('Notion:', e.message); }
+  guardarPedidoNotion(u, items, total, orderId, diaSeleccionado, direccion);
   hideLoading();
 
   var mapLink = (pinLat && pinLng)
@@ -4183,74 +4264,129 @@ function getDireccionFinal() {
 
 // === ADMIN PANEL ===
 function renderAdmin() {
-  if (currentUser.phone !== ADMIN_PHONE) return;
-  // Stats
-  var totalConexiones = localStorage.getItem('cch_total_conexiones') || '0';
+  if (!currentUser || currentUser.phone !== ADMIN_PHONE) return;
+  var clientes = [];
+  var pedidos = [];
+  var logs = [];
+  try { clientes = JSON.parse(localStorage.getItem('cch_db_clientes') || '[]'); } catch(e) {}
+  try { pedidos = JSON.parse(localStorage.getItem('cch_db_pedidos') || '[]'); } catch(e) {}
+  try { logs = JSON.parse(localStorage.getItem('cch_activity_log') || '[]'); } catch(e) {}
   var hoy = new Date().toDateString();
-  var conexionesHoy = (localStorage.getItem('cch_conexiones_hoy_date') === hoy)
-    ? (localStorage.getItem('cch_conexiones_hoy') || '0') : '0';
-  // Get all users
-  var allUsers = [];
-  try {
-    for (var k in localStorage) {
-      if (k.startsWith('cch_user_')) {
-        try { allUsers.push(JSON.parse(localStorage.getItem(k))); } catch(e) {}
-      }
-    }
-  } catch(e) {}
-  // Render stats
-  var el = document.getElementById('admin-total-conexiones');
-  if (el) el.textContent = totalConexiones;
-  var el2 = document.getElementById('admin-conexiones-hoy');
-  if (el2) el2.textContent = conexionesHoy;
-  var el3 = document.getElementById('admin-total-usuarios');
-  if (el3) el3.textContent = allUsers.length;
-  // Show activity log count
-  try {
-    var logs = JSON.parse(localStorage.getItem('cch_activity_log') || '[]');
-    var logEl = document.getElementById('admin-total-actividad');
-    if (logEl) logEl.textContent = logs.length;
-    // Render activity log
-    var logTbody = document.getElementById('admin-log-tbody');
-    if (logTbody) {
-      logTbody.innerHTML = '';
-      logs.slice(0, 50).forEach(function(l) {
-        var tr = document.createElement('tr');
-        tr.innerHTML = '<td style="padding:8px 12px;border-bottom:1px solid #f0ede6;font-size:12px;color:#555;">' + l.fecha + '</td>' +
-          '<td style="padding:8px 12px;border-bottom:1px solid #f0ede6;font-weight:600;font-size:12px;">' + l.tipo + '</td>' +
-          '<td style="padding:8px 12px;border-bottom:1px solid #f0ede6;font-size:12px;">' + l.usuario + '</td>' +
-          '<td style="padding:8px 12px;border-bottom:1px solid #f0ede6;color:#888;font-size:11px;">' + (l.detalle||'') + '</td>';
-        logTbody.appendChild(tr);
-      });
-      if (!logs.length) {
-        var tr2 = document.createElement('tr');
-        tr2.innerHTML = '<td colspan="4" style="padding:16px;text-align:center;color:#aaa;font-size:13px;">Sin actividad registrada aun</td>';
-        logTbody.appendChild(tr2);
-      }
-    }
-  } catch(e) {}
+  var setEl = function(id, val) { var el = document.getElementById(id); if (el) el.textContent = val; };
+  setEl('admin-total-conexiones', localStorage.getItem('cch_total_conexiones') || '0');
+  setEl('admin-conexiones-hoy', (localStorage.getItem('cch_conexiones_hoy_date') === hoy) ? (localStorage.getItem('cch_conexiones_hoy') || '0') : '0');
+  setEl('admin-total-usuarios', clientes.length);
+  setEl('admin-total-pedidos', pedidos.length);
+  setEl('admin-total-ventas', '$' + pedidos.reduce(function(s,p){ return s+(p.total||0); },0).toLocaleString('es-MX'));
 
-  // Render users table
-  var tbody = document.getElementById('admin-users-tbody');
-  if (tbody) {
-    tbody.innerHTML = '';
-    allUsers.sort(function(a,b) { return (b.fechaRegistro||'').localeCompare(a.fechaRegistro||''); });
-    allUsers.forEach(function(u) {
-      var tr = document.createElement('tr');
-      tr.innerHTML = '<td style="padding:10px 12px;border-bottom:1px solid #f0ede6;font-weight:600;color:#111;">' + (u.nombre||'') + '</td>' +
-        '<td style="padding:10px 12px;border-bottom:1px solid #f0ede6;color:#555;">' + (u.phone||'') + '</td>' +
-        '<td style="padding:10px 12px;border-bottom:1px solid #f0ede6;color:#555;">' + (u.email||'') + '</td>' +
-        '<td style="padding:10px 12px;border-bottom:1px solid #f0ede6;color:#888;font-size:12px;">' + (u.direccion||'o') + '</td>' +
-        '<td style="padding:10px 12px;border-bottom:1px solid #f0ede6;color:#888;font-size:12px;">' + (u.fechaRegistro ? u.fechaRegistro.substring(0,10) : 'o') + '</td>';
-      tbody.appendChild(tr);
-    });
-    if (!allUsers.length) {
-      var tr2 = document.createElement('tr');
-      tr2.innerHTML = '<td colspan="5" style="padding:20px;text-align:center;color:#aaa;">Sin usuarios registrados aun</td>';
-      tbody.appendChild(tr2);
+  // Clientes
+  var tcBody = document.getElementById('admin-clientes-tbody');
+  if (tcBody) {
+    tcBody.innerHTML = '';
+    if (!clientes.length) {
+      tcBody.innerHTML = '<tr><td colspan="6" style="padding:16px;text-align:center;color:#aaa;font-size:13px;">Sin clientes registrados</td></tr>';
+    } else {
+      clientes.forEach(function(c) {
+        var tr = document.createElement('tr');
+        tr.style.borderBottom = '1px solid #f0ede6';
+        tr.innerHTML =
+          '<td style="padding:10px 14px;font-weight:700;color:#111;font-size:13px;">' + (c.nombre||'') + '</td>' +
+          '<td style="padding:10px 14px;color:#555;font-size:13px;">' + (c.phone||'') + '</td>' +
+          '<td style="padding:10px 14px;color:#555;font-size:12px;">' + (c.email||'') + '</td>' +
+          '<td style="padding:10px 14px;color:#888;font-size:12px;">' + (c.direccion||'Sin guardar') + '</td>' +
+          '<td style="padding:10px 14px;text-align:center;font-size:13px;font-weight:700;color:#067c49;">' + (c.totalPedidos||0) + '</td>' +
+          '<td style="padding:10px 14px;color:#aaa;font-size:11px;">' + (c.fechaRegistro||'-') + '</td>';
+        tcBody.appendChild(tr);
+      });
+    }
+  }
+
+  // Pedidos
+  var tpBody = document.getElementById('admin-pedidos-tbody');
+  if (tpBody) {
+    tpBody.innerHTML = '';
+    if (!pedidos.length) {
+      tpBody.innerHTML = '<tr><td colspan="7" style="padding:16px;text-align:center;color:#aaa;font-size:13px;">Sin pedidos registrados</td></tr>';
+    } else {
+      pedidos.forEach(function(p) {
+        var estadoColor = p.estado === 'Confirmado' ? '#067c49' : p.estado === 'Entregado' ? '#bdac41' : '#c1121f';
+        var tr = document.createElement('tr');
+        tr.style.borderBottom = '1px solid #f0ede6';
+        var td7 = document.createElement('td');
+        td7.style.padding = '10px 14px';
+        var sel = document.createElement('select');
+        sel.style.cssText = 'border:1.5px solid ' + estadoColor + ';border-radius:8px;padding:4px 8px;font-size:11px;font-weight:700;color:' + estadoColor + ';background:white;cursor:pointer;';
+        ['Pendiente','Confirmado','Entregado'].forEach(function(est) {
+          var opt = document.createElement('option');
+          opt.value = est;
+          opt.textContent = est;
+          if (p.estado === est) opt.selected = true;
+          sel.appendChild(opt);
+        });
+        (function(pid) {
+          sel.addEventListener('change', function() { cambiarEstadoPedido(pid, this.value); });
+        })(p.id);
+        td7.appendChild(sel);
+        tr.innerHTML =
+          '<td style="padding:10px 14px;font-weight:700;color:#111;font-size:12px;">#' + (p.id||'') + '</td>' +
+          '<td style="padding:10px 14px;font-weight:600;font-size:13px;">' + (p.cliente||'') + '</td>' +
+          '<td style="padding:10px 14px;color:#555;font-size:12px;">' + (p.dia||'') + ' ' + (p.turno||'') + '</td>' +
+          '<td style="padding:10px 14px;color:#555;font-size:11px;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="' + (p.platillos||'') + '">' + (p.platillos||'') + '</td>' +
+          '<td style="padding:10px 14px;font-weight:800;color:#067c49;font-size:14px;">$' + (p.total||0).toLocaleString('es-MX') + '</td>' +
+          '<td></td>' +
+          '<td style="padding:10px 14px;color:#aaa;font-size:11px;">' + (p.fecha||'-') + '</td>';
+        tr.cells[5].appendChild(sel);
+        tpBody.appendChild(tr);
+      });
+    }
+  }
+
+  // Log
+  var logBody = document.getElementById('admin-log-tbody');
+  if (logBody) {
+    logBody.innerHTML = '';
+    if (!logs.length) {
+      logBody.innerHTML = '<tr><td colspan="4" style="padding:16px;text-align:center;color:#aaa;font-size:13px;">Sin actividad registrada</td></tr>';
+    } else {
+      logs.slice(0,30).forEach(function(l) {
+        var tr = document.createElement('tr');
+        tr.style.borderBottom = '1px solid #f0ede6';
+        tr.innerHTML =
+          '<td style="padding:8px 14px;color:#888;font-size:11px;">' + (l.fecha||'') + '</td>' +
+          '<td style="padding:8px 14px;font-weight:700;font-size:12px;">' + (l.tipo||'') + '</td>' +
+          '<td style="padding:8px 14px;font-size:12px;">' + (l.usuario||'') + '</td>' +
+          '<td style="padding:8px 14px;color:#888;font-size:11px;">' + (l.detalle||'') + '</td>';
+        logBody.appendChild(tr);
+      });
     }
   }
 }
+
+function cambiarEstadoPedido(pedidoId, nuevoEstado) {
+  try {
+    var pedidos = JSON.parse(localStorage.getItem('cch_db_pedidos') || '[]');
+    var p = pedidos.find(function(x) { return x.id === pedidoId; });
+    if (p) { p.estado = nuevoEstado; localStorage.setItem('cch_db_pedidos', JSON.stringify(pedidos)); showToast('Estado: ' + nuevoEstado, 'success'); }
+  } catch(e) {}
+}
+
+function exportarCSV(tipo) {
+  try {
+    var data = JSON.parse(localStorage.getItem('cch_db_' + tipo) || '[]');
+    if (!data.length) { showToast('No hay datos para exportar', 'error'); return; }
+    var headers = Object.keys(data[0]);
+    var csv = headers.join(',') + '\n';
+    data.forEach(function(row) {
+      csv += headers.map(function(h) { return '"' + (row[h]||'').toString().replace(/"/g,'""') + '"'; }).join(',') + '\n';
+    });
+    var blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url; a.download = 'chefchef_' + tipo + '_' + new Date().toISOString().split('T')[0] + '.csv';
+    a.click(); URL.revokeObjectURL(url);
+  } catch(e) { showToast('Error al exportar', 'error'); }
+}
+
 
 function adminLogout() {
   cerrarSesion();
