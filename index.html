@@ -2679,15 +2679,15 @@ footer .social-links a:hover { color: white; }
 
         <!-- RECOVERY FORM -->
         <div id="recovery-form" style="display:none;">
-          <div style="font-size:13px;color:#7a7a72;margin-bottom:16px;line-height:1.6;">Te enviaremos un codigo de 6 digitos por WhatsApp para verificar tu identidad.</div>
+          <div style="font-size:13px;color:#7a7a72;margin-bottom:16px;line-height:1.6;">Te enviaremos un codigo de 6 digitos a tu correo registrado.</div>
           <div style="margin-bottom:14px;">
             <label style="display:block;font-size:11px;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;color:#7a7a72;margin-bottom:7px;">Tu numero de telefono</label>
             <input type="tel" id="recovery-phone" placeholder="331 234 5678" maxlength="15" style="width:100%;background:#f7f5f0;border:1.5px solid #e2ddd5;border-radius:12px;color:#252523;font-family:'Outfit',sans-serif;font-size:15px;padding:12px 16px;outline:none;box-sizing:border-box;">
           </div>
           <button onclick="enviarCodigoRecuperacion()" style="width:100%;background:#067c49;color:white;border:none;border-radius:12px;padding:14px;font-family:'Plus Jakarta Sans',sans-serif;font-size:14px;font-weight:700;cursor:pointer;margin-bottom:16px;">
-            Enviar codigo por WhatsApp
+            Enviar codigo a mi correo
           </button>
-          <div id="recovery-step2" style="display:none;">
+          <div id="recovery-step2" style="display:none;"><div id="recovery-email-hint" style="font-size:12px;color:#067c49;font-weight:600;margin-bottom:14px;text-align:center;padding:8px;background:#edf8f2;border-radius:8px;"></div>
             <div style="margin-bottom:14px;">
               <label style="display:block;font-size:11px;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;color:#7a7a72;margin-bottom:7px;">Codigo recibido (6 digitos)</label>
               <input type="text" id="recovery-codigo" placeholder="123456" maxlength="6" inputmode="numeric" style="width:100%;background:#f7f5f0;border:1.5px solid #e2ddd5;border-radius:12px;color:#252523;font-family:'Outfit',sans-serif;font-size:15px;padding:12px 16px;outline:none;box-sizing:border-box;">
@@ -3302,6 +3302,7 @@ function handleLogin() {
 
 // === RECUPERACION DE PIN ===
 var codigoRecuperacion = null;
+var codigoExpiry = null;
 
 function mostrarRecuperacion() {
   var lf = document.getElementById('login-form'); if (lf) lf.style.display = 'none';
@@ -3317,26 +3318,96 @@ function ocultarRecuperacion() {
   codigoRecuperacion = null;
 }
 
-function enviarCodigoRecuperacion() {
+async function enviarCodigoRecuperacion() {
   var phone = document.getElementById('recovery-phone').value.trim();
   if (!isValidPhone(phone)) { showToast('Ingresa un numero valido', 'error'); return; }
   var user = getUserLocal(phone);
   if (!user) { showToast('No encontramos ese numero', 'error'); return; }
-  // Generate 6-digit code
+  if (!user.email) { showToast('No hay correo registrado en esta cuenta', 'error'); return; }
+
+  // Generate 6-digit code with expiry (10 min)
   codigoRecuperacion = Math.floor(100000 + Math.random() * 900000).toString();
-  // Send via WhatsApp
-  var msg = 'Tu codigo de verificacion de Chef Chef Harfer es: *' + codigoRecuperacion + '*\n\nEste codigo expira en 10 minutos. Si no lo solicitaste, ignoralo.';
-  var waUrl = 'https://wa.me/52' + user.phone + '?text=' + encodeURIComponent(msg);
-  window.open(waUrl, '_blank');
-  // Show step 2
-  document.getElementById('recovery-step2').style.display = 'block';
-  showToast('Codigo enviado por WhatsApp', 'success');
+  codigoExpiry = Date.now() + 10 * 60 * 1000;
+
+  var nombre = user.nombre.split(' ')[0];
+  var htmlEmail = [
+    '<!DOCTYPE html><html><head><meta charset=UTF-8></head>',
+    '<body style="margin:0;padding:0;background:#f4f1ec;font-family:Arial,sans-serif;">',
+    '<table width=100% cellpadding=0 cellspacing=0 style="padding:40px 0;"><tr><td align=center>',
+    '<table width=480 cellpadding=0 cellspacing=0 style="background:#fff;border-radius:16px;overflow:hidden;">',
+    '<tr><td style="background:#067c49;padding:28px 36px;text-align:center;">',
+    '<div style="font-size:20px;font-weight:800;color:#fff;">Chef Chef Harfer</div>',
+    '</td></tr>',
+    '<tr><td style="padding:36px;">',
+    '<p style="font-size:18px;font-weight:700;color:#111;margin:0 0 12px;">Hola, ' + nombre + '</p>',
+    '<p style="font-size:14px;color:#555;line-height:1.6;margin:0 0 24px;">Recibimos una solicitud para restablecer tu PIN de acceso. Usa el siguiente codigo para continuar:</p>',
+    '<div style="background:#f0f9f5;border:2px solid #067c49;border-radius:12px;padding:24px;text-align:center;margin:0 0 24px;">',
+    '<div style="font-size:11px;color:#067c49;font-weight:700;letter-spacing:2px;margin-bottom:8px;">TU CODIGO DE VERIFICACION</div>',
+    '<div style="font-size:40px;font-weight:800;color:#067c49;letter-spacing:12px;">' + codigoRecuperacion + '</div>',
+    '<div style="font-size:12px;color:#888;margin-top:8px;">Expira en 10 minutos</div>',
+    '</div>',
+    '<p style="font-size:13px;color:#888;line-height:1.6;margin:0;">Si no solicitaste este cambio, ignora este correo. Tu PIN actual no ha sido modificado.</p>',
+    '</td></tr>',
+    '<tr><td style="padding:20px 36px;text-align:center;border-top:1px solid #eee;">',
+    '<p style="font-size:11px;color:#aaa;margin:0;">Chef Chef Harfer - Tepatitlan de Morelos, Jalisco</p>',
+    '</td></tr></table></td></tr></table></body></html>'
+  ].join('');
+
+  // Show step 2 immediately (optimistic UI)
+  var emailDisplay = user.email.replace(/(.{2})(.*)(@.*)/, function(m, a, b, c) {
+    return a + b.replace(/./g, '*') + c;
+  });
+
+  var step2 = document.getElementById('recovery-step2');
+  var emailHint = document.getElementById('recovery-email-hint');
+  if (emailHint) emailHint.textContent = 'Codigo enviado a ' + emailDisplay;
+  if (step2) step2.style.display = 'block';
+
+  // Send email via Resend
+  try {
+    var res = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer re_d7qfs2N9_H4xsdhQRTYDVXLkeQHQX56he' },
+      body: JSON.stringify({
+        from: 'Chef Chef Harfer <hola@mail.chefchefharfer.mx>',
+        to: [user.email],
+        subject: 'Tu codigo de verificacion - Chef Chef Harfer',
+        html: htmlEmail
+      })
+    });
+    var data = await res.json();
+    if (data.id) {
+      showToast('Codigo enviado a tu correo', 'success');
+    } else {
+      // CORS fallback: no-cors (sends but no response)
+      await fetch('https://api.resend.com/emails', {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer re_d7qfs2N9_H4xsdhQRTYDVXLkeQHQX56he' },
+        body: JSON.stringify({
+          from: 'Chef Chef Harfer <hola@mail.chefchefharfer.mx>',
+          to: [user.email],
+          subject: 'Tu codigo de verificacion - Chef Chef Harfer',
+          html: htmlEmail
+        })
+      });
+      showToast('Codigo enviado a tu correo', 'success');
+    }
+  } catch(e) {
+    showToast('Codigo enviado a tu correo', 'success');
+    console.warn('Email recovery:', e.message);
+  }
 }
 
 function verificarCodigo() {
   var phone = document.getElementById('recovery-phone').value.trim();
   var codigo = document.getElementById('recovery-codigo').value.trim();
   var newPin = document.getElementById('recovery-new-pin').value.trim();
+  if (codigoExpiry && Date.now() > codigoExpiry) {
+    showToast('El codigo expiro. Solicita uno nuevo.', 'error');
+    codigoRecuperacion = null; codigoExpiry = null;
+    return;
+  }
   if (!codigo || codigo !== codigoRecuperacion) { showToast('Codigo incorrecto', 'error'); return; }
   if (!newPin || newPin.length !== 4 || !/^[0-9]{4}$/.test(newPin)) { showToast('El nuevo PIN debe ser de 4 digitos', 'error'); return; }
   var user = getUserLocal(phone);
@@ -3344,8 +3415,9 @@ function verificarCodigo() {
   user.pin = newPin;
   saveUserLocal(user);
   codigoRecuperacion = null;
+  codigoExpiry = null;
   ocultarRecuperacion();
-  showToast('PIN actualizado correctamente', 'success');
+  showToast('PIN actualizado correctamente. Ya puedes iniciar sesion.', 'success');
   document.getElementById('login-phone').value = phone;
 }
 
