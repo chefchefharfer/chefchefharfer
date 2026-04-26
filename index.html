@@ -2620,11 +2620,24 @@ footer .social-links a:hover { color: white; }
  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
  </a>
  </div>
- <div class="nav-user" id="nav-user" style="display:none" onclick="abrirPanelPerfil()" style="cursor:pointer;">
+ <div style="position:relative;display:none;" id="nav-user-wrap"><div class="nav-user" id="nav-user" onclick="abrirPanelPerfil()">
  <div class="avatar" id="nav-avatar">?</div>
  <span id="nav-name">Cliente</span>
- </div>
- </div>
+    </div>
+    <!-- Dropdown menu -->
+    <div id="nav-dropdown" style="display:none;position:absolute;top:calc(100% + 8px);right:0;background:white;border-radius:14px;box-shadow:0 8px 32px rgba(0,0,0,0.15);border:1px solid rgba(0,0,0,0.08);min-width:180px;z-index:500;overflow:hidden;">
+      <div onclick="irAPerfil()" style="padding:13px 18px;font-family:'Outfit',sans-serif;font-size:14px;font-weight:500;color:#252523;cursor:pointer;border-bottom:1px solid #f0ede6;display:flex;align-items:center;gap:10px;" onmouseover="this.style.background='#f7f5f0'" onmouseout="this.style.background=''">
+        <span>&#128100;</span> Mi perfil
+      </div>
+      <div id="nav-dd-admin" onclick="irAAdmin()" style="display:none;padding:13px 18px;font-family:'Outfit',sans-serif;font-size:14px;font-weight:500;color:#067c49;cursor:pointer;border-bottom:1px solid #f0ede6;display:flex;align-items:center;gap:10px;" onmouseover="this.style.background='#f7f5f0'" onmouseout="this.style.background=''">
+        <span>&#128203;</span> Panel Admin
+      </div>
+      <div onclick="cerrarSesionDesdeNav()" style="padding:13px 18px;font-family:'Outfit',sans-serif;font-size:14px;font-weight:500;color:#c1121f;cursor:pointer;display:flex;align-items:center;gap:10px;" onmouseover="this.style.background='#fff5f5'" onmouseout="this.style.background=''">
+        <span>&#8594;</span> Cerrar sesion
+      </div>
+    </div>
+  </div>
+  </div>
 </nav>
 
 <!-- PANTALLA LOGIN -->
@@ -2761,7 +2774,11 @@ footer .social-links a:hover { color: white; }
       <div class="menu-welcome">Hola, <span id="welcome-name">amigo</span></div>
       <div class="menu-sub">Elige tus meal kits para esta semana</div>
     </div>
-
+    <div id="btn-volver-admin" style="display:none;">
+      <button onclick="showScreen('admin');setTimeout(function(){renderAdmin();},50);" style="background:rgba(255,255,255,0.15);border:1.5px solid rgba(255,255,255,0.3);border-radius:10px;padding:8px 14px;font-family:'Outfit',sans-serif;font-size:12px;font-weight:600;color:white;cursor:pointer;">
+        &#8592; Panel Admin
+      </button>
+    </div>
   </div>
 
   <!-- Aviso cierre -->
@@ -3011,6 +3028,9 @@ footer .social-links a:hover { color: white; }
             <th style="padding:10px 14px;text-align:left;font-size:10px;letter-spacing:1px;color:#aaa;font-weight:700;text-transform:uppercase;white-space:nowrap;">Direccion</th>
             <th style="padding:10px 14px;text-align:center;font-size:10px;letter-spacing:1px;color:#aaa;font-weight:700;text-transform:uppercase;white-space:nowrap;">Pedidos</th>
             <th style="padding:10px 14px;text-align:left;font-size:10px;letter-spacing:1px;color:#aaa;font-weight:700;text-transform:uppercase;white-space:nowrap;">Registro</th>
+            <th style="padding:10px 14px;text-align:left;font-size:10px;letter-spacing:1px;color:#aaa;font-weight:700;text-transform:uppercase;white-space:nowrap;">Ultimo login</th>
+            <th style="padding:10px 14px;text-align:left;font-size:10px;letter-spacing:1px;color:#aaa;font-weight:700;text-transform:uppercase;white-space:nowrap;">Total gastado</th>
+            <th style="padding:10px 14px;text-align:left;font-size:10px;letter-spacing:1px;color:#aaa;font-weight:700;text-transform:uppercase;white-space:nowrap;">Platillo favorito</th>
           </tr>
         </thead>
         <tbody id="admin-clientes-tbody">
@@ -3302,7 +3322,10 @@ function iniciarSessionTimer() {
 }
 
 function cerrarSesion() {
-  if (currentUser) registrarActividad(currentUser, 'Logout', 'Cerro sesion manualmente');
+  if (currentUser) {
+    registrarActividad(currentUser, 'Logout', 'Cerro sesion manualmente');
+    actualizarClienteLogout(currentUser.phone);
+  }
   currentUser = null;
   if (sessionTimer) clearTimeout(sessionTimer);
   sessionTimer = null;
@@ -3458,6 +3481,7 @@ function handleLogin() {
   }
   currentUser = user;
   registrarActividad(user, 'Login', 'Inicio de sesion exitoso');
+  actualizarClienteLogin(user.phone);
   loginSuccess();
   showToast('Hola de nuevo, ' + user.nombre.split(' ')[0] + '!', 'welcome');
 }
@@ -3543,9 +3567,8 @@ async function handleRegister() {
 function guardarClienteNotion(user) {
   try {
     var clientes = JSON.parse(localStorage.getItem('cch_db_clientes') || '[]');
-    // Check no duplicate
-    var exists = clientes.find(function(c) { return c.phone === user.phone; });
-    if (!exists) {
+    var idx = clientes.findIndex(function(c) { return c.phone === user.phone; });
+    if (idx < 0) {
       clientes.push({
         id: Date.now().toString(),
         nombre: user.nombre,
@@ -3555,11 +3578,48 @@ function guardarClienteNotion(user) {
         diaPref: user.diaPref || '',
         turnoPref: user.turnoPref || '',
         fechaRegistro: new Date().toLocaleString('es-MX'),
-        totalPedidos: 0
+        ultimoLogin: new Date().toLocaleString('es-MX'),
+        ultimoLogout: '',
+        totalPedidos: 0,
+        totalGastado: 0,
+        platillosFav: {},
+        historialSesiones: [{ tipo: 'Registro', fecha: new Date().toLocaleString('es-MX') }]
       });
+    } else {
+      // Update existing record
+      clientes[idx].nombre = user.nombre;
+      clientes[idx].email = user.email || clientes[idx].email;
+    }
+    localStorage.setItem('cch_db_clientes', JSON.stringify(clientes));
+  } catch(e) { console.warn('DB clientes:', e.message); }
+}
+
+function actualizarClienteLogin(phone) {
+  try {
+    var clientes = JSON.parse(localStorage.getItem('cch_db_clientes') || '[]');
+    var c = clientes.find(function(x) { return x.phone === phone; });
+    if (c) {
+      c.ultimoLogin = new Date().toLocaleString('es-MX');
+      if (!c.historialSesiones) c.historialSesiones = [];
+      c.historialSesiones.unshift({ tipo: 'Login', fecha: new Date().toLocaleString('es-MX') });
+      if (c.historialSesiones.length > 50) c.historialSesiones = c.historialSesiones.slice(0,50);
       localStorage.setItem('cch_db_clientes', JSON.stringify(clientes));
     }
-  } catch(e) { console.warn('DB clientes:', e.message); }
+  } catch(e) {}
+}
+
+function actualizarClienteLogout(phone) {
+  try {
+    var clientes = JSON.parse(localStorage.getItem('cch_db_clientes') || '[]');
+    var c = clientes.find(function(x) { return x.phone === phone; });
+    if (c) {
+      c.ultimoLogout = new Date().toLocaleString('es-MX');
+      if (!c.historialSesiones) c.historialSesiones = [];
+      c.historialSesiones.unshift({ tipo: 'Logout', fecha: new Date().toLocaleString('es-MX') });
+      if (c.historialSesiones.length > 50) c.historialSesiones = c.historialSesiones.slice(0,50);
+      localStorage.setItem('cch_db_clientes', JSON.stringify(clientes));
+    }
+  } catch(e) {}
 }
 
 
@@ -3585,10 +3645,24 @@ function guardarPedidoNotion(user, items, total, orderId, dia, direccion) {
       fecha: new Date().toLocaleString('es-MX')
     });
     localStorage.setItem('cch_db_pedidos', JSON.stringify(pedidos));
-    // Update total pedidos in clientes DB
+    // Update clientes DB
     var clientes = JSON.parse(localStorage.getItem('cch_db_clientes') || '[]');
     var c = clientes.find(function(x) { return x.phone === user.phone; });
-    if (c) { c.totalPedidos = (c.totalPedidos || 0) + 1; }
+    if (c) {
+      c.totalPedidos = (c.totalPedidos || 0) + 1;
+      c.totalGastado = (c.totalGastado || 0) + total;
+      c.direccion = direccion || c.direccion;
+      c.diaPref = dia || c.diaPref;
+      c.turnoPref = turnoSeleccionado || c.turnoPref;
+      if (!c.platillosFav) c.platillosFav = {};
+      items.forEach(function(i) {
+        var n = i.platillo.nombre;
+        c.platillosFav[n] = (c.platillosFav[n] || 0) + i.cantidad;
+      });
+      if (!c.historialSesiones) c.historialSesiones = [];
+      c.historialSesiones.unshift({ tipo: 'Pedido', fecha: new Date().toLocaleString('es-MX'), total: total, platillos: itemsText });
+      if (c.historialSesiones.length > 50) c.historialSesiones = c.historialSesiones.slice(0,50);
+    }
     localStorage.setItem('cch_db_clientes', JSON.stringify(clientes));
   } catch(e) { console.warn('DB pedidos:', e.message); }
 }
@@ -3656,14 +3730,22 @@ function aplicarLogo(src) {
 
 // === POST-LOGIN ===
 function loginSuccess() {
+  // Show nav
+  var navWrap = document.getElementById('nav-user-wrap');
+  if (navWrap) navWrap.style.display = 'block';
   var nav = document.getElementById('nav-user');
-  nav.style.display = 'flex';
+  if (nav) nav.style.display = 'flex';
   document.getElementById('nav-avatar').textContent = currentUser.nombre.charAt(0).toUpperCase();
   document.getElementById('nav-name').textContent = currentUser.nombre.split(' ')[0];
-  // welcome-name may not exist yet if menu hasn't rendered
+  // Show/hide admin options
+  var ddAdmin = document.getElementById('nav-dd-admin');
+  var btnVolverAdmin = document.getElementById('btn-volver-admin');
+  var isAdmin = currentUser.phone === ADMIN_PHONE;
+  if (ddAdmin) ddAdmin.style.display = isAdmin ? 'flex' : 'none';
+  if (btnVolverAdmin) btnVolverAdmin.style.display = isAdmin ? 'block' : 'none';
   iniciarSessionTimer();
   registrarConexion();
-  if (currentUser.phone === ADMIN_PHONE) {
+  if (isAdmin) {
     showScreen('admin');
     setTimeout(function() { renderAdmin(); }, 50);
   } else {
@@ -3683,8 +3765,30 @@ function goToPerfil() {
 
 function abrirPanelPerfil() {
   if (!currentUser) return;
+  var dd = document.getElementById('nav-dropdown');
+  if (dd) {
+    dd.style.display = dd.style.display === 'block' ? 'none' : 'block';
+  }
+}
+
+function irAPerfil() {
+  var dd = document.getElementById('nav-dropdown');
+  if (dd) dd.style.display = 'none';
   showScreen_perfil();
   showScreen('perfil');
+}
+
+function cerrarSesionDesdeNav() {
+  var dd = document.getElementById('nav-dropdown');
+  if (dd) dd.style.display = 'none';
+  cerrarSesion();
+}
+
+function irAAdmin() {
+  var dd = document.getElementById('nav-dropdown');
+  if (dd) dd.style.display = 'none';
+  showScreen('admin');
+  setTimeout(function() { renderAdmin(); }, 50);
 }
 
 function cerrarPanelPerfil() {
@@ -3757,27 +3861,37 @@ function renderMenu() {
     var imgWrap = document.createElement('div');
     imgWrap.className = 'prod-img-wrap';
 
+    var isAdmin = (currentUser && currentUser.phone === ADMIN_PHONE);
     if (imgSrc) {
       var img = document.createElement('img');
       img.src = imgSrc;
       img.className = 'prod-img';
       img.alt = p.nombre;
-      img.onclick = function(e) { e.stopPropagation(); document.getElementById('imgup_' + p.id).click(); };
+      if (isAdmin) {
+        img.style.cursor = 'pointer';
+        img.title = 'Click para cambiar imagen';
+        img.onclick = (function(pid) { return function(e) { e.stopPropagation(); document.getElementById('imgup_' + pid).click(); }; })(p.id);
+      }
       imgWrap.appendChild(img);
     } else {
       var ph = document.createElement('div');
       ph.className = 'prod-img-placeholder';
-      ph.onclick = function(e) { e.stopPropagation(); document.getElementById('imgup_' + p.id).click(); };
-      var phIcon = document.createElement('div');
-      phIcon.className = 'prod-img-placeholder-icon';
-      phIcon.textContent = '+';
-      var phText = document.createElement('div');
-      phText.className = 'prod-img-placeholder-text';
-      phText.textContent = 'Subir foto';
-      ph.appendChild(phIcon);
-      ph.appendChild(phText);
+      if (isAdmin) {
+        ph.style.cursor = 'pointer';
+        ph.onclick = (function(pid) { return function(e) { e.stopPropagation(); document.getElementById('imgup_' + pid).click(); }; })(p.id);
+        var phIcon = document.createElement('div');
+        phIcon.className = 'prod-img-placeholder-icon';
+        phIcon.textContent = '+';
+        var phText = document.createElement('div');
+        phText.className = 'prod-img-placeholder-text';
+        phText.textContent = 'Subir foto';
+        ph.appendChild(phIcon);
+        ph.appendChild(phText);
+      }
       imgWrap.appendChild(ph);
     }
+    // File input - only functional for admin
+    if (isAdmin) {
 
     // Badge en carrito (top left)
     if (inCartCount > 0) {
@@ -3788,14 +3902,14 @@ function renderMenu() {
       imgWrap.appendChild(cb);
     }
 
-    // File input oculto
-    var finput = document.createElement('input');
-    finput.type = 'file';
-    finput.id = 'imgup_' + p.id;
-    finput.accept = 'image/*';
-    finput.style.display = 'none';
-    finput.onchange = (function(pid) { return function(e) { subirImgPlatillo(pid, e); }; })(p.id);
-    imgWrap.appendChild(finput);
+      var finput = document.createElement('input');
+      finput.type = 'file';
+      finput.id = 'imgup_' + p.id;
+      finput.accept = 'image/*';
+      finput.style.display = 'none';
+      finput.onchange = (function(pid) { return function(e) { subirImgPlatillo(pid, e); }; })(p.id);
+      imgWrap.appendChild(finput);
+    }
     card.appendChild(imgWrap);
 
     // -- INFO --
@@ -4289,13 +4403,25 @@ function renderAdmin() {
       clientes.forEach(function(c) {
         var tr = document.createElement('tr');
         tr.style.borderBottom = '1px solid #f0ede6';
+        // Get favorite platillo
+        var favName = '-';
+        if (c.platillosFav) {
+          var favs = Object.entries(c.platillosFav);
+          if (favs.length) {
+            favs.sort(function(a,b){return b[1]-a[1];});
+            favName = favs[0][0].split(' ').slice(0,3).join(' ');
+          }
+        }
         tr.innerHTML =
           '<td style="padding:10px 14px;font-weight:700;color:#111;font-size:13px;">' + (c.nombre||'') + '</td>' +
           '<td style="padding:10px 14px;color:#555;font-size:13px;">' + (c.phone||'') + '</td>' +
           '<td style="padding:10px 14px;color:#555;font-size:12px;">' + (c.email||'') + '</td>' +
           '<td style="padding:10px 14px;color:#888;font-size:12px;">' + (c.direccion||'Sin guardar') + '</td>' +
           '<td style="padding:10px 14px;text-align:center;font-size:13px;font-weight:700;color:#067c49;">' + (c.totalPedidos||0) + '</td>' +
-          '<td style="padding:10px 14px;color:#aaa;font-size:11px;">' + (c.fechaRegistro||'-') + '</td>';
+          '<td style="padding:10px 14px;color:#aaa;font-size:11px;">' + (c.fechaRegistro||'-') + '</td>' +
+          '<td style="padding:10px 14px;color:#555;font-size:11px;">' + (c.ultimoLogin||'-') + '</td>' +
+          '<td style="padding:10px 14px;font-weight:600;color:#067c49;font-size:12px;">$' + (c.totalGastado||0).toLocaleString('es-MX') + '</td>' +
+          '<td style="padding:10px 14px;color:#888;font-size:11px;">' + favName + '</td>';
         tcBody.appendChild(tr);
       });
     }
@@ -4400,10 +4526,8 @@ function nuevoPedido() {
 
 window.addEventListener('load', function() {
   document.body.className = 'on-login';
-  // Explicitly show login page
   var loginPage = document.getElementById('login-page');
   if (loginPage) loginPage.style.display = 'flex';
-  // Make sure login form is visible
   var lf = document.getElementById('login-form');
   if (lf) lf.style.display = 'block';
   var rf = document.getElementById('register-form');
@@ -4412,6 +4536,12 @@ window.addEventListener('load', function() {
   if (recf) recf.style.display = 'none';
   var pill = document.getElementById('cart-pill');
   if (pill) pill.classList.remove('visible');
+  // Close dropdown when clicking outside
+  document.addEventListener('click', function(e) {
+    var wrap = document.getElementById('nav-user-wrap');
+    var dd = document.getElementById('nav-dropdown');
+    if (wrap && dd && !wrap.contains(e.target)) dd.style.display = 'none';
+  });
 });
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
