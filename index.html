@@ -2620,6 +2620,10 @@ footer .social-links a:hover { color: white; }
  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
  </a>
  </div>
+ <button id="nav-guest-btn" onclick="abrirLoginDesdeNav()" style="display:none;background:#067c49;color:white;border:none;border-radius:10px;padding:9px 16px;font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;font-weight:700;cursor:pointer;align-items:center;gap:6px;">
+   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+   Iniciar sesion
+ </button>
  <div style="position:relative;display:none;" id="nav-user-wrap"><div class="nav-user" id="nav-user" onclick="abrirPanelPerfil()">
  <div class="avatar" id="nav-avatar">?</div>
  <span id="nav-name">Cliente</span>
@@ -2656,6 +2660,22 @@ footer .social-links a:hover { color: white; }
   <!-- FORMULARIO -->
   <div style="flex:1;display:flex;align-items:flex-start;justify-content:center;padding:24px 16px 80px;">
     <div style="width:100%;max-width:480px;">
+
+      <!-- Boton volver al menu -->
+      <div id="login-back-to-menu" style="display:none;margin-bottom:14px;">
+        <button onclick="volverAlMenuDesdeLogin()" style="background:transparent;border:1.5px solid #e2ddd5;color:#7a7a72;border-radius:10px;padding:9px 16px;font-family:'Outfit',sans-serif;font-size:13px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:6px;">
+          &#8592; Seguir explorando el menu
+        </button>
+      </div>
+
+      <!-- Banner contextual: checkout pendiente -->
+      <div id="login-context-banner" style="display:none;background:linear-gradient(135deg,#067c49 0%,#0a9659 100%);color:white;border-radius:14px;padding:16px 18px;margin-bottom:18px;box-shadow:0 4px 14px rgba(6,124,73,0.25);align-items:center;gap:12px;">
+        <div style="font-size:24px;flex-shrink:0;">&#128722;</div>
+        <div style="flex:1;">
+          <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:14px;font-weight:700;margin-bottom:2px;">Casi listo!</div>
+          <div style="font-size:12px;opacity:0.95;line-height:1.4;">Crea tu cuenta o inicia sesion para finalizar tu pedido. Tu carrito se conserva.</div>
+        </div>
+      </div>
 
       <!-- Tabs -->
       <div style="display:flex;background:#f0ede6;border-radius:12px;padding:4px;margin-bottom:20px;border:1.5px solid #e2ddd5;">
@@ -2721,8 +2741,8 @@ footer .social-links a:hover { color: white; }
         <!-- REGISTER FORM -->
         <div id="register-form" style="display:none;">
           <div style="margin-bottom:14px;">
-            <label style="display:block;font-size:11px;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;color:#7a7a72;margin-bottom:7px;">Nombre *</label>
-            <input type="text" id="reg-nombre" placeholder="Tu nombre" style="width:100%;background:#f7f5f0;border:1.5px solid #e2ddd5;border-radius:12px;color:#252523;font-family:'Outfit',sans-serif;font-size:15px;padding:12px 16px;outline:none;box-sizing:border-box;">
+            <label style="display:block;font-size:11px;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;color:#7a7a72;margin-bottom:7px;">Nombre completo *</label>
+            <input type="text" id="reg-nombre" placeholder="Tu nombre completo" style="width:100%;background:#f7f5f0;border:1.5px solid #e2ddd5;border-radius:12px;color:#252523;font-family:'Outfit',sans-serif;font-size:15px;padding:12px 16px;outline:none;box-sizing:border-box;">
           </div>
           <div style="margin-bottom:14px;">
             <label style="display:block;font-size:11px;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;color:#7a7a72;margin-bottom:7px;">Numero de telefono * <span style="font-size:10px;font-weight:400;">(sera tu acceso)</span></label>
@@ -3305,10 +3325,22 @@ function resetSessionTimer() {
     currentUser = null;
     if (sessionTimer) clearTimeout(sessionTimer);
     sessionTimer = null;
-    // Reset UI
+    // Reset UI - regresar al menu como invitado
+    var navWrap = document.getElementById('nav-user-wrap');
+    if (navWrap) navWrap.style.display = 'none';
     var nav = document.getElementById('nav-user');
     if (nav) nav.style.display = 'none';
-    showScreen('login');
+    var navGuest = document.getElementById('nav-guest-btn');
+    if (navGuest) navGuest.style.display = 'inline-flex';
+    document.querySelectorAll('.screen').forEach(function(s) { s.classList.remove('active'); });
+    var loginPage = document.getElementById('login-page');
+    if (loginPage) loginPage.style.display = 'none';
+    var menuScreen = document.getElementById('screen-menu');
+    if (menuScreen) menuScreen.classList.add('active');
+    document.body.className = 'on-menu';
+    var welcomeEl = document.getElementById('welcome-name');
+    if (welcomeEl) welcomeEl.textContent = 'amigo';
+    if (typeof renderMenu === 'function') renderMenu();
     showToast('Sesion cerrada por inactividad (10 min)', 'error');
   }, SESSION_TIMEOUT);
 }
@@ -3329,12 +3361,28 @@ function cerrarSesion() {
   currentUser = null;
   if (sessionTimer) clearTimeout(sessionTimer);
   sessionTimer = null;
+  // Ocultar perfil del nav, mostrar boton invitado
+  var navWrap = document.getElementById('nav-user-wrap');
+  if (navWrap) navWrap.style.display = 'none';
   var nav = document.getElementById('nav-user');
   if (nav) nav.style.display = 'none';
+  var navGuest = document.getElementById('nav-guest-btn');
+  if (navGuest) navGuest.style.display = 'inline-flex';
+  // Limpiar carrito y volver al menu (modo invitado)
   cart = {};
+  try { localStorage.removeItem('cch_cart'); } catch(e) {}
   updateCartBar();
   cerrarPanelPerfil();
-  showScreen('login');
+  // Mostrar el menu como invitado
+  document.querySelectorAll('.screen').forEach(function(s) { s.classList.remove('active'); });
+  var loginPage = document.getElementById('login-page');
+  if (loginPage) loginPage.style.display = 'none';
+  var menuScreen = document.getElementById('screen-menu');
+  if (menuScreen) menuScreen.classList.add('active');
+  document.body.className = 'on-menu';
+  var welcomeEl = document.getElementById('welcome-name');
+  if (welcomeEl) welcomeEl.textContent = 'amigo';
+  if (typeof renderMenu === 'function') renderMenu();
   showToast('Sesion cerrada', 'success');
 }
 
@@ -3370,19 +3418,21 @@ function registrarConexion() {
 
 var BASE_IMG = 'https://chefchefharfer.github.io/chefchefharfer/';
 var MENU = [
-  { id:'001', nombre:'Tiras de Res en Salsa de Jengibre con Arroz Esponjoso',                          proteina:'Res',     badge:'badge-res',     precio2p:229, img:BASE_IMG+'001%20-%20Tiras%20de%20Res%20en%20Salsa%20.jpg' },
-  { id:'002', nombre:'Rib Eye Steak con Mantequilla de Alcaparras, Pure de Coliflor y Cebolla Caramelizada', proteina:'Res', badge:'badge-res',   precio2p:279, img:BASE_IMG+'002%20-%20Rib%20Eye%20Steak%20con%20Mantequilla%20.jpg' },
-  { id:'003', nombre:'Salmon al Miso con Arroz de Coliflor y Espinacas al Sesamo',                     proteina:'Salmon',  badge:'badge-salmon',  precio2p:329, img:BASE_IMG+'003%20-%20Miso%20Salmon%20con%20Arroz%20.jpg' },
-  { id:'004', nombre:'Filete de Pollo Honey Barbecue con Papas y Crispy Onions',                        proteina:'Pollo',   badge:'badge-pollo',   precio2p:229, img:BASE_IMG+'004%20-%20Filete%20de%20Pollo%20Honey%20bbq.jpg' },
-  { id:'005', nombre:'Camarones en Glaseado de Chile Guajillo y Mantequilla',                           proteina:'Camaron', badge:'badge-camaron', precio2p:269, img:BASE_IMG+'005%20-%20Camarones%20en%20Glaseado.jpg' },
-  { id:'006', nombre:'Caldo de Pollo con Arroz Rojo Casero',                                            proteina:'Pollo',   badge:'badge-pollo',   precio2p:209, img:BASE_IMG+'006%20-%20Caldo%20de%20Pollo%20con%20Arroz%20Rojo.jpg' },
-  { id:'007', nombre:'Spaghetti Bolonesa Clasico con Parmesano',                                        proteina:'Pasta',   badge:'badge-pasta',   precio2p:279, img:BASE_IMG+'007%20-%20Spaghetti%20Bolo%C3%B1esa%20Cl%C3%A1sico%20.jpg' },
-  { id:'008', nombre:'Ceviche de Chicharron',                                                           proteina:'Cerdo',   badge:'badge-cerdo',   precio2p:239, img:BASE_IMG+'008%20-%20Ceviche%20de%20chicharron.jpg' }
+  { id:'001', nombre:'Tiras de Res en Salsa de Jengibre con Arroz Esponjoso',                          proteina:'Res',     badge:'badge-res',     precio2p:180, img:BASE_IMG+'001%20-%20Tiras%20de%20Res%20en%20Salsa%20.jpg' },
+  { id:'002', nombre:'Rib Eye Steak con Mantequilla de Alcaparras, Pure de Coliflor y Cebolla Caramelizada', proteina:'Res', badge:'badge-res',   precio2p:210, img:BASE_IMG+'002%20-%20Rib%20Eye%20Steak%20con%20Mantequilla%20.jpg' },
+  { id:'003', nombre:'Salmon al Miso con Arroz de Coliflor y Espinacas al Sesamo',                     proteina:'Salmon',  badge:'badge-salmon',  precio2p:240, img:BASE_IMG+'003%20-%20Miso%20Salmon%20con%20Arroz%20.jpg' },
+  { id:'004', nombre:'Filete de Pollo Honey Barbecue con Papas y Crispy Onions',                        proteina:'Pollo',   badge:'badge-pollo',   precio2p:180, img:BASE_IMG+'004%20-%20Filete%20de%20Pollo%20Honey%20bbq.jpg' },
+  { id:'005', nombre:'Camarones en Glaseado de Chile Guajillo y Mantequilla',                           proteina:'Camaron', badge:'badge-camaron', precio2p:210, img:BASE_IMG+'005%20-%20Camarones%20en%20Glaseado.jpg' },
+  { id:'006', nombre:'Caldo de Pollo con Arroz Rojo Casero',                                            proteina:'Pollo',   badge:'badge-pollo',   precio2p:160, img:BASE_IMG+'006%20-%20Caldo%20de%20Pollo%20con%20Arroz%20Rojo.jpg' },
+  { id:'007', nombre:'Spaghetti Bolonesa Clasico con Parmesano',                                        proteina:'Pasta',   badge:'badge-pasta',   precio2p:220, img:BASE_IMG+'007%20-%20Spaghetti%20Bolo%C3%B1esa%20Cl%C3%A1sico%20.jpg' },
+  { id:'008', nombre:'Ceviche de Chicharron',                                                           proteina:'Cerdo',   badge:'badge-cerdo',   precio2p:190, img:BASE_IMG+'008%20-%20Ceviche%20de%20chicharron.jpg' },
+  { id:'009', nombre:'Bagels con Salmon Ahumado',                                                       proteina:'Salmon',  badge:'badge-salmon',  precio2p:260, img:BASE_IMG+'009%20-%20Bagels%20con%20Salmon%20Ahumado.jpg' }
 ];
 
 var currentUser = null;
 var cart = {};
 var loginMode = 'login';
+var pendingCheckout = false;
 var diaSeleccionado = null;
 var turnoSeleccionado = null;
 var dirConfirmada = false;
@@ -3402,6 +3452,61 @@ function getUserLocal(phone) {
 }
 function cleanPhone(p) { return p.replace(/\D/g, ''); }
 function isValidPhone(p) { return cleanPhone(p).length >= 10; }
+
+// === NAVEGACION INVITADO <-> LOGIN ===
+function abrirLoginDesdeNav() {
+  // El usuario toca "Iniciar sesion" desde el nav (sin checkout pendiente)
+  pendingCheckout = false;
+  mostrarPantallaLogin();
+}
+
+function abrirLoginParaCheckout() {
+  // El usuario quiere finalizar pedido pero no tiene sesion
+  pendingCheckout = true;
+  mostrarPantallaLogin();
+  showToast('Crea tu cuenta o inicia sesion para finalizar tu pedido', 'welcome');
+}
+
+function mostrarPantallaLogin() {
+  // Ocultar todas las screens
+  document.querySelectorAll('.screen').forEach(function(s) { s.classList.remove('active'); });
+  document.body.className = 'on-login';
+  // Mostrar el login-page
+  var loginPage = document.getElementById('login-page');
+  if (loginPage) loginPage.style.display = 'flex';
+  // Ocultar el cart-pill mientras esta en login
+  var pill = document.getElementById('cart-pill');
+  if (pill) pill.classList.remove('visible');
+  // Asegurar que el form de login este visible (no el de registro ni recuperacion)
+  selectLoginMode('login');
+  // Actualizar el banner segun el contexto (checkout o normal)
+  var banner = document.getElementById('login-context-banner');
+  if (banner) {
+    if (pendingCheckout) {
+      banner.style.display = 'flex';
+    } else {
+      banner.style.display = 'none';
+    }
+  }
+  // Mostrar el boton "Volver al menu"
+  var backBtn = document.getElementById('login-back-to-menu');
+  if (backBtn) backBtn.style.display = 'block';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function volverAlMenuDesdeLogin() {
+  // El usuario decide regresar al menu sin iniciar sesion
+  pendingCheckout = false;
+  var loginPage = document.getElementById('login-page');
+  if (loginPage) loginPage.style.display = 'none';
+  document.body.className = 'on-menu';
+  document.querySelectorAll('.screen').forEach(function(s) { s.classList.remove('active'); });
+  var menuScreen = document.getElementById('screen-menu');
+  if (menuScreen) menuScreen.classList.add('active');
+  // Restaurar el cart-pill si hay items
+  updateCartBar();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
 
 // === UI ===
 function showScreen(id) {
@@ -3541,7 +3646,7 @@ async function handleRegister() {
   var phone  = document.getElementById('reg-phone').value.trim();
   var email  = document.getElementById('reg-email').value.trim();
   var pin    = document.getElementById('reg-pin').value.trim();
-  if (!nombre)              { showToast('Escribe tu nombre', 'error'); return; }
+  if (!nombre)              { showToast('Escribe tu nombre completo', 'error'); return; }
   if (!isValidPhone(phone)) { showToast('Numero de telefono invalido', 'error'); return; }
   if (!email || email.indexOf('@') < 0) { showToast('Ingresa un correo valido', 'error'); return; }
   if (!pin || pin.length !== 4 || !/^[0-9]{4}$/.test(pin)) { showToast('El PIN debe ser de 4 digitos numericos', 'error'); return; }
@@ -3734,7 +3839,12 @@ function aplicarLogo(src) {
 // === POST-LOGIN ===
 function loginSuccess() {
   var nav = document.getElementById('nav-user');
+  var navWrap = document.getElementById('nav-user-wrap');
+  if (navWrap) navWrap.style.display = 'block';
   nav.style.display = 'flex';
+  // Ocultar el boton "Iniciar sesion" del nav (ya hay sesion)
+  var navGuest = document.getElementById('nav-guest-btn');
+  if (navGuest) navGuest.style.display = 'none';
   document.getElementById('nav-avatar').textContent = currentUser.nombre.charAt(0).toUpperCase();
   document.getElementById('nav-name').textContent = currentUser.nombre.split(' ')[0];
   // welcome-name may not exist yet if menu hasn't rendered
@@ -3743,14 +3853,26 @@ function loginSuccess() {
   if (currentUser.phone === ADMIN_PHONE) {
     showScreen('admin');
     setTimeout(function() { renderAdmin(); }, 50);
-  } else {
-    showScreen('menu');
-    setTimeout(function() {
-      var el = document.getElementById('welcome-name');
-      if (el) el.textContent = currentUser.nombre.split(' ')[0];
-      renderMenu();
-    }, 50);
+    pendingCheckout = false;
+    return;
   }
+  // Si venia del checkout, ir directo a screen-confirm
+  if (pendingCheckout && getCartItemCount() > 0) {
+    pendingCheckout = false;
+    setTimeout(function() {
+      var welcomeEl = document.getElementById('welcome-name');
+      if (welcomeEl) welcomeEl.textContent = currentUser.nombre.split(' ')[0];
+      irAConfirmar();
+    }, 80);
+    return;
+  }
+  pendingCheckout = false;
+  showScreen('menu');
+  setTimeout(function() {
+    var el = document.getElementById('welcome-name');
+    if (el) el.textContent = currentUser.nombre.split(' ')[0];
+    renderMenu();
+  }, 50);
 }
 
 function goToPerfil() {
@@ -3841,6 +3963,23 @@ function getCartCountForItem(id) {
 function renderMenu() {
   var grid = document.getElementById('platillos-grid');
   if (!grid) return;
+
+  // Actualizar el saludo del header segun estado de sesion
+  var welcomeEl = document.getElementById('welcome-name');
+  var subEl = document.querySelector('#screen-menu .menu-sub');
+  if (welcomeEl) {
+    if (currentUser && currentUser.phone !== ADMIN_PHONE) {
+      welcomeEl.textContent = currentUser.nombre.split(' ')[0];
+      if (subEl) subEl.textContent = 'Elige tus meal kits para esta semana';
+    } else if (currentUser && currentUser.phone === ADMIN_PHONE) {
+      welcomeEl.textContent = 'Admin';
+      if (subEl) subEl.textContent = 'Elige tus meal kits para esta semana';
+    } else {
+      welcomeEl.textContent = 'amigo';
+      if (subEl) subEl.textContent = 'Explora nuestros meal kits y arma tu pedido';
+    }
+  }
+
   grid.innerHTML = '';
 
   MENU.forEach(function(p) {
@@ -3989,11 +4128,16 @@ function showAddFeedback(btn, origText) {
 // === CARRITO ===
 function getCartKey(id, porciones) { return id + '_' + porciones; }
 
+function persistCart() {
+  try { localStorage.setItem('cch_cart', JSON.stringify(cart)); } catch(e) {}
+}
+
 function addToCart(id, porciones) {
   var p = MENU.find(function(x) { return x.id === id; });
   var key = getCartKey(id, porciones);
   if (cart[key]) { cart[key].cantidad += 1; }
   else { cart[key] = { platillo: p, porciones: porciones, cantidad: 1 }; }
+  persistCart();
   updateCartBar();
   renderMenu();
 }
@@ -4002,12 +4146,14 @@ function removeFromCart(key) {
   if (!cart[key]) return;
   if (cart[key].cantidad > 1) { cart[key].cantidad -= 1; }
   else { delete cart[key]; }
+  persistCart();
   updateCartBar();
   renderCartPanel();
 }
 
 function deleteFromCart(key) {
   delete cart[key];
+  persistCart();
   updateCartBar();
   renderCartPanel();
 }
@@ -4158,6 +4304,12 @@ function mostrarCambioDir() {
 
 function irAConfirmar() {
   if (!getCartItemCount()) { showToast('Agrega al menos un platillo', 'error'); return; }
+  // Si no hay sesion, pedirla antes de finalizar el pedido
+  if (!currentUser) {
+    pendingCheckout = true;
+    abrirLoginParaCheckout();
+    return;
+  }
   diaSeleccionado = null;
   turnoSeleccionado = null;
   // Reset all dia/turno buttons
@@ -4257,6 +4409,7 @@ async function abrirWhatsApp() {
   var waUrl = 'https://wa.me/' + WA_NUMBER + '?text=' + encodeURIComponent(msg);
   window.location.href = waUrl;
   cart = {};
+  try { localStorage.removeItem('cch_cart'); } catch(e) {}
   updateCartBar();
   showScreen('success');
 }
@@ -4502,25 +4655,51 @@ function adminLogout() {
 }
 function nuevoPedido() {
   cart = {};
+  try { localStorage.removeItem('cch_cart'); } catch(e) {}
   updateCartBar();
   renderMenu();
   showScreen('menu');
 }
 
 window.addEventListener('load', function() {
-  document.body.className = 'on-login';
-  // Explicitly show login page
+  // Inicio sin sesion: mostrar el menu directamente para que el usuario explore
+  document.body.className = 'on-menu';
+  // Ocultar login-page por defecto (solo aparece al checkout o al hacer login manual)
   var loginPage = document.getElementById('login-page');
-  if (loginPage) loginPage.style.display = 'flex';
-  // Make sure login form is visible
+  if (loginPage) loginPage.style.display = 'none';
+  // Mostrar el menu como pantalla inicial
+  var menuScreen = document.getElementById('screen-menu');
+  if (menuScreen) menuScreen.classList.add('active');
+  // Configurar header del menu para usuario invitado
+  var welcomeEl = document.getElementById('welcome-name');
+  if (welcomeEl) welcomeEl.textContent = 'amigo';
+  // Mostrar el boton "Iniciar sesion" en el nav (solo visible para invitados)
+  var navGuest = document.getElementById('nav-guest-btn');
+  if (navGuest) navGuest.style.display = 'inline-flex';
+  var navUserWrap = document.getElementById('nav-user-wrap');
+  if (navUserWrap) navUserWrap.style.display = 'none';
+  // Renderizar el menu
+  setTimeout(function() {
+    if (typeof renderMenu === 'function') renderMenu();
+  }, 50);
+  // Resetear formularios del login (por si alguien navega a login despues)
   var lf = document.getElementById('login-form');
   if (lf) lf.style.display = 'block';
   var rf = document.getElementById('register-form');
   if (rf) rf.style.display = 'none';
   var recf = document.getElementById('recovery-form');
   if (recf) recf.style.display = 'none';
+  // Inicializar cart-pill (oculto si no hay items)
   var pill = document.getElementById('cart-pill');
   if (pill) pill.classList.remove('visible');
+  // Si hay items en el carrito de antes (localStorage), restaurarlos
+  try {
+    var savedCart = localStorage.getItem('cch_cart');
+    if (savedCart) {
+      cart = JSON.parse(savedCart) || {};
+      updateCartBar();
+    }
+  } catch(e) {}
 });async function enviarCodigoRecuperacion() {
   var phone = document.getElementById('recovery-phone').value.trim();
   if (!isValidPhone(phone)) { showToast('Ingresa un numero valido', 'error'); return; }
