@@ -4606,49 +4606,73 @@ function renderCartPanel() {
 // === CONFIRMAR ===
 // === FECHAS DE ENTREGA AUTOMÁTICAS ===
 function calcularFechasEntrega() {
-  // Días de entrega: 2=Martes, 4=Jueves, 6=Sábado
-  // Cierre de pedidos: 12:00 pm del día PREVIO a la entrega
   var ahora = new Date();
   var meses = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
 
-  function proximoDia(diaSemana) {
-    // diaSemana: 0=Dom, 1=Lun, 2=Mar, 3=Mie, 4=Jue, 5=Vie, 6=Sab
-    // El cierre es a las 12pm del día PREVIO a la entrega
-    // Entonces el deadline para ese día de entrega es: (diaSemana - 1) a las 12:00
+  function proximaFecha(diaSemana) {
+    // Calcula la próxima fecha de entrega disponible para ese día de la semana
+    // Cierre: 12:00 pm del día PREVIO a la entrega
     var candidato = new Date(ahora);
-    // Calcular cuántos días faltan para el próximo diaSemana
     var diff = (diaSemana - candidato.getDay() + 7) % 7;
     if (diff === 0) diff = 7; // si hoy es ese día, ir al siguiente
     candidato.setDate(candidato.getDate() + diff);
     candidato.setHours(0, 0, 0, 0);
-
-    // Verificar si el pedido todavía está a tiempo para ESTA semana
-    // Deadline = día previo a la entrega a las 12:00 pm
+    // Deadline = día previo a las 12:00 pm
     var deadline = new Date(candidato);
     deadline.setDate(deadline.getDate() - 1);
     deadline.setHours(12, 0, 0, 0);
-
     if (ahora > deadline) {
-      // Ya pasó el deadline, ir a la semana siguiente
       candidato.setDate(candidato.getDate() + 7);
     }
     return candidato;
   }
 
-  var fechaMar = proximoDia(2); // Martes
-  var fechaJue = proximoDia(4); // Jueves
-  var fechaSab = proximoDia(6); // Sábado
-
   function formatFecha(d) {
     return d.getDate() + '-' + meses[d.getMonth()] + '-' + String(d.getFullYear()).slice(2);
   }
 
-  var elMar = document.getElementById('fecha-Mar');
-  var elJue = document.getElementById('fecha-Jue');
-  var elSab = document.getElementById('fecha-Sab');
-  if (elMar) elMar.textContent = formatFecha(fechaMar);
-  if (elJue) elJue.textContent = formatFecha(fechaJue);
-  if (elSab) elSab.textContent = formatFecha(fechaSab);
+  // Calcular las 3 fechas
+  var dias = [
+    { id: 'dia-Mar', fechaId: 'fecha-Mar', nombre: 'Martes',  diaSemana: 2, clave: 'Martes' },
+    { id: 'dia-Jue', fechaId: 'fecha-Jue', nombre: 'Jueves',  diaSemana: 4, clave: 'Jueves' },
+    { id: 'dia-Sab', fechaId: 'fecha-Sab', nombre: 'Sabado',  diaSemana: 6, clave: 'Sabado' }
+  ];
+
+  dias.forEach(function(d) {
+    d.fecha = proximaFecha(d.diaSemana);
+    d.fechaStr = formatFecha(d.fecha);
+  });
+
+  // Ordenar por fecha más cercana
+  dias.sort(function(a, b) { return a.fecha - b.fecha; });
+
+  // Reordenar los botones en el DOM según el nuevo orden
+  var grid = document.getElementById('dia-grid');
+  if (!grid) return;
+
+  // Actualizar ids, textos y onclick de cada botón en el orden correcto
+  var botones = grid.querySelectorAll('.dia-btn');
+  dias.forEach(function(d, i) {
+    var btn = botones[i];
+    if (!btn) return;
+    // Actualizar id del botón y del span de fecha
+    btn.id = d.id;
+    btn.onclick = (function(clave) {
+      return function() { selDia(clave, this); };
+    })(d.clave);
+    // Nombre del día
+    var nombreSpan = btn.querySelector('.dia-nombre');
+    if (nombreSpan) nombreSpan.textContent = d.nombre;
+    // Fecha
+    var fechaSpan = btn.querySelector('.dia-fecha');
+    if (fechaSpan) { fechaSpan.id = d.fechaId; fechaSpan.textContent = d.fechaStr; }
+    // Restaurar selección si ya tenía uno elegido
+    if (diaSeleccionado === d.clave) {
+      btn.classList.add('selected');
+    } else {
+      btn.classList.remove('selected');
+    }
+  });
 }
 
 function selDia(dia, btn) {
