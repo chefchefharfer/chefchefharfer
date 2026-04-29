@@ -712,6 +712,155 @@ h1 em {
 .qty-num { font-size: 14px; font-weight: 700; min-width: 20px; text-align: center; }
 
 /* CARRITO FLOTANTE */
+/* MINI-CART PANEL DESLIZABLE */
+.mini-cart-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
+  z-index: 300;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+.mini-cart-overlay.open {
+  opacity: 1;
+  pointer-events: all;
+}
+.mini-cart-panel {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  background: white;
+  border-radius: 22px 22px 0 0;
+  z-index: 301;
+  max-height: 80vh;
+  overflow-y: auto;
+  transform: translateY(100%);
+  transition: transform 0.38s cubic-bezier(0.34, 1.2, 0.64, 1);
+  padding-bottom: env(safe-area-inset-bottom, 16px);
+}
+.mini-cart-panel.open {
+  transform: translateY(0);
+}
+.mini-cart-handle {
+  width: 40px; height: 4px;
+  background: #e0ddd6;
+  border-radius: 2px;
+  margin: 12px auto 0;
+}
+.mini-cart-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px 12px;
+  border-bottom: 1px solid #f0ede6;
+}
+.mini-cart-title {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 17px;
+  font-weight: 800;
+  color: #111;
+  letter-spacing: -0.3px;
+}
+.mini-cart-btn-vaciar {
+  background: transparent;
+  border: 1.5px solid #e2ddd5;
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-family: 'Outfit', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  color: #c1121f;
+  cursor: pointer;
+}
+.mini-cart-btn-vaciar:hover { background: #fff5f5; border-color: #c1121f; }
+.mini-cart-items {
+  padding: 8px 20px;
+}
+.mini-cart-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid #f5f3ee;
+}
+.mini-cart-item:last-child { border-bottom: none; }
+.mini-cart-item-info { flex: 1; min-width: 0; }
+.mini-cart-item-name {
+  font-family: 'Outfit', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  color: #252523;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-bottom: 2px;
+}
+.mini-cart-item-detail {
+  font-size: 12px;
+  color: #7a7a72;
+}
+.mini-cart-item-price {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: #111;
+  white-space: nowrap;
+}
+.mini-cart-item-delete {
+  background: transparent;
+  border: none;
+  width: 30px; height: 30px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #bbb;
+  font-size: 16px;
+  flex-shrink: 0;
+  transition: background 0.15s, color 0.15s;
+}
+.mini-cart-item-delete:hover { background: #fff0f0; color: #c1121f; }
+.mini-cart-footer {
+  padding: 14px 20px 20px;
+  border-top: 1px solid #f0ede6;
+  background: white;
+  position: sticky;
+  bottom: 0;
+}
+.mini-cart-total-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+.mini-cart-total-label {
+  font-family: 'Outfit', sans-serif;
+  font-size: 13px;
+  color: #7a7a72;
+}
+.mini-cart-total-amount {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 22px;
+  font-weight: 800;
+  color: #111;
+  letter-spacing: -0.5px;
+}
+.mini-cart-btn-pagar {
+  width: 100%;
+  background: #067c49;
+  color: white;
+  border: none;
+  border-radius: 14px;
+  padding: 16px;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  letter-spacing: -0.2px;
+}
+.mini-cart-btn-pagar:hover { background: #056038; }
+
 .cart-bar {
  position: fixed;
  bottom: 0; left: 0; right: 0;
@@ -3277,10 +3426,30 @@ footer .social-links a:hover { color: white; }
  </div>
 </div>
 
+<!-- MINI-CART PANEL -->
+<div class="mini-cart-overlay" id="mini-cart-overlay" onclick="cerrarMiniCart()"></div>
+<div class="mini-cart-panel" id="mini-cart-panel">
+  <div class="mini-cart-handle"></div>
+  <div class="mini-cart-header">
+    <div class="mini-cart-title">Mi seleccion</div>
+    <button class="mini-cart-btn-vaciar" onclick="vaciarCarrito()">Vaciar todo</button>
+  </div>
+  <div class="mini-cart-items" id="mini-cart-items"></div>
+  <div class="mini-cart-footer">
+    <div class="mini-cart-total-row">
+      <span class="mini-cart-total-label">Total estimado</span>
+      <span class="mini-cart-total-amount" id="mini-cart-total">$0</span>
+    </div>
+    <button class="mini-cart-btn-pagar" onclick="cerrarMiniCartYPagar()">
+      Continuar al pago &rarr;
+    </button>
+  </div>
+</div>
+
 <!-- CARRITO FLOTANTE -->
 <div class="cart-bar">
  <div class="cart-bar-inner">
- <div class="cart-pill" id="cart-pill" onclick="irAConfirmar()">
+ <div class="cart-pill" id="cart-pill" onclick="abrirMiniCart()">
  <div class="cart-pill-left">
  <div class="cart-count" id="cart-count">0</div>
  <div>
@@ -3522,6 +3691,12 @@ function showScreen(id) {
   var target = document.getElementById('screen-' + id);
   if (target) target.classList.add('active');
   document.body.className = 'on-' + id;
+  // Cerrar mini-cart si estaba abierto
+  var mcOverlay = document.getElementById('mini-cart-overlay');
+  var mcPanel = document.getElementById('mini-cart-panel');
+  if (mcOverlay) mcOverlay.classList.remove('open');
+  if (mcPanel) mcPanel.classList.remove('open');
+  document.body.style.overflow = '';
   // login-page is the real login UI (outside .screen system)
   var loginPage = document.getElementById('login-page');
   if (loginPage) loginPage.style.display = (id === 'login') ? 'flex' : 'none';
@@ -4349,6 +4524,93 @@ function mostrarCambioDir() {
   if (currentUser && currentUser.direccion) {
     document.getElementById('input-direccion').value = currentUser.direccion;
   }
+}
+
+// === MINI-CART PANEL ===
+function abrirMiniCart() {
+  if (!getCartItemCount()) return;
+  renderMiniCart();
+  document.getElementById('mini-cart-overlay').classList.add('open');
+  document.getElementById('mini-cart-panel').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function cerrarMiniCart() {
+  document.getElementById('mini-cart-overlay').classList.remove('open');
+  document.getElementById('mini-cart-panel').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function cerrarMiniCartYPagar() {
+  cerrarMiniCart();
+  setTimeout(function() { irAConfirmar(); }, 200);
+}
+
+function vaciarCarrito() {
+  cart = {};
+  persistCart();
+  updateCartBar();
+  cerrarMiniCart();
+  renderMenu();
+  showToast('Carrito vaciado', 'success');
+}
+
+function eliminarItemMiniCart(key) {
+  delete cart[key];
+  persistCart();
+  updateCartBar();
+  renderMenu();
+  if (!getCartItemCount()) {
+    cerrarMiniCart();
+  } else {
+    renderMiniCart();
+  }
+}
+
+function renderMiniCart() {
+  var container = document.getElementById('mini-cart-items');
+  var totalEl = document.getElementById('mini-cart-total');
+  if (!container) return;
+  container.innerHTML = '';
+  var items = Object.entries(cart);
+  items.forEach(function(entry) {
+    var key = entry[0];
+    var item = entry[1];
+    var precio = item.porciones === 4 ? item.platillo.precio2p * 2 : item.platillo.precio2p;
+    var subtotal = precio * item.cantidad;
+
+    var row = document.createElement('div');
+    row.className = 'mini-cart-item';
+
+    var info = document.createElement('div');
+    info.className = 'mini-cart-item-info';
+
+    var name = document.createElement('div');
+    name.className = 'mini-cart-item-name';
+    name.textContent = item.platillo.nombre;
+    info.appendChild(name);
+
+    var detail = document.createElement('div');
+    detail.className = 'mini-cart-item-detail';
+    detail.textContent = 'Kit ' + item.porciones + 'p' + (item.cantidad > 1 ? '  ×' + item.cantidad : '');
+    info.appendChild(detail);
+
+    var price = document.createElement('div');
+    price.className = 'mini-cart-item-price';
+    price.textContent = '$' + subtotal.toLocaleString('es-MX');
+
+    var delBtn = document.createElement('button');
+    delBtn.className = 'mini-cart-item-delete';
+    delBtn.innerHTML = '&#10005;';
+    delBtn.title = 'Eliminar';
+    delBtn.onclick = (function(k) { return function() { eliminarItemMiniCart(k); }; })(key);
+
+    row.appendChild(info);
+    row.appendChild(price);
+    row.appendChild(delBtn);
+    container.appendChild(row);
+  });
+  if (totalEl) totalEl.textContent = '$' + getCartTotal().toLocaleString('es-MX');
 }
 
 function irAConfirmar() {
