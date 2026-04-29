@@ -712,6 +712,18 @@ h1 em {
 .qty-num { font-size: 14px; font-weight: 700; min-width: 20px; text-align: center; }
 
 /* CARRITO FLOTANTE */
+/* Proteger imágenes del menú: no se pueden guardar ni arrastrar */
+.prod-img, .prod-img-wrap img {
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+  pointer-events: none;
+}
+/* Pero el wrapper sí puede recibir clicks del admin */
+.prod-img-wrap {
+  pointer-events: all;
+}
+
 /* MINI-CART PANEL DESLIZABLE */
 .mini-cart-overlay {
   position: fixed;
@@ -2159,7 +2171,6 @@ footer .social-links a:hover { color: white; }
 #screen-menu {
   background: #111111 !important;
   min-height: 100vh;
-  padding: 24px 14px 120px !important;
 }
 
 .menu-header {
@@ -2702,45 +2713,84 @@ footer .social-links a:hover { color: white; }
 }
 
 
-/* Fix screen-login layout */
-#screen-login {
-  padding: 0 !important;
-  max-width: 100% !important;
+/* ── LAYOUT UNIFICADO ──────────────────────────────────────────
+   Todo el contenido visible se acota a 680px centrado.
+   En móvil ocupa el 100%. En PC se ve como una app centrada.
+   ─────────────────────────────────────────────────────────── */
+
+/* Contenedor interior del nav */
+nav {
+  padding: 0;
+}
+nav > * {
+  /* el nav ya tiene display flex con justify-content: space-between */
+}
+nav::before {
+  display: none; /* limpiar pseudo si los hubiera */
+}
+
+/* Wrapper interior del nav para acotar el ancho */
+nav {
+  padding: 0 max(24px, calc((100vw - 680px) / 2));
+}
+
+/* Screens: acotar ancho en PC */
+.screen {
+  max-width: 680px !important;
+  margin: 0 auto !important;
   overflow: visible !important;
 }
 
-#screen-menu {
-  overflow: visible !important;
+/* Hero del menú: fondo full-width pero contenido acotado */
+.hero-new {
+  width: 100%;
+}
+.hero-new-inner {
+  max-width: 680px;
+  margin: 0 auto;
+  width: 100%;
 }
 
-
-/* Garantizar que pantallas activas sean visibles */
-.screen.active {
-  display: block !important;
-}
-#screen-menu.active {
-  display: block !important;
-  background: #111111;
-}
-#screen-envio.active {
-  display: flex !important;
-}
+/* login-page: acotar ancho */
 #login-page {
-  display: flex;
-  flex-direction: column;
-  min-height: calc(100vh - 72px);
+  max-width: 680px;
+  margin: 0 auto;
 }
 
-
-/* Panel perfil - no bloquear clicks cuando está oculto */
-/* panel perfil movido a screen-perfil */
-
-/* Menu siempre renderizable */
-#screen-menu.active {
-  display: block !important;
-  position: relative;
-  z-index: 1;
+/* screen-menu: fondo oscuro full-width, pero padding interno correcto */
+#screen-menu {
+  max-width: none !important;
+  width: 100% !important;
+  padding: 0 !important;
+  overflow: visible !important;
 }
+
+/* El contenido interior del screen-menu se acota */
+#screen-menu .menu-header,
+#screen-menu .aviso-cierre,
+#screen-menu .tienda-grid {
+  max-width: 680px;
+  margin-left: auto;
+  margin-right: auto;
+  width: 100%;
+  box-sizing: border-box;
+  padding-left: 14px;
+  padding-right: 14px;
+}
+#screen-menu .menu-header {
+  padding-top: 20px;
+  padding-bottom: 0;
+}
+#screen-menu .aviso-cierre {
+  margin-top: 14px;
+  margin-bottom: 18px;
+}
+#screen-menu .tienda-grid {
+  padding-left: 14px;
+  padding-right: 14px;
+  padding-bottom: 120px;
+}
+
 
 /* Turno grid igual que dia grid */
 .turno-grid .dia-btn {
@@ -2782,7 +2832,7 @@ footer .social-links a:hover { color: white; }
       <div onclick="irAPerfil()" style="padding:13px 18px;font-family:'Outfit',sans-serif;font-size:14px;font-weight:500;color:#252523;cursor:pointer;border-bottom:1px solid #f0ede6;display:flex;align-items:center;gap:10px;" onmouseover="this.style.background='#f7f5f0'" onmouseout="this.style.background=''">
         <span>&#128100;</span> Mi perfil
       </div>
-      <div id="nav-dd-admin" onclick="irAAdmin()" style="display:none;padding:13px 18px;font-family:'Outfit',sans-serif;font-size:14px;font-weight:500;color:#067c49;cursor:pointer;border-bottom:1px solid #f0ede6;display:flex;align-items:center;gap:10px;" onmouseover="this.style.background='#f7f5f0'" onmouseout="this.style.background=''">
+      <div id="nav-dd-admin" onclick="irAAdmin()" style="display:none;padding:13px 18px;font-family:'Outfit',sans-serif;font-size:14px;font-weight:500;color:#067c49;cursor:pointer;border-bottom:1px solid #f0ede6;align-items:center;gap:10px;" onmouseover="this.style.background='#f7f5f0'" onmouseout="this.style.background=''">
         <span>&#128203;</span> Panel Admin
       </div>
       <div onclick="cerrarSesionDesdeNav()" style="padding:13px 18px;font-family:'Outfit',sans-serif;font-size:14px;font-weight:500;color:#c1121f;cursor:pointer;display:flex;align-items:center;gap:10px;" onmouseover="this.style.background='#fff5f5'" onmouseout="this.style.background=''">
@@ -3228,6 +3278,7 @@ footer .social-links a:hover { color: white; }
       <div style="display:flex;gap:8px;">
         <button onclick="renderAdmin()" style="background:var(--green-pale);border:1px solid var(--green-light);border-radius:8px;padding:6px 12px;font-size:11px;font-weight:600;color:var(--green);cursor:pointer;">Actualizar</button>
         <button onclick="exportarCSV('pedidos')" style="background:#f0ede6;border:1px solid #e2ddd5;border-radius:8px;padding:6px 12px;font-size:11px;font-weight:600;color:#555;cursor:pointer;">Exportar CSV</button>
+        <button onclick="limpiarPedidos()" style="background:#fff0f0;border:1px solid #ffc0c0;border-radius:8px;padding:6px 12px;font-size:11px;font-weight:600;color:#c1121f;cursor:pointer;">Limpiar</button>
       </div>
     </div>
     <div style="overflow-x:auto;">
@@ -3252,8 +3303,9 @@ footer .social-links a:hover { color: white; }
 
   <!-- LOG -->
   <div style="background:white;border-radius:16px;border:1px solid rgba(0,0,0,0.06);overflow:hidden;margin-bottom:16px;">
-    <div style="padding:16px 20px;border-bottom:1px solid #f0ede6;">
-      <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:14px;font-weight:800;color:#111;">&#128336; Actividad reciente</div>
+    <div style="padding:16px 20px;border-bottom:1px solid #f0ede6;display:flex;align-items:center;justify-content:space-between;">
+      <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:14px;font-weight:800;color:#111;">&#128336; Historial de actividad</div>
+      <button onclick="limpiarLogs()" style="background:#fff0f0;border:1px solid #ffc0c0;border-radius:8px;padding:6px 12px;font-size:11px;font-weight:600;color:#c1121f;cursor:pointer;">Limpiar historial</button>
     </div>
     <div style="overflow-x:auto;">
       <table style="width:100%;border-collapse:collapse;font-family:'Outfit',sans-serif;">
@@ -3565,7 +3617,6 @@ function cerrarSesion() {
 
 // === LOG DE ACTIVIDAD ===
 async function registrarActividad(user, tipo, detalle) {
-  // Log guardado localmente (Notion bloqueado por CORS desde browser)
   try {
     var logs = JSON.parse(localStorage.getItem('cch_activity_log') || '[]');
     logs.unshift({
@@ -3575,9 +3626,24 @@ async function registrarActividad(user, tipo, detalle) {
       detalle: detalle || '',
       fecha: new Date().toLocaleString('es-MX')
     });
-    if (logs.length > 200) logs = logs.slice(0, 200);
+    // Limite alto: 2000 entradas — solo el admin puede limpiar manualmente
+    if (logs.length > 2000) logs = logs.slice(0, 2000);
     localStorage.setItem('cch_activity_log', JSON.stringify(logs));
   } catch(e) {}
+}
+
+function limpiarLogs() {
+  if (!confirm('¿Estas seguro de que quieres eliminar todo el historial de actividad? Esta accion no se puede deshacer.')) return;
+  try { localStorage.removeItem('cch_activity_log'); } catch(e) {}
+  showToast('Historial eliminado', 'success');
+  renderAdmin();
+}
+
+function limpiarPedidos() {
+  if (!confirm('¿Eliminar todos los pedidos del historial?')) return;
+  try { localStorage.removeItem('cch_db_pedidos'); } catch(e) {}
+  showToast('Pedidos eliminados', 'success');
+  renderAdmin();
 }
 
 // === CONTADOR DE CONEXIONES ===
@@ -4028,9 +4094,15 @@ function loginSuccess() {
   // Ocultar el boton "Iniciar sesion" del nav (ya hay sesion)
   var navGuest = document.getElementById('nav-guest-btn');
   if (navGuest) navGuest.style.display = 'none';
-  document.getElementById('nav-avatar').textContent = currentUser.nombre.charAt(0).toUpperCase();
-  document.getElementById('nav-name').textContent = currentUser.nombre.split(' ')[0];
-  // welcome-name may not exist yet if menu hasn't rendered
+  // Solo primer nombre en el nav
+  var primerNombre = currentUser.nombre.split(' ')[0];
+  document.getElementById('nav-avatar').textContent = primerNombre.charAt(0).toUpperCase();
+  document.getElementById('nav-name').textContent = primerNombre;
+  // Panel Admin: solo visible para el administrador
+  var adminBtn = document.getElementById('nav-dd-admin');
+  if (adminBtn) {
+    adminBtn.style.display = (currentUser.phone === ADMIN_PHONE) ? 'flex' : 'none';
+  }
   iniciarSessionTimer();
   registrarConexion();
   if (currentUser.phone === ADMIN_PHONE) {
@@ -4621,22 +4693,36 @@ function irAConfirmar() {
     abrirLoginParaCheckout();
     return;
   }
-  diaSeleccionado = null;
-  turnoSeleccionado = null;
-  // Reset all dia/turno buttons
+  // Restaurar selecciones guardadas (dia, turno, direccion) si existen
+  // Solo resetear si no habia nada guardado previamente
+  var teniaDia = !!diaSeleccionado;
+  var teniaTurno = !!turnoSeleccionado;
+
+  // Restaurar botones de dia
   document.querySelectorAll('#screen-confirm .dia-btn').forEach(function(b) { b.classList.remove('selected'); });
-  // Init address section
+  var dmap = { 'Martes': 'dia-Mar', 'Jueves': 'dia-Jue', 'Sabado': 'dia-Sab' };
+  if (diaSeleccionado) {
+    var dBtn = document.getElementById(dmap[diaSeleccionado]);
+    if (dBtn) dBtn.classList.add('selected');
+  } else if (currentUser.diaPref) {
+    var dBtn2 = document.getElementById(dmap[currentUser.diaPref]);
+    if (dBtn2) { dBtn2.classList.add('selected'); diaSeleccionado = currentUser.diaPref; }
+  }
+
+  // Restaurar botones de turno
+  var turnoGrid = document.querySelector('#screen-confirm .turno-grid');
+  if (turnoGrid) turnoGrid.querySelectorAll('.dia-btn').forEach(function(b) { b.classList.remove('selected'); });
+  if (turnoSeleccionado) {
+    var tBtn = document.getElementById(turnoSeleccionado === 'Manana' ? 'turno-man' : 'turno-tar');
+    if (tBtn) tBtn.classList.add('selected');
+  } else if (currentUser.turnoPref) {
+    var tBtn2 = document.getElementById(currentUser.turnoPref === 'Manana' ? 'turno-man' : 'turno-tar');
+    if (tBtn2) { tBtn2.classList.add('selected'); turnoSeleccionado = currentUser.turnoPref; }
+  }
+
+  // Iniciar seccion de direccion preservando lo que ya habia
   iniciarSeccionDireccion();
-  // Pre-select from user preferences if saved
-  if (currentUser && currentUser.diaPref) {
-    var dmap = { 'Martes': 'dia-Mar', 'Jueves': 'dia-Jue', 'Sabado': 'dia-Sab' };
-    var dBtn = document.getElementById(dmap[currentUser.diaPref]);
-    if (dBtn) { dBtn.classList.add('selected'); diaSeleccionado = currentUser.diaPref; }
-  }
-  if (currentUser && currentUser.turnoPref) {
-    var tBtn = document.getElementById(currentUser.turnoPref === 'Manana' ? 'turno-man' : 'turno-tar');
-    if (tBtn) { tBtn.classList.add('selected'); turnoSeleccionado = currentUser.turnoPref; }
-  }
+
   showScreen('confirm');
   setTimeout(function() { renderCartPanel(); }, 80);
 }
@@ -4720,6 +4806,10 @@ async function abrirWhatsApp() {
   var waUrl = 'https://wa.me/' + WA_NUMBER + '?text=' + encodeURIComponent(msg);
   window.location.href = waUrl;
   cart = {};
+  diaSeleccionado = null;
+  turnoSeleccionado = null;
+  mismaDireccionConfirmada = false;
+  pinLat = null; pinLng = null;
   try { localStorage.removeItem('cch_cart'); } catch(e) {}
   updateCartBar();
   showScreen('success');
@@ -4738,26 +4828,32 @@ function iniciarSeccionDireccion() {
   var u = currentUser;
   var bloqExistente = document.getElementById('dir-cliente-existente');
   var bloqNuevo = document.getElementById('dir-nueva-form');
-  mismaDireccionConfirmada = false;
-  pinLat = null; pinLng = null;
+  // NO resetear pinLat/pinLng si ya los tenia el usuario (volvio del menu)
+  // Solo resetear el mapa visual para re-inicializarlo
   if (mapaInstance) { mapaInstance.remove(); mapaInstance = null; mapaMarker = null; }
   var mapaContainer = document.getElementById('mapa-container');
   if (mapaContainer) mapaContainer.style.display = 'none';
   var mapBtn = document.getElementById('btn-abrir-mapa');
   if (mapBtn) { mapBtn.textContent = 'Ver mapa'; mapBtn.classList.remove('abierto'); }
   mapaAbierto = false;
-  var toggle = document.getElementById('toggle-dir-same');
-  if (toggle) toggle.classList.remove('active');
+  // Restaurar direccion: prioridad → lo que escribio en esta sesion → la guardada en perfil
+  var dirActual = u && u.direccion ? u.direccion : '';
+  var inp = document.getElementById('input-dir-nueva');
+  // Si ya habia algo en el input (volvio del menu), conservarlo
+  var inputActual = inp ? inp.value.trim() : '';
   if (u && u.direccion) {
     var textoEl = document.getElementById('dir-existente-texto');
     if (textoEl) textoEl.textContent = u.direccion;
     if (bloqExistente) bloqExistente.style.display = 'block';
     if (bloqNuevo) bloqNuevo.style.display = 'none';
+    // Si mismaDireccionConfirmada ya estaba activa, restaurar el toggle
+    var toggle = document.getElementById('toggle-dir-same');
+    if (toggle) toggle.classList.toggle('active', mismaDireccionConfirmada);
   } else {
     if (bloqExistente) bloqExistente.style.display = 'none';
     if (bloqNuevo) bloqNuevo.style.display = 'block';
-    var inp = document.getElementById('input-dir-nueva');
-    if (inp) inp.value = '';
+    // Conservar lo que habia en el input si ya habia algo
+    if (inp && !inputActual) inp.value = '';
   }
 }
 
@@ -4921,7 +5017,7 @@ function renderAdmin() {
     if (!logs.length) {
       logBody.innerHTML = '<tr><td colspan="4" style="padding:16px;text-align:center;color:#aaa;font-size:13px;">Sin actividad registrada</td></tr>';
     } else {
-      logs.slice(0,30).forEach(function(l) {
+      logs.slice(0, 500).forEach(function(l) {
         var tr = document.createElement('tr');
         tr.style.borderBottom = '1px solid #f0ede6';
         tr.innerHTML =
@@ -4966,6 +5062,10 @@ function adminLogout() {
 }
 function nuevoPedido() {
   cart = {};
+  diaSeleccionado = null;
+  turnoSeleccionado = null;
+  mismaDireccionConfirmada = false;
+  pinLat = null; pinLng = null;
   try { localStorage.removeItem('cch_cart'); } catch(e) {}
   updateCartBar();
   renderMenu();
@@ -4973,6 +5073,20 @@ function nuevoPedido() {
 }
 
 window.addEventListener('load', function() {
+  // Deshabilitar clic derecho en imágenes del menu para evitar "Guardar imagen"
+  document.addEventListener('contextmenu', function(e) {
+    if (e.target && e.target.tagName === 'IMG') {
+      e.preventDefault();
+      return false;
+    }
+  });
+  // Deshabilitar drag de imágenes
+  document.addEventListener('dragstart', function(e) {
+    if (e.target && e.target.tagName === 'IMG') {
+      e.preventDefault();
+      return false;
+    }
+  });
   // Inicio sin sesion: mostrar el menu directamente para que el usuario explore
   document.body.className = 'on-menu';
   // Ocultar login-page por defecto (solo aparece al checkout o al hacer login manual)
