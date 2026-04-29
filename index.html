@@ -2792,6 +2792,22 @@ nav {
 }
 
 
+/* Fecha disponible dentro del botón de día */
+.dia-fecha {
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--muted);
+  letter-spacing: 0.3px;
+  margin-top: 2px;
+  opacity: 0.85;
+}
+.dia-btn.selected .dia-fecha { color: rgba(255,255,255,0.85); opacity: 1; }
+
+/* Logo del nav: oculto en la página de inicio (el hero ya tiene el logo) */
+body.on-menu #nav-logo-wrap { display: none; }
+/* En cualquier otra pantalla el logo sí aparece */
+body:not(.on-menu) #nav-logo-wrap { display: flex; }
+
 /* Turno grid igual que dia grid */
 .turno-grid .dia-btn {
   display: flex;
@@ -2991,7 +3007,7 @@ nav {
   <div class="hero-new" id="menu-hero">
     <div class="hero-new-inner">
       <img src="https://chefchefharfer.github.io/chefchefharfer/Logo%20chef%20chef.png" alt="Chef Chef Harfer" class="hero-logo">
-      <p class="hero-new-sub">Ingredientes frescos, recetas listas.<br>Solo cocina.</p>
+      <p class="hero-new-sub">Ingredientes frescos y porcionados, recetas listas.<br>Disfruta la experiencia.</p>
       <div class="hero-new-location">
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
         TEPATITLAN DE MORELOS
@@ -3090,12 +3106,15 @@ nav {
     <div class="dia-grid" id="dia-grid">
       <button class="dia-btn" id="dia-Mar" onclick="selDia('Martes', this)">
         <span class="dia-nombre">Martes</span>
+        <span class="dia-fecha" id="fecha-Mar">—</span>
       </button>
       <button class="dia-btn" id="dia-Jue" onclick="selDia('Jueves', this)">
         <span class="dia-nombre">Jueves</span>
+        <span class="dia-fecha" id="fecha-Jue">—</span>
       </button>
       <button class="dia-btn" id="dia-Sab" onclick="selDia('Sabado', this)">
         <span class="dia-nombre">Sabado</span>
+        <span class="dia-fecha" id="fecha-Sab">—</span>
       </button>
     </div>
   </div>
@@ -3130,10 +3149,19 @@ nav {
     </div>
     <div id="dir-nueva-form">
       <div class="field" style="margin-bottom:10px;">
-        <input type="text" id="input-dir-nueva" placeholder="Ej: Calle Hidalgo 123, Col. Centro" style="border-radius:12px;">
+        <label style="display:block;font-size:11px;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;color:var(--muted);margin-bottom:6px;">Calle</label>
+        <input type="text" id="input-dir-calle" placeholder="Ej: Calle Hidalgo" style="border-radius:12px;width:100%;background:#f7f5f0;border:1.5px solid #e2ddd5;color:#252523;font-family:'Outfit',sans-serif;font-size:15px;padding:12px 16px;outline:none;box-sizing:border-box;">
+      </div>
+      <div class="field" style="margin-bottom:10px;">
+        <label style="display:block;font-size:11px;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;color:var(--muted);margin-bottom:6px;">Numero exterior / interior <span style="font-weight:400;text-transform:none;">(si aplica)</span></label>
+        <input type="text" id="input-dir-numero" placeholder="Ej: 123 Int. 4-B" style="border-radius:12px;width:100%;background:#f7f5f0;border:1.5px solid #e2ddd5;color:#252523;font-family:'Outfit',sans-serif;font-size:15px;padding:12px 16px;outline:none;box-sizing:border-box;">
+      </div>
+      <div class="field" style="margin-bottom:14px;">
+        <label style="display:block;font-size:11px;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;color:var(--muted);margin-bottom:6px;">Colonia</label>
+        <input type="text" id="input-dir-colonia" placeholder="Ej: Col. Centro" style="border-radius:12px;width:100%;background:#f7f5f0;border:1.5px solid #e2ddd5;color:#252523;font-family:'Outfit',sans-serif;font-size:15px;padding:12px 16px;outline:none;box-sizing:border-box;">
       </div>
       <div class="mapa-toggle-row">
-        <span class="mapa-toggle-label">Marcar en el mapa <span class="mapa-opcional">(opcional)</span></span>
+        <span class="mapa-toggle-label">Marcar en el mapa <span class="mapa-opcional">(recomendado)</span></span>
         <button class="btn-abrir-mapa" id="btn-abrir-mapa" onclick="toggleMapa()">Ver mapa</button>
       </div>
       <div id="mapa-container" style="display:none;">
@@ -3527,12 +3555,21 @@ nav {
 <footer>
  <div class="footer-logo">Chef Chef Harfer</div>
  <div class="social-links">
- <a href="https://instagram.com/chefchef.harfer" target="_blank"> Instagram</a>
- <a href="https://www.facebook.com/profile.php?id=61582969501407" target="_blank"> Facebook</a>
- <a href="https://wa.me/523782901365" target="_blank"> WhatsApp</a>
+  <a href="https://instagram.com/chefchef.harfer" target="_blank">Instagram</a>
+  <a href="https://www.facebook.com/profile.php?id=61582969501407" target="_blank">Facebook</a>
+  <a href="https://wa.me/523782901365" target="_blank">WhatsApp</a>
  </div>
- <p> Tepatitlán de Morelos, Jalisco · Entregas martes, jueves y sábado</p>
- <p style="margin-top:8px">© 2026 Chef Chef Harfer · Todos los derechos reservados</p>
+ <p>Tepatitlán de Morelos, Jalisco · Entregas martes, jueves y sábado</p>
+ <div style="margin-top:16px;border-top:1px solid rgba(255,255,255,0.1);padding-top:16px;">
+  <p style="font-size:11px;color:rgba(255,255,255,0.5);line-height:1.7;max-width:560px;margin:0 auto;">
+    <strong style="color:rgba(255,255,255,0.7);">Aviso de Privacidad</strong> · 
+    Chef Chef Harfer, con domicilio en Tepatitlán de Morelos, Jalisco, México, es responsable del tratamiento de sus datos personales (nombre, teléfono, correo electrónico y dirección de entrega) con la finalidad de gestionar su pedido y brindarle el servicio solicitado. Sus datos no serán compartidos con terceros sin su consentimiento, salvo disposición legal. Usted puede ejercer sus derechos ARCO (Acceso, Rectificación, Cancelación u Oposición) enviando un mensaje a través de WhatsApp al número 378 290 1365. El uso de este sitio implica la aceptación del presente aviso.
+  </p>
+  <p style="margin-top:10px;font-size:11px;color:rgba(255,255,255,0.35);">
+    Al registrarse y realizar un pedido, usted acepta que sus datos sean utilizados únicamente para la gestión del servicio de Chef Chef Harfer, de conformidad con la Ley Federal de Protección de Datos Personales en Posesión de los Particulares (LFPDPPP).
+  </p>
+ </div>
+ <p style="margin-top:12px;font-size:11px;color:rgba(255,255,255,0.3);">© 2026 Chef Chef Harfer · Todos los derechos reservados</p>
 </footer>
 
 <script>
@@ -4273,7 +4310,7 @@ function renderMenu() {
   } else {
     // Invitado: solo "Hola"
     if (welcomeNameWrap) welcomeNameWrap.style.display = 'none';
-    if (subEl) subEl.textContent = 'Explora nuestros meal kits y arma tu pedido';
+    if (subEl) subEl.textContent = 'Explora nuestro menu y arma tu pedido. Elige kits para 2 o 4 personas. ¿Son mas? ¡Solo suma kits a tu pedido!';
   }
 
   grid.innerHTML = '';
@@ -4567,6 +4604,53 @@ function renderCartPanel() {
 }
 
 // === CONFIRMAR ===
+// === FECHAS DE ENTREGA AUTOMÁTICAS ===
+function calcularFechasEntrega() {
+  // Días de entrega: 2=Martes, 4=Jueves, 6=Sábado
+  // Cierre de pedidos: 12:00 pm del día PREVIO a la entrega
+  var ahora = new Date();
+  var meses = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+
+  function proximoDia(diaSemana) {
+    // diaSemana: 0=Dom, 1=Lun, 2=Mar, 3=Mie, 4=Jue, 5=Vie, 6=Sab
+    // El cierre es a las 12pm del día PREVIO a la entrega
+    // Entonces el deadline para ese día de entrega es: (diaSemana - 1) a las 12:00
+    var candidato = new Date(ahora);
+    // Calcular cuántos días faltan para el próximo diaSemana
+    var diff = (diaSemana - candidato.getDay() + 7) % 7;
+    if (diff === 0) diff = 7; // si hoy es ese día, ir al siguiente
+    candidato.setDate(candidato.getDate() + diff);
+    candidato.setHours(0, 0, 0, 0);
+
+    // Verificar si el pedido todavía está a tiempo para ESTA semana
+    // Deadline = día previo a la entrega a las 12:00 pm
+    var deadline = new Date(candidato);
+    deadline.setDate(deadline.getDate() - 1);
+    deadline.setHours(12, 0, 0, 0);
+
+    if (ahora > deadline) {
+      // Ya pasó el deadline, ir a la semana siguiente
+      candidato.setDate(candidato.getDate() + 7);
+    }
+    return candidato;
+  }
+
+  var fechaMar = proximoDia(2); // Martes
+  var fechaJue = proximoDia(4); // Jueves
+  var fechaSab = proximoDia(6); // Sábado
+
+  function formatFecha(d) {
+    return d.getDate() + '-' + meses[d.getMonth()] + '-' + String(d.getFullYear()).slice(2);
+  }
+
+  var elMar = document.getElementById('fecha-Mar');
+  var elJue = document.getElementById('fecha-Jue');
+  var elSab = document.getElementById('fecha-Sab');
+  if (elMar) elMar.textContent = formatFecha(fechaMar);
+  if (elJue) elJue.textContent = formatFecha(fechaJue);
+  if (elSab) elSab.textContent = formatFecha(fechaSab);
+}
+
 function selDia(dia, btn) {
   diaSeleccionado = dia;
   // Only clear dia buttons (not turno buttons)
@@ -4723,6 +4807,8 @@ function irAConfirmar() {
   // Iniciar seccion de direccion preservando lo que ya habia
   iniciarSeccionDireccion();
 
+  // Calcular y mostrar fechas disponibles en los botones de día
+  calcularFechasEntrega();
   showScreen('confirm');
   setTimeout(function() { renderCartPanel(); }, 80);
 }
@@ -4732,27 +4818,38 @@ function confirmarYEnviar() {
   if (!diaSeleccionado) { showToast('Selecciona el dia de entrega', 'error'); return; }
   if (!turnoSeleccionado) { showToast('Selecciona el turno de entrega', 'error'); return; }
   if (!getCartItemCount()) { showToast('Tu carrito esta vacio', 'error'); return; }
-  // Validate address
   var u = currentUser;
-  if (u && u.direccion) {
-    if (!mismaDireccionConfirmada) {
-      var inp = document.getElementById('input-dir-nueva');
-      var newDir = inp ? inp.value.trim() : '';
-      if (!newDir && document.getElementById('dir-nueva-form').style.display !== 'none') {
-        showToast('Escribe tu direccion de entrega', 'error'); return;
-      }
-      if (newDir) { u.direccion = newDir; saveUserLocal(u); currentUser = u; }
-    }
-  } else {
-    var inp2 = document.getElementById('input-dir-nueva');
-    var dir2 = inp2 ? inp2.value.trim() : '';
-    if (!dir2) { showToast('Escribe tu direccion de entrega', 'error'); return; }
-    u.direccion = dir2; saveUserLocal(u); currentUser = u;
+
+  // Validar y armar dirección desde los 3 campos
+  if (document.getElementById('dir-nueva-form').style.display !== 'none') {
+    var calle   = (document.getElementById('input-dir-calle')   || {value:''}).value.trim();
+    var numero  = (document.getElementById('input-dir-numero')  || {value:''}).value.trim();
+    var colonia = (document.getElementById('input-dir-colonia') || {value:''}).value.trim();
+    if (!calle)   { showToast('Escribe el nombre de tu calle', 'error'); return; }
+    if (!colonia) { showToast('Escribe tu colonia', 'error'); return; }
+    var dirCompleta = calle + (numero ? ' #' + numero : '') + ', ' + colonia;
+    u.direccion = dirCompleta;
+    saveUserLocal(u);
+    currentUser = u;
+  } else if (u && u.direccion && !mismaDireccionConfirmada) {
+    // Tiene dirección guardada pero no confirmó que sea la misma
+    showToast('Confirma si enviamos a la misma direccion', 'error'); return;
+  } else if (!u || !u.direccion) {
+    showToast('Escribe tu direccion de entrega', 'error'); return;
   }
+
+  // Guardar pin si se colocó
   if (pinLat && pinLng) {
     if (currentUser) { currentUser.mapLat = pinLat; currentUser.mapLng = pinLng; saveUserLocal(currentUser); }
   }
-  // Build resumen for the preview screen
+
+  // Recordatorio si no puso pin en el mapa
+  if (!pinLat || !pinLng) {
+    var sinPin = confirm('No marcaste tu ubicacion en el mapa.\n\nMarcar el pin nos ayuda a llegar mas rapido y asegurar la entrega.\n\n¿Quieres continuar sin el pin?');
+    if (!sinPin) return; // regresa para que marque el pin
+  }
+
+  // Build resumen
   var total = getCartTotal();
   var items = Object.values(cart);
   var turnoLabel = turnoSeleccionado === 'Manana' ? 'Manana (10am-1pm)' : 'Tarde (4pm-7pm)';
@@ -4852,8 +4949,9 @@ function iniciarSeccionDireccion() {
   } else {
     if (bloqExistente) bloqExistente.style.display = 'none';
     if (bloqNuevo) bloqNuevo.style.display = 'block';
-    // Conservar lo que habia en el input si ya habia algo
-    if (inp && !inputActual) inp.value = '';
+    // Conservar lo que habia en los campos si ya habia algo
+    var calleEl = document.getElementById('input-dir-calle');
+    if (calleEl && !calleEl.value) calleEl.value = '';
   }
 }
 
@@ -4867,7 +4965,17 @@ function mostrarFormDireccion() {
   var bloqExistente = document.getElementById('dir-cliente-existente');
   var bloqNuevo = document.getElementById('dir-nueva-form');
   if (bloqExistente) bloqExistente.style.display = 'none';
-  if (bloqNuevo) { bloqNuevo.style.display = 'block'; var inp = document.getElementById('input-dir-nueva'); if (inp && currentUser && currentUser.direccion) inp.value = currentUser.direccion; }
+  if (bloqNuevo) bloqNuevo.style.display = 'block';
+  // Pre-rellenar campos si hay dirección guardada
+  if (currentUser && currentUser.direccion) {
+    var partes = currentUser.direccion.split(',');
+    var calleNum = partes[0] ? partes[0].trim() : '';
+    var colPart  = partes[1] ? partes[1].trim() : '';
+    var calleEl  = document.getElementById('input-dir-calle');
+    var coloniaEl = document.getElementById('input-dir-colonia');
+    if (calleEl) calleEl.value = calleNum;
+    if (coloniaEl) coloniaEl.value = colPart;
+  }
   mismaDireccionConfirmada = false;
 }
 
