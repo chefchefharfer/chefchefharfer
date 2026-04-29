@@ -2788,11 +2788,23 @@ footer .social-links a:hover { color: white; }
  -->
 <div class="screen" id="screen-menu" style="background:#111;">
 
+  <!-- HERO visible siempre (invitado o con sesion) -->
+  <div class="hero-new" id="menu-hero">
+    <div class="hero-new-inner">
+      <img src="https://chefchefharfer.github.io/chefchefharfer/Logo%20chef%20chef.png" alt="Chef Chef Harfer" class="hero-logo">
+      <p class="hero-new-sub">Ingredientes frescos, recetas listas.<br>Solo cocina.</p>
+      <div class="hero-new-location">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        TEPATITLAN DE MORELOS
+      </div>
+    </div>
+  </div>
+
   <!-- Header bienvenida -->
   <div class="menu-header">
     <div>
-      <div class="menu-welcome">Hola, <span id="welcome-name">amigo</span></div>
-      <div class="menu-sub">Elige tus meal kits para esta semana</div>
+      <div class="menu-welcome" id="welcome-line">Hola<span id="welcome-name-wrap" style="display:none;">, <span id="welcome-name"></span></span></div>
+      <div class="menu-sub" id="menu-sub-text">Elige tus meal kits para esta semana</div>
     </div>
     <div id="btn-volver-admin" style="display:none;">
       <button onclick="showScreen('admin');setTimeout(function(){renderAdmin();},50);" style="background:rgba(255,255,255,0.15);border:1.5px solid rgba(255,255,255,0.3);border-radius:10px;padding:8px 14px;font-family:'Outfit',sans-serif;font-size:12px;font-weight:600;color:white;cursor:pointer;">
@@ -3338,8 +3350,6 @@ function resetSessionTimer() {
     var menuScreen = document.getElementById('screen-menu');
     if (menuScreen) menuScreen.classList.add('active');
     document.body.className = 'on-menu';
-    var welcomeEl = document.getElementById('welcome-name');
-    if (welcomeEl) welcomeEl.textContent = 'amigo';
     if (typeof renderMenu === 'function') renderMenu();
     showToast('Sesion cerrada por inactividad (10 min)', 'error');
   }, SESSION_TIMEOUT);
@@ -3380,8 +3390,6 @@ function cerrarSesion() {
   var menuScreen = document.getElementById('screen-menu');
   if (menuScreen) menuScreen.classList.add('active');
   document.body.className = 'on-menu';
-  var welcomeEl = document.getElementById('welcome-name');
-  if (welcomeEl) welcomeEl.textContent = 'amigo';
   if (typeof renderMenu === 'function') renderMenu();
   showToast('Sesion cerrada', 'success');
 }
@@ -3859,20 +3867,59 @@ function loginSuccess() {
   // Si venia del checkout, ir directo a screen-confirm
   if (pendingCheckout && getCartItemCount() > 0) {
     pendingCheckout = false;
-    setTimeout(function() {
-      var welcomeEl = document.getElementById('welcome-name');
-      if (welcomeEl) welcomeEl.textContent = currentUser.nombre.split(' ')[0];
-      irAConfirmar();
-    }, 80);
+    setTimeout(function() { irAConfirmar(); }, 80);
     return;
   }
   pendingCheckout = false;
   showScreen('menu');
-  setTimeout(function() {
-    var el = document.getElementById('welcome-name');
-    if (el) el.textContent = currentUser.nombre.split(' ')[0];
-    renderMenu();
-  }, 50);
+  setTimeout(function() { renderMenu(); }, 50);
+}
+
+function mostrarEditarDir() {
+  var f = document.getElementById('perfil-dir-form');
+  if (f) {
+    f.style.display = f.style.display === 'none' ? 'block' : 'none';
+    var inp = document.getElementById('perfil-input-dir');
+    if (inp && currentUser && currentUser.direccion) inp.value = currentUser.direccion;
+  }
+}
+
+function guardarDirPerfil() {
+  var inp = document.getElementById('perfil-input-dir');
+  if (!inp || !inp.value.trim()) { showToast('Escribe una direccion', 'error'); return; }
+  if (currentUser) {
+    currentUser.direccion = inp.value.trim();
+    saveUserLocal(currentUser);
+    var dirEl = document.getElementById('perfil-dir-texto');
+    if (dirEl) dirEl.textContent = currentUser.direccion;
+    var f = document.getElementById('perfil-dir-form');
+    if (f) f.style.display = 'none';
+    showToast('Direccion guardada', 'success');
+  }
+}
+
+function showScreen_perfil() {
+  if (!currentUser) return;
+  // Nombre — solo lectura
+  var elNombre = document.getElementById('perfil-nombre');
+  if (elNombre) elNombre.textContent = currentUser.nombre || '--';
+  // Telefono — solo lectura (formateado)
+  var elTel = document.getElementById('perfil-tel');
+  if (elTel) elTel.textContent = currentUser.phone || '--';
+  // Correo — solo lectura
+  var elEmail = document.getElementById('perfil-email');
+  if (elEmail) elEmail.textContent = currentUser.email || '--';
+  // Direccion
+  var dirEl = document.getElementById('perfil-dir-texto');
+  if (dirEl) dirEl.textContent = currentUser.direccion || 'Aun no tienes una direccion guardada. Se guardara la primera vez que realices un pedido.';
+  // Preferencias de entrega
+  var diaEl = document.getElementById('perfil-dia-pref');
+  if (diaEl) diaEl.textContent = currentUser.diaPref || 'Sin preferencia';
+  var turnoEl = document.getElementById('perfil-turno-pref');
+  if (turnoEl) turnoEl.textContent = currentUser.turnoPref || 'Sin preferencia';
+  // Ocultar form de direccion si estaba abierto
+  var dirForm = document.getElementById('perfil-dir-form');
+  if (dirForm) dirForm.style.display = 'none';
 }
 
 function goToPerfil() {
@@ -3965,19 +4012,21 @@ function renderMenu() {
   if (!grid) return;
 
   // Actualizar el saludo del header segun estado de sesion
-  var welcomeEl = document.getElementById('welcome-name');
-  var subEl = document.querySelector('#screen-menu .menu-sub');
-  if (welcomeEl) {
-    if (currentUser && currentUser.phone !== ADMIN_PHONE) {
-      welcomeEl.textContent = currentUser.nombre.split(' ')[0];
-      if (subEl) subEl.textContent = 'Elige tus meal kits para esta semana';
-    } else if (currentUser && currentUser.phone === ADMIN_PHONE) {
-      welcomeEl.textContent = 'Admin';
-      if (subEl) subEl.textContent = 'Elige tus meal kits para esta semana';
-    } else {
-      welcomeEl.textContent = 'amigo';
-      if (subEl) subEl.textContent = 'Explora nuestros meal kits y arma tu pedido';
-    }
+  var welcomeNameEl = document.getElementById('welcome-name');
+  var welcomeNameWrap = document.getElementById('welcome-name-wrap');
+  var subEl = document.getElementById('menu-sub-text');
+  if (currentUser && currentUser.phone !== ADMIN_PHONE) {
+    if (welcomeNameEl) welcomeNameEl.textContent = currentUser.nombre.split(' ')[0];
+    if (welcomeNameWrap) welcomeNameWrap.style.display = 'inline';
+    if (subEl) subEl.textContent = 'Elige tus meal kits para esta semana';
+  } else if (currentUser && currentUser.phone === ADMIN_PHONE) {
+    if (welcomeNameEl) welcomeNameEl.textContent = 'Admin';
+    if (welcomeNameWrap) welcomeNameWrap.style.display = 'inline';
+    if (subEl) subEl.textContent = 'Elige tus meal kits para esta semana';
+  } else {
+    // Invitado: solo "Hola"
+    if (welcomeNameWrap) welcomeNameWrap.style.display = 'none';
+    if (subEl) subEl.textContent = 'Explora nuestros meal kits y arma tu pedido';
   }
 
   grid.innerHTML = '';
@@ -4670,9 +4719,6 @@ window.addEventListener('load', function() {
   // Mostrar el menu como pantalla inicial
   var menuScreen = document.getElementById('screen-menu');
   if (menuScreen) menuScreen.classList.add('active');
-  // Configurar header del menu para usuario invitado
-  var welcomeEl = document.getElementById('welcome-name');
-  if (welcomeEl) welcomeEl.textContent = 'amigo';
   // Mostrar el boton "Iniciar sesion" en el nav (solo visible para invitados)
   var navGuest = document.getElementById('nav-guest-btn');
   if (navGuest) navGuest.style.display = 'inline-flex';
