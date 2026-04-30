@@ -18,6 +18,11 @@
   status = 200
 
 [[redirects]]
+  from = "/api/manage-days"
+  to = "/.netlify/functions/manage-days"
+  status = 200
+
+[[redirects]]
   from = "/api/get-data"
   to = "/.netlify/functions/get-data"
   status = 200
