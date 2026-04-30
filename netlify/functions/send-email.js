@@ -4,7 +4,7 @@
 
 const RESEND_API = 'https://api.resend.com/emails';
 const FROM      = 'Chef Chef Harfer <hola@chefchefharfer.mx>';
-const LOGO_URL  = 'https://chefchefharfer.github.io/chefchefharfer/Logo%20chef%20chef.png';
+const LOGO_URL  = 'https://chefchefharfer.github.io/chefchefharfer/Logo%20chef%20chef%20blanco.png';
 const SITE_URL  = 'https://chefchefharfer.netlify.app';
 const WA_LINK   = 'https://wa.me/523782901365';
 
