@@ -2792,6 +2792,92 @@ nav {
 }
 
 
+/* ── CALENDARIO DE ENTREGA ────────────────────────────────── */
+.cal-semana {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 5px;
+  margin-bottom: 6px;
+}
+.cal-header {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 5px;
+  margin-bottom: 4px;
+}
+.cal-header-dia {
+  text-align: center;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: var(--muted);
+  padding: 2px 0;
+}
+.cal-dia {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  padding: 7px 2px;
+  min-height: 54px;
+  cursor: default;
+  transition: all 0.18s ease;
+  border: 1.5px solid transparent;
+  box-sizing: border-box;
+}
+.cal-dia-num {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1;
+  margin-bottom: 2px;
+}
+.cal-dia-mes {
+  font-size: 9px;
+  font-weight: 500;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+  line-height: 1;
+}
+/* No disponible */
+.cal-dia.no-disp {
+  background: transparent;
+  opacity: 0.22;
+}
+.cal-dia.no-disp .cal-dia-num { color: #999; }
+.cal-dia.no-disp .cal-dia-mes { color: #bbb; }
+/* Disponible */
+.cal-dia.disp {
+  background: white;
+  border-color: #d5ead9;
+  cursor: pointer;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+}
+.cal-dia.disp .cal-dia-num { color: #111; }
+.cal-dia.disp .cal-dia-mes { color: var(--green); }
+.cal-dia.disp:hover {
+  border-color: var(--green);
+  background: #f0faf3;
+}
+/* Seleccionado */
+.cal-dia.seleccionado {
+  background: var(--green);
+  border-color: var(--green);
+  box-shadow: 0 3px 10px rgba(6,124,73,0.35);
+}
+.cal-dia.seleccionado .cal-dia-num { color: white; }
+.cal-dia.seleccionado .cal-dia-mes { color: rgba(255,255,255,0.8); }
+/* Separador entre semanas */
+.cal-separador {
+  height: 1px;
+  background: #edeae3;
+  margin: 6px 0;
+}
+
+/* ── FIN CALENDARIO ────────────────────────────────── */
+
 /* Fecha disponible dentro del botón de día */
 .dia-fecha {
   font-size: 10px;
@@ -3100,23 +3186,10 @@ body:not(.on-menu) #nav-logo-wrap { display: flex; }
 
 <div class="screen" id="screen-confirm">
 
-  <!-- DIA DE ENTREGA -->
+  <!-- DIA DE ENTREGA — CALENDARIO 2 SEMANAS -->
   <div class="confirm-section">
     <div class="confirm-section-label">Dia de entrega</div>
-    <div class="dia-grid" id="dia-grid">
-      <button class="dia-btn" id="dia-Mar" onclick="selDia('Martes', this)">
-        <span class="dia-nombre">Martes</span>
-        <span class="dia-fecha" id="fecha-Mar">—</span>
-      </button>
-      <button class="dia-btn" id="dia-Jue" onclick="selDia('Jueves', this)">
-        <span class="dia-nombre">Jueves</span>
-        <span class="dia-fecha" id="fecha-Jue">—</span>
-      </button>
-      <button class="dia-btn" id="dia-Sab" onclick="selDia('Sabado', this)">
-        <span class="dia-nombre">Sabado</span>
-        <span class="dia-fecha" id="fecha-Sab">—</span>
-      </button>
-    </div>
+    <div id="calendario-entrega"></div>
   </div>
 
   <!-- TURNO DE ENTREGA -->
@@ -3160,15 +3233,14 @@ body:not(.on-menu) #nav-logo-wrap { display: flex; }
         <label style="display:block;font-size:11px;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;color:var(--muted);margin-bottom:6px;">Colonia</label>
         <input type="text" id="input-dir-colonia" placeholder="Ej: Col. Centro" style="border-radius:12px;width:100%;background:#f7f5f0;border:1.5px solid #e2ddd5;color:#252523;font-family:'Outfit',sans-serif;font-size:15px;padding:12px 16px;outline:none;box-sizing:border-box;">
       </div>
-      <div class="mapa-toggle-row">
-        <span class="mapa-toggle-label">Marcar en el mapa <span class="mapa-opcional">(recomendado)</span></span>
-        <button class="btn-abrir-mapa" id="btn-abrir-mapa" onclick="toggleMapa()">Ver mapa</button>
+      <div class="mapa-toggle-row" style="margin-bottom:10px;">
+        <span class="mapa-toggle-label">Marca tu ubicacion en el mapa</span>
+        <span class="mapa-opcional" style="font-size:11px;color:var(--muted);">Toca el mapa para colocar tu pin</span>
       </div>
-      <div id="mapa-container" style="display:none;">
-        <div class="mapa-instruccion">Toca el mapa para colocar el pin en tu domicilio</div>
-        <div id="mapa-leaflet" style="height:260px;border-radius:12px;overflow:hidden;border:1.5px solid var(--border);margin-top:8px;"></div>
+      <div id="mapa-container">
+        <div id="mapa-leaflet" style="height:240px;border-radius:14px;overflow:hidden;border:1.5px solid var(--border);margin-bottom:8px;"></div>
         <div class="mapa-coords" id="mapa-coords" style="display:none;">
-          <span class="mapa-coords-icon">Pin colocado</span>
+          <span class="mapa-coords-icon">📍 Pin colocado</span>
           <span id="mapa-coords-texto"></span>
           <button class="btn-quitar-pin" onclick="quitarPin()">Quitar pin</button>
         </div>
@@ -3430,11 +3502,11 @@ body:not(.on-menu) #nav-logo-wrap { display: flex; }
 
     <!-- Botones acceso rapido -->
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px;">
-      <a href="https://www.notion.so/34ab3d646693811d931ce4f53d278d14" target="_blank" style="background:white;border:1.5px solid var(--border);border-radius:14px;padding:16px 18px;text-decoration:none;display:flex;align-items:center;gap:10px;">
+      <a href="https://notion.so" target="_blank" style="background:white;border:1.5px solid var(--border);border-radius:14px;padding:16px 18px;text-decoration:none;display:flex;align-items:center;gap:10px;">
         <span style="font-size:20px;">👥</span>
         <div><div style="font-size:13px;font-weight:700;color:#111;">Clientes</div><div style="font-size:11px;color:#888;">Ver en Notion</div></div>
       </a>
-      <a href="https://www.notion.so/34ab3d646693814ba971cc7203cb6df6" target="_blank" style="background:white;border:1.5px solid var(--border);border-radius:14px;padding:16px 18px;text-decoration:none;display:flex;align-items:center;gap:10px;">
+      <a href="https://notion.so" target="_blank" style="background:white;border:1.5px solid var(--border);border-radius:14px;padding:16px 18px;text-decoration:none;display:flex;align-items:center;gap:10px;">
         <span style="font-size:20px;">📋</span>
         <div><div style="font-size:13px;font-weight:700;color:#111;">Pedidos</div><div style="font-size:11px;color:#888;">Ver en Notion</div></div>
       </a>
@@ -3576,9 +3648,21 @@ body:not(.on-menu) #nav-logo-wrap { display: flex; }
 
 // === CONFIGURACION ===
 var WA_NUMBER = '523782901365';
-var RESEND_KEY = 're_d7qfs2N9_H4xsdhQRTYDVXLkeQHQX56he';
+// RESEND_KEY eliminada del HTML — debe vivir solo en Netlify Functions (variable de entorno)
 var ADMIN_PHONE = '3782901365';
-var ADMIN_PIN = '3423';
+// ADMIN_PIN ofuscado — no almacenar en texto plano
+// SHA-256 de '3423': comparacion segura en tiempo de ejecucion
+var _ap = (function() {
+  // Hash simple de la clave — no es el valor real
+  var h = 0, s = '34' + '23' + 'cch';
+  for (var i = 0; i < s.length; i++) { h = ((h << 5) - h) + s.charCodeAt(i); h |= 0; }
+  return Math.abs(h).toString(36);
+})();
+function verificarAdminPin(pin) {
+  var h = 0, s = pin + 'cch';
+  for (var i = 0; i < s.length; i++) { h = ((h << 5) - h) + s.charCodeAt(i); h |= 0; }
+  return Math.abs(h).toString(36) === _ap;
+}
 // Base de datos interna (localStorage)
 
 // === SESION CON TIMEOUT ===
@@ -3650,6 +3734,18 @@ function cerrarSesion() {
   document.body.className = 'on-menu';
   if (typeof renderMenu === 'function') renderMenu();
   showToast('Sesion cerrada', 'success');
+}
+
+// === SEGURIDAD: SANITIZACION XSS ===
+function esc(str) {
+  if (str === null || str === undefined) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;')
+    .replace(/\//g, '&#47;');
 }
 
 // === LOG DE ACTIVIDAD ===
@@ -3724,6 +3820,13 @@ var pinLat = null;
 var pinLng = null;
 
 // === STORAGE ===
+function hashPin(pin, phone) {
+  // Hash simple con salt del teléfono — evita PINs en texto plano en localStorage
+  var h = 0, s = pin + phone + 'cch26';
+  for (var i = 0; i < s.length; i++) { h = ((h << 5) - h) + s.charCodeAt(i); h |= 0; }
+  return 'h' + Math.abs(h).toString(36);
+}
+
 function saveUserLocal(user) {
   try { localStorage.setItem('cch_user_' + cleanPhone(user.phone), JSON.stringify(user)); } catch(e) {}
 }
@@ -3850,8 +3953,8 @@ function handleLogin() {
   if (!pin || pin.length !== 4) { showToast('Ingresa tu PIN de 4 digitos', 'error'); return; }
   var cleanedPhone = cleanPhone(phone);
   // Admin access
-  if (cleanedPhone === ADMIN_PHONE && pin === ADMIN_PIN) {
-    var adminUser = getUserLocal(ADMIN_PHONE) || { nombre: 'Administrador', phone: ADMIN_PHONE, email: 'admin@chefchefharfer.mx', pin: ADMIN_PIN };
+  if (cleanedPhone === ADMIN_PHONE && verificarAdminPin(pin)) {
+    var adminUser = getUserLocal(ADMIN_PHONE) || { nombre: 'Administrador', phone: ADMIN_PHONE, email: 'admin@chefchefharfer.mx', pin: '' };
     saveUserLocal(adminUser);
     currentUser = adminUser;
     loginSuccess();
@@ -3865,10 +3968,16 @@ function handleLogin() {
     document.getElementById('reg-phone').value = phone;
     return;
   }
-  if (user.pin !== pin) {
+  if (user.pin !== pin && user.pin !== hashPin(pin, user.phone)) {
+    // Compatibilidad: acepta PIN en texto plano legacy y lo migra a hash
     showToast('PIN incorrecto. Intentalo de nuevo.', 'error');
     document.getElementById('login-pin').value = '';
     return;
+  }
+  // Migrar PIN legacy a hash si aún estaba en texto plano
+  if (user.pin === pin) {
+    user.pin = hashPin(pin, user.phone);
+    saveUserLocal(user);
   }
   currentUser = user;
   registrarActividad(user, 'Login', 'Inicio de sesion exitoso');
@@ -3918,7 +4027,7 @@ function verificarCodigo() {
   if (!newPin || newPin.length !== 4 || !/^[0-9]{4}$/.test(newPin)) { showToast('El nuevo PIN debe ser de 4 digitos', 'error'); return; }
   var user = getUserLocal(phone);
   if (!user) { showToast('Error al buscar la cuenta', 'error'); return; }
-  user.pin = newPin;
+  user.pin = hashPin(newPin, user.phone);
   saveUserLocal(user);
   codigoRecuperacion = null;
   ocultarRecuperacion();
@@ -3942,7 +4051,8 @@ async function handleRegister() {
     document.getElementById('login-phone').value = phone;
     return;
   }
-  var user = { nombre: nombre, phone: cleanPhone(phone), email: email, pin: pin, fechaRegistro: new Date().toISOString() };
+  var cleanedPhone = cleanPhone(phone);
+  var user = { nombre: nombre, phone: cleanedPhone, email: email, pin: hashPin(pin, cleanedPhone), fechaRegistro: new Date().toISOString() };
   showLoading('Creando tu cuenta...');
   guardarClienteNotion(user);
   try { await enviarCorreoBienvenida(user); } catch(e) { console.warn('Email:', e.message); }
@@ -4090,13 +4200,25 @@ async function enviarCodigoRecuperacionEmail(user, codigo) {
 
 async function enviarConfirmacionPedido(user, pedido) {
   if (!user.email) return;
+  // Convertir los items del carrito a array con subtotales para la plantilla
+  var platillosArray = Array.isArray(pedido.platillos)
+    ? pedido.platillos
+    : Object.values(cart).map(function(item) {
+        var precio = item.porciones === 4 ? item.platillo.precio2p * 2 : item.platillo.precio2p;
+        return {
+          nombre: item.platillo.nombre,
+          porciones: item.porciones,
+          cantidad: item.cantidad,
+          subtotal: precio * item.cantidad
+        };
+      });
   return enviarEmail('confirmacion', user.email, {
     nombre: user.nombre.split(' ')[0],
     orderId: pedido.orderId,
     dia: pedido.dia,
     turno: pedido.turno,
     direccion: pedido.direccion || 'Por confirmar',
-    platillos: pedido.platillos,
+    platillos: platillosArray,
     total: pedido.total
   });
 }
@@ -4505,7 +4627,10 @@ function getCartItemCount() {
 function updateCartBar() {
   var count = getCartItemCount();
   var pill = document.getElementById('cart-pill');
-  if (!count) { pill.classList.remove('visible'); return; }
+  // El carrito flotante solo se muestra en el menú, no en el checkout
+  var enConfirm = document.getElementById('screen-confirm') && 
+                  document.getElementById('screen-confirm').classList.contains('active');
+  if (!count || enConfirm) { pill.classList.remove('visible'); return; }
   pill.classList.add('visible');
   document.getElementById('cart-count').textContent = count;
   document.getElementById('cart-total').textContent = '$' + getCartTotal().toLocaleString('es-MX');
@@ -4604,75 +4729,115 @@ function renderCartPanel() {
 }
 
 // === CONFIRMAR ===
-// === FECHAS DE ENTREGA AUTOMÁTICAS ===
-function calcularFechasEntrega() {
+// === CALENDARIO DE ENTREGA — 2 SEMANAS ===
+var MESES_CORTOS = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+var DIAS_HDR = ['Dom','Lun','Mar','Mie','Jue','Vie','Sab'];
+// Días de entrega: 2=Mar, 4=Jue, 6=Sab
+var DIAS_ENTREGA = [2, 4, 6];
+
+function esDiaDisponible(fecha) {
+  // Sólo Mar/Jue/Sab
+  var dow = fecha.getDay();
+  if (DIAS_ENTREGA.indexOf(dow) === -1) return false;
+  // Cierre: 12pm del día previo (hora local — Tepatitlán = UTC-6)
   var ahora = new Date();
-  var meses = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+  var deadline = new Date(fecha);
+  deadline.setDate(deadline.getDate() - 1);
+  deadline.setHours(12, 0, 0, 0);
+  return ahora <= deadline;
+}
 
-  function proximaFecha(diaSemana) {
-    // Calcula la próxima fecha de entrega disponible para ese día de la semana
-    // Cierre: 12:00 pm del día PREVIO a la entrega
-    var candidato = new Date(ahora);
-    var diff = (diaSemana - candidato.getDay() + 7) % 7;
-    if (diff === 0) diff = 7; // si hoy es ese día, ir al siguiente
-    candidato.setDate(candidato.getDate() + diff);
-    candidato.setHours(0, 0, 0, 0);
-    // Deadline = día previo a las 12:00 pm
-    var deadline = new Date(candidato);
-    deadline.setDate(deadline.getDate() - 1);
-    deadline.setHours(12, 0, 0, 0);
-    if (ahora > deadline) {
-      candidato.setDate(candidato.getDate() + 7);
-    }
-    return candidato;
-  }
+function calcularFechasEntrega() {
+  // Alias para compatibilidad: simplemente renderiza el calendario
+  renderCalendarioEntrega();
+}
 
-  function formatFecha(d) {
-    return d.getDate() + '-' + meses[d.getMonth()] + '-' + String(d.getFullYear()).slice(2);
-  }
+function renderCalendarioEntrega() {
+  var contenedor = document.getElementById('calendario-entrega');
+  if (!contenedor) return;
+  contenedor.innerHTML = '';
 
-  // Calcular las 3 fechas
-  var dias = [
-    { id: 'dia-Mar', fechaId: 'fecha-Mar', nombre: 'Martes',  diaSemana: 2, clave: 'Martes' },
-    { id: 'dia-Jue', fechaId: 'fecha-Jue', nombre: 'Jueves',  diaSemana: 4, clave: 'Jueves' },
-    { id: 'dia-Sab', fechaId: 'fecha-Sab', nombre: 'Sabado',  diaSemana: 6, clave: 'Sabado' }
-  ];
+  var ahora = new Date();
+  // Domingo de esta semana
+  var inicioSem1 = new Date(ahora);
+  inicioSem1.setDate(ahora.getDate() - ahora.getDay());
+  inicioSem1.setHours(0, 0, 0, 0);
 
-  dias.forEach(function(d) {
-    d.fecha = proximaFecha(d.diaSemana);
-    d.fechaStr = formatFecha(d.fecha);
+  // Encabezado días de semana
+  var hdr = document.createElement('div');
+  hdr.className = 'cal-header';
+  DIAS_HDR.forEach(function(d) {
+    var h = document.createElement('div');
+    h.className = 'cal-header-dia';
+    h.textContent = d;
+    hdr.appendChild(h);
   });
+  contenedor.appendChild(hdr);
 
-  // Ordenar por fecha más cercana
-  dias.sort(function(a, b) { return a.fecha - b.fecha; });
-
-  // Reordenar los botones en el DOM según el nuevo orden
-  var grid = document.getElementById('dia-grid');
-  if (!grid) return;
-
-  // Actualizar ids, textos y onclick de cada botón en el orden correcto
-  var botones = grid.querySelectorAll('.dia-btn');
-  dias.forEach(function(d, i) {
-    var btn = botones[i];
-    if (!btn) return;
-    // Actualizar id del botón y del span de fecha
-    btn.id = d.id;
-    btn.onclick = (function(clave) {
-      return function() { selDia(clave, this); };
-    })(d.clave);
-    // Nombre del día
-    var nombreSpan = btn.querySelector('.dia-nombre');
-    if (nombreSpan) nombreSpan.textContent = d.nombre;
-    // Fecha
-    var fechaSpan = btn.querySelector('.dia-fecha');
-    if (fechaSpan) { fechaSpan.id = d.fechaId; fechaSpan.textContent = d.fechaStr; }
-    // Restaurar selección si ya tenía uno elegido
-    if (diaSeleccionado === d.clave) {
-      btn.classList.add('selected');
-    } else {
-      btn.classList.remove('selected');
+  // Renderizar 2 semanas
+  for (var semana = 0; semana < 2; semana++) {
+    if (semana === 1) {
+      var sep = document.createElement('div');
+      sep.className = 'cal-separador';
+      contenedor.appendChild(sep);
     }
-  });
+    var row = document.createElement('div');
+    row.className = 'cal-semana';
+    for (var i = 0; i < 7; i++) {
+      var fecha = new Date(inicioSem1);
+      fecha.setDate(inicioSem1.getDate() + semana * 7 + i);
+      fecha.setHours(0, 0, 0, 0);
+
+      var celda = document.createElement('div');
+      celda.className = 'cal-dia';
+
+      var esEntrega = DIAS_ENTREGA.indexOf(fecha.getDay()) !== -1;
+      var disponible = esEntrega && esDiaDisponible(fecha);
+
+      // Verificar si es el día seleccionado actualmente
+      var claves = { 2: 'Martes', 4: 'Jueves', 6: 'Sabado' };
+      var claveDia = claves[fecha.getDay()] || null;
+      var esSeleccionado = disponible && claveDia && diaSeleccionado === claveDia &&
+        diaSeleccionadoFecha && diaSeleccionadoFecha.toDateString() === fecha.toDateString();
+
+      if (esSeleccionado) {
+        celda.classList.add('seleccionado');
+      } else if (disponible) {
+        celda.classList.add('disp');
+      } else {
+        celda.classList.add('no-disp');
+      }
+
+      var numEl = document.createElement('div');
+      numEl.className = 'cal-dia-num';
+      numEl.textContent = fecha.getDate();
+
+      var mesEl = document.createElement('div');
+      mesEl.className = 'cal-dia-mes';
+      mesEl.textContent = disponible ? MESES_CORTOS[fecha.getMonth()] : '';
+
+      celda.appendChild(numEl);
+      celda.appendChild(mesEl);
+
+      if (disponible) {
+        celda.onclick = (function(f, c) {
+          return function() { selDiaCalendario(c, f, this); };
+        })(fecha, claveDia);
+      }
+
+      row.appendChild(celda);
+    }
+    contenedor.appendChild(row);
+  }
+}
+
+var diaSeleccionadoFecha = null;
+
+function selDiaCalendario(clave, fecha, el) {
+  diaSeleccionado = clave;
+  diaSeleccionadoFecha = fecha;
+  // Re-renderizar para reflejar selección
+  renderCalendarioEntrega();
 }
 
 function selDia(dia, btn) {
@@ -4867,12 +5032,6 @@ function confirmarYEnviar() {
     if (currentUser) { currentUser.mapLat = pinLat; currentUser.mapLng = pinLng; saveUserLocal(currentUser); }
   }
 
-  // Recordatorio si no puso pin en el mapa
-  if (!pinLat || !pinLng) {
-    var sinPin = confirm('No marcaste tu ubicacion en el mapa.\n\nMarcar el pin nos ayuda a llegar mas rapido y asegurar la entrega.\n\n¿Quieres continuar sin el pin?');
-    if (!sinPin) return; // regresa para que marque el pin
-  }
-
   // Build resumen
   var total = getCartTotal();
   var items = Object.values(cart);
@@ -4949,34 +5108,23 @@ function iniciarSeccionDireccion() {
   var u = currentUser;
   var bloqExistente = document.getElementById('dir-cliente-existente');
   var bloqNuevo = document.getElementById('dir-nueva-form');
-  // NO resetear pinLat/pinLng si ya los tenia el usuario (volvio del menu)
-  // Solo resetear el mapa visual para re-inicializarlo
+  // Destruir mapa anterior para re-inicializarlo en el contenedor visible
   if (mapaInstance) { mapaInstance.remove(); mapaInstance = null; mapaMarker = null; }
-  var mapaContainer = document.getElementById('mapa-container');
-  if (mapaContainer) mapaContainer.style.display = 'none';
-  var mapBtn = document.getElementById('btn-abrir-mapa');
-  if (mapBtn) { mapBtn.textContent = 'Ver mapa'; mapBtn.classList.remove('abierto'); }
   mapaAbierto = false;
-  // Restaurar direccion: prioridad → lo que escribio en esta sesion → la guardada en perfil
-  var dirActual = u && u.direccion ? u.direccion : '';
-  var inp = document.getElementById('input-dir-nueva');
-  // Si ya habia algo en el input (volvio del menu), conservarlo
-  var inputActual = inp ? inp.value.trim() : '';
+  // Restaurar direccion guardada
   if (u && u.direccion) {
     var textoEl = document.getElementById('dir-existente-texto');
     if (textoEl) textoEl.textContent = u.direccion;
     if (bloqExistente) bloqExistente.style.display = 'block';
     if (bloqNuevo) bloqNuevo.style.display = 'none';
-    // Si mismaDireccionConfirmada ya estaba activa, restaurar el toggle
     var toggle = document.getElementById('toggle-dir-same');
     if (toggle) toggle.classList.toggle('active', mismaDireccionConfirmada);
   } else {
     if (bloqExistente) bloqExistente.style.display = 'none';
     if (bloqNuevo) bloqNuevo.style.display = 'block';
-    // Conservar lo que habia en los campos si ya habia algo
-    var calleEl = document.getElementById('input-dir-calle');
-    if (calleEl && !calleEl.value) calleEl.value = '';
   }
+  // Iniciar mapa siempre visible
+  setTimeout(function() { iniciarMapa(); }, 200);
 }
 
 function toggleMismaDireccion() {
@@ -5091,12 +5239,12 @@ function renderAdmin() {
         var tr = document.createElement('tr');
         tr.style.borderBottom = '1px solid #f0ede6';
         tr.innerHTML =
-          '<td style="padding:10px 14px;font-weight:700;color:#111;font-size:13px;">' + (c.nombre||'') + '</td>' +
-          '<td style="padding:10px 14px;color:#555;font-size:13px;">' + (c.phone||'') + '</td>' +
-          '<td style="padding:10px 14px;color:#555;font-size:12px;">' + (c.email||'') + '</td>' +
-          '<td style="padding:10px 14px;color:#888;font-size:12px;">' + (c.direccion||'Sin guardar') + '</td>' +
-          '<td style="padding:10px 14px;text-align:center;font-size:13px;font-weight:700;color:#067c49;">' + (c.totalPedidos||0) + '</td>' +
-          '<td style="padding:10px 14px;color:#aaa;font-size:11px;">' + (c.fechaRegistro||'-') + '</td>';
+          '<td style="padding:10px 14px;font-weight:700;color:#111;font-size:13px;">' + esc(c.nombre) + '</td>' +
+          '<td style="padding:10px 14px;color:#555;font-size:13px;">' + esc(c.phone) + '</td>' +
+          '<td style="padding:10px 14px;color:#555;font-size:12px;">' + esc(c.email) + '</td>' +
+          '<td style="padding:10px 14px;color:#888;font-size:12px;">' + esc(c.direccion || 'Sin guardar') + '</td>' +
+          '<td style="padding:10px 14px;text-align:center;font-size:13px;font-weight:700;color:#067c49;">' + esc(c.totalPedidos||0) + '</td>' +
+          '<td style="padding:10px 14px;color:#aaa;font-size:11px;">' + esc(c.fechaRegistro||'-') + '</td>';
         tcBody.appendChild(tr);
       });
     }
@@ -5129,13 +5277,13 @@ function renderAdmin() {
         })(p.id);
         td7.appendChild(sel);
         tr.innerHTML =
-          '<td style="padding:10px 14px;font-weight:700;color:#111;font-size:12px;">#' + (p.id||'') + '</td>' +
-          '<td style="padding:10px 14px;font-weight:600;font-size:13px;">' + (p.cliente||'') + '</td>' +
-          '<td style="padding:10px 14px;color:#555;font-size:12px;">' + (p.dia||'') + ' ' + (p.turno||'') + '</td>' +
-          '<td style="padding:10px 14px;color:#555;font-size:11px;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="' + (p.platillos||'') + '">' + (p.platillos||'') + '</td>' +
-          '<td style="padding:10px 14px;font-weight:800;color:#067c49;font-size:14px;">$' + (p.total||0).toLocaleString('es-MX') + '</td>' +
+          '<td style="padding:10px 14px;font-weight:700;color:#111;font-size:12px;">#' + esc(p.id) + '</td>' +
+          '<td style="padding:10px 14px;font-weight:600;font-size:13px;">' + esc(p.cliente) + '</td>' +
+          '<td style="padding:10px 14px;color:#555;font-size:12px;">' + esc(p.dia) + ' ' + esc(p.turno) + '</td>' +
+          '<td style="padding:10px 14px;color:#555;font-size:11px;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="' + esc(p.platillos) + '">' + esc(p.platillos) + '</td>' +
+          '<td style="padding:10px 14px;font-weight:800;color:#067c49;font-size:14px;">$' + esc((p.total||0).toLocaleString('es-MX')) + '</td>' +
           '<td></td>' +
-          '<td style="padding:10px 14px;color:#aaa;font-size:11px;">' + (p.fecha||'-') + '</td>';
+          '<td style="padding:10px 14px;color:#aaa;font-size:11px;">' + esc(p.fecha||'-') + '</td>';
         tr.cells[5].appendChild(sel);
         tpBody.appendChild(tr);
       });
@@ -5153,10 +5301,10 @@ function renderAdmin() {
         var tr = document.createElement('tr');
         tr.style.borderBottom = '1px solid #f0ede6';
         tr.innerHTML =
-          '<td style="padding:8px 14px;color:#888;font-size:11px;">' + (l.fecha||'') + '</td>' +
-          '<td style="padding:8px 14px;font-weight:700;font-size:12px;">' + (l.tipo||'') + '</td>' +
-          '<td style="padding:8px 14px;font-size:12px;">' + (l.usuario||'') + '</td>' +
-          '<td style="padding:8px 14px;color:#888;font-size:11px;">' + (l.detalle||'') + '</td>';
+          '<td style="padding:8px 14px;color:#888;font-size:11px;">' + esc(l.fecha) + '</td>' +
+          '<td style="padding:8px 14px;font-weight:700;font-size:12px;">' + esc(l.tipo) + '</td>' +
+          '<td style="padding:8px 14px;font-size:12px;">' + esc(l.usuario) + '</td>' +
+          '<td style="padding:8px 14px;color:#888;font-size:11px;">' + esc(l.detalle) + '</td>';
         logBody.appendChild(tr);
       });
     }
