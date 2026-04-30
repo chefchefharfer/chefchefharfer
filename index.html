@@ -4170,7 +4170,7 @@ function guardarPedidoNotion(user, items, total, orderId, dia, direccion) {
 
 
 // === CORREO VIA NETLIFY ===
-var EMAIL_API = '/api/send-email';
+var EMAIL_API = 'https://chefchefharfer.netlify.app/.netlify/functions/send-email';
 
 async function enviarEmail(tipo, to, data) {
   try {
