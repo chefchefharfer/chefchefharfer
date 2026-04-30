@@ -2,7 +2,11 @@
   publish = "."
   functions = "netlify/functions"
 
-# Rutas de la API
+# Función programada: aviso de entrega a las 8am México (14:00 UTC)
+[functions."aviso-entrega"]
+  schedule = "0 14 * * *"
+
+# Rutas API
 [[redirects]]
   from = "/api/send-email"
   to = "/.netlify/functions/send-email"
@@ -27,7 +31,6 @@
     Referrer-Policy = "strict-origin-when-cross-origin"
     Permissions-Policy = "geolocation=(self), camera=(), microphone=()"
 
-# Cache imágenes
 [[headers]]
   for = "/*.jpg"
   [headers.values]
@@ -38,7 +41,6 @@
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
 
-# Cache HTML corto
 [[headers]]
   for = "/*.html"
   [headers.values]
