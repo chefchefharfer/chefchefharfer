@@ -2,23 +2,32 @@
   publish = "."
   functions = "netlify/functions"
 
-# Redirigir /api/send-email a la función serverless
+# Rutas de la API
 [[redirects]]
   from = "/api/send-email"
   to = "/.netlify/functions/send-email"
   status = 200
 
-# Headers de seguridad para todas las páginas
+[[redirects]]
+  from = "/api/save-data"
+  to = "/.netlify/functions/save-data"
+  status = 200
+
+[[redirects]]
+  from = "/api/get-data"
+  to = "/.netlify/functions/get-data"
+  status = 200
+
+# Headers de seguridad
 [[headers]]
   for = "/*"
   [headers.values]
-    X-Frame-Options = "DENY"
     X-Content-Type-Options = "nosniff"
     X-XSS-Protection = "1; mode=block"
     Referrer-Policy = "strict-origin-when-cross-origin"
     Permissions-Policy = "geolocation=(self), camera=(), microphone=()"
 
-# Cache para imágenes
+# Cache imágenes
 [[headers]]
   for = "/*.jpg"
   [headers.values]
@@ -29,7 +38,7 @@
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
 
-# Cache para HTML (corto, para que los cambios se reflejen rápido)
+# Cache HTML corto
 [[headers]]
   for = "/*.html"
   [headers.values]
