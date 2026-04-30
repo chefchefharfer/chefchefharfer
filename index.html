@@ -3013,13 +3013,17 @@ body:not(.on-menu) #nav-logo-wrap { display: flex; }
 
         <!-- RECOVERY FORM -->
         <div id="recovery-form" style="display:none;">
-          <div style="font-size:13px;color:#7a7a72;margin-bottom:16px;line-height:1.6;">Te enviaremos un codigo de 6 digitos por WhatsApp para verificar tu identidad.</div>
+          <div style="font-size:13px;color:#7a7a72;margin-bottom:16px;line-height:1.6;">Te enviaremos un codigo de 6 digitos a tu correo registrado para verificar tu identidad.</div>
           <div style="margin-bottom:14px;">
             <label style="display:block;font-size:11px;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;color:#7a7a72;margin-bottom:7px;">Tu numero de telefono</label>
             <input type="tel" id="recovery-phone" placeholder="331 234 5678" maxlength="15" style="width:100%;background:#f7f5f0;border:1.5px solid #e2ddd5;border-radius:12px;color:#252523;font-family:'Outfit',sans-serif;font-size:15px;padding:12px 16px;outline:none;box-sizing:border-box;">
           </div>
+          <div style="margin-bottom:14px;">
+            <label style="display:block;font-size:11px;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;color:#7a7a72;margin-bottom:7px;">Tu correo electronico registrado</label>
+            <input type="email" id="recovery-email" placeholder="tucorreo@gmail.com" style="width:100%;background:#f7f5f0;border:1.5px solid #e2ddd5;border-radius:12px;color:#252523;font-family:'Outfit',sans-serif;font-size:15px;padding:12px 16px;outline:none;box-sizing:border-box;">
+          </div>
           <button onclick="enviarCodigoRecuperacion()" style="width:100%;background:#067c49;color:white;border:none;border-radius:12px;padding:14px;font-family:'Plus Jakarta Sans',sans-serif;font-size:14px;font-weight:700;cursor:pointer;margin-bottom:16px;">
-            Enviar codigo por WhatsApp
+            Enviar codigo por correo
           </button>
           <div id="recovery-step2" style="display:none;">
             <div style="margin-bottom:14px;">
@@ -3750,19 +3754,22 @@ function esc(str) {
 
 // === LOG DE ACTIVIDAD ===
 async function registrarActividad(user, tipo, detalle) {
+  // Guardar local
   try {
     var logs = JSON.parse(localStorage.getItem('cch_activity_log') || '[]');
     logs.unshift({
-      tipo: tipo,
-      usuario: user ? user.nombre : 'Anonimo',
-      telefono: user ? user.phone : '',
-      detalle: detalle || '',
+      tipo: tipo, usuario: user ? user.nombre : 'Anonimo',
+      telefono: user ? user.phone : '', detalle: detalle || '',
       fecha: new Date().toLocaleString('es-MX')
     });
-    // Limite alto: 2000 entradas — solo el admin puede limpiar manualmente
     if (logs.length > 2000) logs = logs.slice(0, 2000);
     localStorage.setItem('cch_activity_log', JSON.stringify(logs));
   } catch(e) {}
+  // Guardar en Netlify Blobs (central)
+  guardarEnBlobs('actividad', {
+    tipo: tipo, usuario: user ? user.nombre : 'Anonimo',
+    telefono: user ? user.phone : '', detalle: detalle || ''
+  });
 }
 
 function limpiarLogs() {
@@ -4003,20 +4010,31 @@ function ocultarRecuperacion() {
   codigoRecuperacion = null;
 }
 
-function enviarCodigoRecuperacion() {
+async function enviarCodigoRecuperacion() {
   var phone = document.getElementById('recovery-phone').value.trim();
+  var emailIngresado = document.getElementById('recovery-email').value.trim().toLowerCase();
   if (!isValidPhone(phone)) { showToast('Ingresa un numero valido', 'error'); return; }
+  if (!emailIngresado || emailIngresado.indexOf('@') < 0) { showToast('Ingresa tu correo registrado', 'error'); return; }
   var user = getUserLocal(phone);
   if (!user) { showToast('No encontramos ese numero', 'error'); return; }
-  // Generate 6-digit code
+  // Verificar que el correo coincide con el registrado
+  if (!user.email || user.email.toLowerCase() !== emailIngresado) {
+    showToast('El correo no coincide con el registrado en esa cuenta', 'error');
+    return;
+  }
+  // Generar código de 6 dígitos
   codigoRecuperacion = Math.floor(100000 + Math.random() * 900000).toString();
-  // Send via WhatsApp
-  var msg = 'Tu codigo de verificacion de Chef Chef Harfer es: *' + codigoRecuperacion + '*\n\nEste codigo expira en 10 minutos. Si no lo solicitaste, ignoralo.';
-  var waUrl = 'https://wa.me/52' + user.phone + '?text=' + encodeURIComponent(msg);
-  window.open(waUrl, '_blank');
-  // Show step 2
-  document.getElementById('recovery-step2').style.display = 'block';
-  showToast('Codigo enviado por WhatsApp', 'success');
+  // Enviar por correo
+  showLoading('Enviando codigo...');
+  try {
+    await enviarCorreoRecuperacion(user, codigoRecuperacion);
+    hideLoading();
+    document.getElementById('recovery-step2').style.display = 'block';
+    showToast('Codigo enviado a ' + user.email, 'success');
+  } catch(e) {
+    hideLoading();
+    showToast('Error al enviar el correo. Intenta de nuevo.', 'error');
+  }
 }
 
 function verificarCodigo() {
@@ -4065,34 +4083,43 @@ async function handleRegister() {
 }
 
 // === NOTION ===
+var DATA_API = 'https://chefchefharfer.netlify.app/.netlify/functions/save-data';
+
+async function guardarEnBlobs(tipo, data) {
+  try {
+    await fetch(DATA_API, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ tipo, data })
+    });
+  } catch(e) { console.warn('save-data:', e.message); }
+}
+
 function guardarClienteNotion(user) {
+  // Guardar local (respaldo)
   try {
     var clientes = JSON.parse(localStorage.getItem('cch_db_clientes') || '[]');
     var idx = clientes.findIndex(function(c) { return c.phone === user.phone; });
     if (idx < 0) {
       clientes.push({
         id: Date.now().toString(),
-        nombre: user.nombre,
-        phone: user.phone,
-        email: user.email || '',
-        direccion: user.direccion || '',
-        diaPref: user.diaPref || '',
-        turnoPref: user.turnoPref || '',
-        fechaRegistro: new Date().toLocaleString('es-MX'),
-        ultimoLogin: new Date().toLocaleString('es-MX'),
-        ultimoLogout: '',
-        totalPedidos: 0,
-        totalGastado: 0,
-        platillosFav: {},
-        historialSesiones: [{ tipo: 'Registro', fecha: new Date().toLocaleString('es-MX') }]
+        nombre: user.nombre, phone: user.phone, email: user.email || '',
+        direccion: user.direccion || '', diaPref: user.diaPref || '',
+        turnoPref: user.turnoPref || '', fechaRegistro: new Date().toLocaleString('es-MX'),
+        ultimoLogin: new Date().toLocaleString('es-MX'), ultimoLogout: '',
+        totalPedidos: 0, totalGastado: 0
       });
     } else {
-      // Update existing record
       clientes[idx].nombre = user.nombre;
       clientes[idx].email = user.email || clientes[idx].email;
     }
     localStorage.setItem('cch_db_clientes', JSON.stringify(clientes));
-  } catch(e) { console.warn('DB clientes:', e.message); }
+  } catch(e) {}
+  // Guardar en Netlify Blobs (central)
+  guardarEnBlobs('cliente', {
+    nombre: user.nombre, phone: user.phone, email: user.email || '',
+    direccion: user.direccion || '', fechaRegistro: new Date().toISOString(), status: 'Activo'
+  });
 }
 
 function actualizarClienteLogin(phone) {
@@ -4125,47 +4152,34 @@ function actualizarClienteLogout(phone) {
 
 
 function guardarPedidoNotion(user, items, total, orderId, dia, direccion) {
+  var turnoLabel = turnoSeleccionado === 'Manana' ? 'Manana (10am-1pm)' : 'Tarde (4pm-7pm)';
+  var platillosArray = items.map(function(i) {
+    var precio = i.porciones === 4 ? i.platillo.precio2p * 2 : i.platillo.precio2p;
+    return { nombre: i.platillo.nombre, porciones: i.porciones, cantidad: i.cantidad, subtotal: precio * i.cantidad };
+  });
+  // Guardar local (respaldo)
   try {
-    var turnoLabel = turnoSeleccionado === 'Manana' ? 'Manana (10am-1pm)' : 'Tarde (4pm-7pm)';
-    var itemsText = items.map(function(i) {
-      var precio = i.porciones === 4 ? i.platillo.precio2p * 2 : i.platillo.precio2p;
-      return i.platillo.nombre + ' x' + i.cantidad + ' (Kit ' + i.porciones + 'p) $' + (precio * i.cantidad);
-    }).join(' | ');
     var pedidos = JSON.parse(localStorage.getItem('cch_db_pedidos') || '[]');
     pedidos.unshift({
-      id: orderId,
-      cliente: user.nombre,
-      phone: user.phone,
-      email: user.email || '',
-      platillos: itemsText,
-      total: total,
-      dia: dia || '',
-      turno: turnoLabel,
-      direccion: direccion || '',
-      estado: 'Pendiente',
-      fecha: new Date().toLocaleString('es-MX')
+      id: orderId, cliente: user.nombre, phone: user.phone, email: user.email || '',
+      platillos: platillosArray.map(function(p) { return p.nombre + ' x' + p.cantidad + ' Kit ' + p.porciones + 'p'; }).join(' | '),
+      total: total, dia: dia || '', turno: turnoLabel, direccion: direccion || '',
+      estado: 'Pendiente', fecha: new Date().toLocaleString('es-MX')
     });
     localStorage.setItem('cch_db_pedidos', JSON.stringify(pedidos));
-    // Update clientes DB
-    var clientes = JSON.parse(localStorage.getItem('cch_db_clientes') || '[]');
-    var c = clientes.find(function(x) { return x.phone === user.phone; });
-    if (c) {
-      c.totalPedidos = (c.totalPedidos || 0) + 1;
-      c.totalGastado = (c.totalGastado || 0) + total;
-      c.direccion = direccion || c.direccion;
-      c.diaPref = dia || c.diaPref;
-      c.turnoPref = turnoSeleccionado || c.turnoPref;
-      if (!c.platillosFav) c.platillosFav = {};
-      items.forEach(function(i) {
-        var n = i.platillo.nombre;
-        c.platillosFav[n] = (c.platillosFav[n] || 0) + i.cantidad;
-      });
-      if (!c.historialSesiones) c.historialSesiones = [];
-      c.historialSesiones.unshift({ tipo: 'Pedido', fecha: new Date().toLocaleString('es-MX'), total: total, platillos: itemsText });
-      if (c.historialSesiones.length > 50) c.historialSesiones = c.historialSesiones.slice(0,50);
-    }
-    localStorage.setItem('cch_db_clientes', JSON.stringify(clientes));
-  } catch(e) { console.warn('DB pedidos:', e.message); }
+  } catch(e) {}
+  // Guardar en Netlify Blobs (central)
+  guardarEnBlobs('pedido', {
+    orderId: orderId, cliente: user.nombre, phone: user.phone, email: user.email || '',
+    dia: dia || '', turno: turnoSeleccionado || '', direccion: direccion || '',
+    platillos: platillosArray, total: total, status: 'Pendiente',
+    mapLat: pinLat, mapLng: pinLng, fechaPedido: new Date().toISOString()
+  });
+  // Guardar actividad
+  guardarEnBlobs('actividad', {
+    tipo: 'Nuevo pedido', usuario: user.nombre, telefono: user.phone,
+    detalle: 'Pedido #' + orderId + ' — $' + total + ' MXN — ' + dia
+  });
 }
 
 
@@ -5055,6 +5069,27 @@ async function abrirWhatsApp() {
 
   showLoading('Registrando tu pedido...');
   guardarPedidoNotion(u, items, total, orderId, diaSeleccionado, direccion);
+
+  // Correo de confirmación al cliente
+  var platillosArray = items.map(function(i) {
+    var precio = i.porciones === 4 ? i.platillo.precio2p * 2 : i.platillo.precio2p;
+    return { nombre: i.platillo.nombre, porciones: i.porciones, cantidad: i.cantidad, subtotal: precio * i.cantidad };
+  });
+  try {
+    await enviarConfirmacionPedido(u, {
+      orderId: orderId, dia: diaSeleccionado, turno: turnoSeleccionado,
+      direccion: direccion, platillos: platillosArray, total: total
+    });
+  } catch(e) { console.warn('Email confirmacion cliente:', e.message); }
+
+  // Aviso de nueva orden al admin
+  try {
+    await enviarEmail('confirmacion', 'chefchef.harfer@gmail.com', {
+      nombre: u.nombre, orderId: orderId, dia: diaSeleccionado, turno: turnoSeleccionado,
+      direccion: direccion, platillos: platillosArray, total: total
+    });
+  } catch(e) { console.warn('Email aviso admin:', e.message); }
+
   hideLoading();
 
   var mapLink = (pinLat && pinLng)
@@ -5212,16 +5247,47 @@ function getDireccionFinal() {
 
 
 // === ADMIN PANEL ===
-function renderAdmin() {
+var GET_DATA_API = 'https://chefchefharfer.netlify.app/.netlify/functions/get-data';
+
+async function cargarDatosAdmin() {
+  try {
+    var [rClientes, rPedidos, rActividad] = await Promise.all([
+      fetch(GET_DATA_API + '?tipo=clientes').then(r => r.json()),
+      fetch(GET_DATA_API + '?tipo=pedidos').then(r => r.json()),
+      fetch(GET_DATA_API + '?tipo=actividad').then(r => r.json())
+    ]);
+    return {
+      clientes: (rClientes.ok && rClientes.data) || [],
+      pedidos:  (rPedidos.ok  && rPedidos.data)  || [],
+      logs:     (rActividad.ok && rActividad.data) || []
+    };
+  } catch(e) {
+    console.warn('cargarDatosAdmin:', e.message);
+    // Fallback a localStorage si falla la red
+    return {
+      clientes: JSON.parse(localStorage.getItem('cch_db_clientes') || '[]'),
+      pedidos:  JSON.parse(localStorage.getItem('cch_db_pedidos')  || '[]'),
+      logs:     JSON.parse(localStorage.getItem('cch_activity_log') || '[]')
+    };
+  }
+}
+
+async function renderAdmin() {
   if (!currentUser || currentUser.phone !== ADMIN_PHONE) return;
-  var clientes = [];
-  var pedidos = [];
-  var logs = [];
-  try { clientes = JSON.parse(localStorage.getItem('cch_db_clientes') || '[]'); } catch(e) {}
-  try { pedidos = JSON.parse(localStorage.getItem('cch_db_pedidos') || '[]'); } catch(e) {}
-  try { logs = JSON.parse(localStorage.getItem('cch_activity_log') || '[]'); } catch(e) {}
-  var hoy = new Date().toDateString();
+
+  // Mostrar indicador de carga
   var setEl = function(id, val) { var el = document.getElementById(id); if (el) el.textContent = val; };
+  setEl('admin-total-usuarios', '...');
+  setEl('admin-total-pedidos', '...');
+  setEl('admin-total-ventas', '...');
+
+  // Cargar datos desde Netlify Blobs (con fallback a localStorage)
+  var datos = await cargarDatosAdmin();
+  var clientes = datos.clientes;
+  var pedidos = datos.pedidos;
+  var logs = datos.logs;
+
+  var hoy = new Date().toDateString();
   setEl('admin-total-conexiones', localStorage.getItem('cch_total_conexiones') || '0');
   setEl('admin-conexiones-hoy', (localStorage.getItem('cch_conexiones_hoy_date') === hoy) ? (localStorage.getItem('cch_conexiones_hoy') || '0') : '0');
   setEl('admin-total-usuarios', clientes.length);
@@ -5402,36 +5468,7 @@ window.addEventListener('load', function() {
       updateCartBar();
     }
   } catch(e) {}
-});async function enviarCodigoRecuperacion() {
-  var phone = document.getElementById('recovery-phone').value.trim();
-  if (!isValidPhone(phone)) { showToast('Ingresa un numero valido', 'error'); return; }
-  var user = getUserLocal(phone);
-  if (!user) { showToast('No encontramos ese numero', 'error'); return; }
-  if (!user.email) { showToast('No hay correo registrado en esta cuenta', 'error'); return; }
-
-  codigoRecuperacion = Math.floor(100000 + Math.random() * 900000).toString();
-  codigoExpiry = Date.now() + 10 * 60 * 1000;
-
-  var emailDisplay = user.email.replace(/(\S{2})(.+)(@.*)/, function(m,a,b,c){ return a+b.replace(/./g,'*')+c; });
-  var emailHint = document.getElementById('recovery-email-hint');
-  if (emailHint) emailHint.textContent = 'Enviando codigo a ' + emailDisplay + '...';
-
-  showLoading('Enviando codigo...');
-  var sent = await enviarCodigoRecuperacionEmail(user, codigoRecuperacion);
-  hideLoading();
-
-  if (!sent) {
-    showToast('Error al enviar el correo. Intenta de nuevo.', 'error');
-    codigoRecuperacion = null; codigoExpiry = null;
-    return;
-  }
-
-  if (emailHint) emailHint.textContent = 'Codigo enviado a ' + emailDisplay;
-  var step2 = document.getElementById('recovery-step2');
-  if (step2) step2.style.display = 'block';
-  showToast('Codigo enviado a tu correo', 'success');
-}
-
+});
 
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
