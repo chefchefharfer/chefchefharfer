@@ -3,7 +3,8 @@
 // Maneja 3 tipos de correo: bienvenida, recuperacion, confirmacion
 
 const RESEND_API = 'https://api.resend.com/emails';
-const FROM = 'Chef Chef Harfer <hola@chefchefharfer.mx>';
+// Temporal: usar dominio de prueba de Resend mientras se verifica chefchefharfer.mx
+const FROM = 'Chef Chef Harfer <onboarding@resend.dev>';
 
 // Plantillas de correo
 function templateBienvenida(nombre) {
