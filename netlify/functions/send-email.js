@@ -139,12 +139,26 @@ exports.handler = async function(event) {
     return { statusCode: 405, body: JSON.stringify({ error: 'Método no permitido' }) };
   }
 
-  // CORS — solo permitir el dominio propio
+  // CORS — permitir tanto Netlify como GitHub Pages
+  const origin = event.headers.origin || event.headers.Origin || '';
+  const allowedOrigins = [
+    'https://chefchefharfer.netlify.app',
+    'https://chefchefharfer.github.io',
+    'http://localhost:8888'
+  ];
+  const allowOrigin = allowedOrigins.includes(origin) ? origin : allowedOrigins[0];
+
   const headers = {
-    'Access-Control-Allow-Origin': 'https://chefchefharfer.github.io',
+    'Access-Control-Allow-Origin': allowOrigin,
     'Access-Control-Allow-Headers': 'Content-Type',
+    'Access-Control-Allow-Methods': 'POST, OPTIONS',
     'Content-Type': 'application/json'
   };
+
+  // Manejar preflight OPTIONS
+  if (event.httpMethod === 'OPTIONS') {
+    return { statusCode: 200, headers, body: '' };
+  }
 
   let body;
   try {
