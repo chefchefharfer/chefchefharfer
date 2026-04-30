@@ -1,5 +1,9 @@
 // netlify/functions/manage-days.js
-// Gestión de días bloqueados — usa variable de entorno DIAS_BLOQUEADOS
+// Gestión de días bloqueados sin dependencia de Netlify Blobs
+// Los días se guardan en la variable de entorno DIAS_BLOQUEADOS
+// y se actualizan via Netlify API
+
+const https = require('https');
 
 const CORS_HEADERS = {
   'Access-Control-Allow-Origin': '*',
@@ -8,37 +12,26 @@ const CORS_HEADERS = {
   'Content-Type': 'application/json'
 };
 
-// Los días bloqueados se leen/escriben via variable de entorno
-// Netlify no permite escribir env vars en runtime, así que usamos
-// un archivo en /tmp que persiste durante la ejecución del mismo contenedor
-// Para persistencia real entre invocaciones usamos BLOBS_STORE_OVERRIDE o fetch a la API de Netlify
-
-const https = require('https');
-const NETLIFY_API = 'https://api.netlify.com/api/v1';
-
-function netlifyRequest(method, path, body, token) {
-  return new Promise((resolve, reject) => {
-    const data = body ? JSON.stringify(body) : null;
+async function updateEnvVar(siteId, token, value) {
+  return new Promise((resolve) => {
+    const data = JSON.stringify([{ key: 'DIAS_BLOQUEADOS', value: value, context: 'all' }]);
     const options = {
       hostname: 'api.netlify.com',
-      path: `/api/v1${path}`,
-      method,
+      path: `/api/v1/sites/${siteId}/env`,
+      method: 'PUT',
       headers: {
         'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json',
-        ...(data ? { 'Content-Length': Buffer.byteLength(data) } : {})
+        'Content-Length': Buffer.byteLength(data)
       }
     };
     const req = https.request(options, (res) => {
-      let responseData = '';
-      res.on('data', chunk => responseData += chunk);
-      res.on('end', () => {
-        try { resolve({ status: res.statusCode, data: JSON.parse(responseData) }); }
-        catch(e) { resolve({ status: res.statusCode, data: responseData }); }
-      });
+      let body = '';
+      res.on('data', chunk => body += chunk);
+      res.on('end', () => resolve(res.statusCode));
     });
-    req.on('error', reject);
-    if (data) req.write(data);
+    req.on('error', () => resolve(500));
+    req.write(data);
     req.end();
   });
 }
@@ -46,10 +39,9 @@ function netlifyRequest(method, path, body, token) {
 exports.handler = async function(event) {
   if (event.httpMethod === 'OPTIONS') return { statusCode: 200, headers: CORS_HEADERS, body: '' };
 
-  // Leer días bloqueados desde variable de entorno (fallback a array vacío)
-  const diasEnv = process.env.DIAS_BLOQUEADOS || '[]';
+  // Leer días bloqueados desde variable de entorno
   let diasBloqueados = [];
-  try { diasBloqueados = JSON.parse(diasEnv); } catch(e) { diasBloqueados = []; }
+  try { diasBloqueados = JSON.parse(process.env.DIAS_BLOQUEADOS || '[]'); } catch(e) {}
 
   if (event.httpMethod === 'GET') {
     return { statusCode: 200, headers: CORS_HEADERS, body: JSON.stringify({ ok: true, diasBloqueados }) };
@@ -70,18 +62,16 @@ exports.handler = async function(event) {
       diasBloqueados = diasBloqueados.filter(d => d !== fecha);
     }
 
-    // Actualizar la variable de entorno en Netlify via API
     const token = process.env.NETLIFY_API_TOKEN;
     const siteId = process.env.NETLIFY_SITE_ID;
 
     if (token && siteId) {
-      try {
-        await netlifyRequest('PATCH', `/sites/${siteId}/env/DIAS_BLOQUEADOS`, {
-          value: JSON.stringify(diasBloqueados)
-        }, token);
-      } catch(e) {
-        console.error('Error actualizando env var:', e.message);
+      const status = await updateEnvVar(siteId, token, JSON.stringify(diasBloqueados));
+      if (status !== 200 && status !== 201) {
+        console.error('Error actualizando env var, status:', status);
       }
+    } else {
+      console.warn('NETLIFY_API_TOKEN o NETLIFY_SITE_ID no configurados');
     }
 
     return { statusCode: 200, headers: CORS_HEADERS, body: JSON.stringify({ ok: true, diasBloqueados }) };
