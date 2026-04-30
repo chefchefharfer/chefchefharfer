@@ -3308,138 +3308,11 @@ body:not(.on-menu) #nav-logo-wrap { display: flex; }
 <!-- 
  PANTALLA ADMIN
  -->
-<div class="screen" id="screen-admin">
-<div style="max-width:900px;margin:0 auto;">
-
-  <!-- Header -->
-  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px;">
-    <div>
-      <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:22px;font-weight:800;color:#111;letter-spacing:-0.5px;">Panel Administrador</div>
-      <div style="font-size:12px;color:#888;margin-top:2px;">Chef Chef Harfer &mdash; Base de datos interna</div>
-    </div>
-    <button onclick="adminLogout()" style="background:transparent;border:1.5px solid #ffd5d5;border-radius:10px;padding:8px 16px;font-family:'Outfit',sans-serif;font-size:12px;font-weight:600;color:#c1121f;cursor:pointer;">Cerrar sesion</button>
-  </div>
-
-  <!-- Stats -->
-  <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:20px;">
-    <div style="background:white;border-radius:14px;padding:16px;border:1px solid rgba(0,0,0,0.06);text-align:center;">
-      <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:26px;font-weight:800;color:#067c49;" id="admin-total-usuarios">0</div>
-      <div style="font-size:10px;color:#888;margin-top:4px;font-weight:600;letter-spacing:0.5px;">CLIENTES</div>
-    </div>
-    <div style="background:white;border-radius:14px;padding:16px;border:1px solid rgba(0,0,0,0.06);text-align:center;">
-      <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:26px;font-weight:800;color:#bdac41;" id="admin-total-pedidos">0</div>
-      <div style="font-size:10px;color:#888;margin-top:4px;font-weight:600;letter-spacing:0.5px;">PEDIDOS</div>
-    </div>
-    <div style="background:white;border-radius:14px;padding:16px;border:1px solid rgba(0,0,0,0.06);text-align:center;">
-      <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:22px;font-weight:800;color:#111;" id="admin-total-ventas">$0</div>
-      <div style="font-size:10px;color:#888;margin-top:4px;font-weight:600;letter-spacing:0.5px;">VENTAS TOTALES</div>
-    </div>
-    <div style="background:white;border-radius:14px;padding:16px;border:1px solid rgba(0,0,0,0.06);text-align:center;">
-      <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:26px;font-weight:800;color:#555;" id="admin-total-conexiones">0</div>
-      <div style="font-size:10px;color:#888;margin-top:4px;font-weight:600;letter-spacing:0.5px;">CONEXIONES</div>
-    </div>
-    <div style="background:white;border-radius:14px;padding:16px;border:1px solid rgba(0,0,0,0.06);text-align:center;">
-      <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:26px;font-weight:800;color:#555;" id="admin-conexiones-hoy">0</div>
-      <div style="font-size:10px;color:#888;margin-top:4px;font-weight:600;letter-spacing:0.5px;">HOY</div>
-    </div>
-  </div>
-
-  <!-- CLIENTES -->
-  <div style="background:white;border-radius:16px;border:1px solid rgba(0,0,0,0.06);overflow:hidden;margin-bottom:16px;">
-    <div style="padding:16px 20px;border-bottom:1px solid #f0ede6;display:flex;align-items:center;justify-content:space-between;">
-      <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:14px;font-weight:800;color:#111;">&#128101; Clientes Registrados</div>
-      <div style="display:flex;gap:8px;">
-        <button onclick="renderAdmin()" style="background:var(--green-pale);border:1px solid var(--green-light);border-radius:8px;padding:6px 12px;font-size:11px;font-weight:600;color:var(--green);cursor:pointer;">Actualizar</button>
-        <button onclick="exportarCSV('clientes')" style="background:#f0ede6;border:1px solid #e2ddd5;border-radius:8px;padding:6px 12px;font-size:11px;font-weight:600;color:#555;cursor:pointer;">Exportar CSV</button>
-      </div>
-    </div>
-    <div style="overflow-x:auto;">
-      <table style="width:100%;border-collapse:collapse;font-family:'Outfit',sans-serif;">
-        <thead>
-          <tr style="background:#fafaf8;">
-            <th style="padding:10px 14px;text-align:left;font-size:10px;letter-spacing:1px;color:#aaa;font-weight:700;text-transform:uppercase;white-space:nowrap;">Nombre</th>
-            <th style="padding:10px 14px;text-align:left;font-size:10px;letter-spacing:1px;color:#aaa;font-weight:700;text-transform:uppercase;white-space:nowrap;">Telefono</th>
-            <th style="padding:10px 14px;text-align:left;font-size:10px;letter-spacing:1px;color:#aaa;font-weight:700;text-transform:uppercase;white-space:nowrap;">Email</th>
-            <th style="padding:10px 14px;text-align:left;font-size:10px;letter-spacing:1px;color:#aaa;font-weight:700;text-transform:uppercase;white-space:nowrap;">Direccion</th>
-            <th style="padding:10px 14px;text-align:center;font-size:10px;letter-spacing:1px;color:#aaa;font-weight:700;text-transform:uppercase;white-space:nowrap;">Pedidos</th>
-            <th style="padding:10px 14px;text-align:left;font-size:10px;letter-spacing:1px;color:#aaa;font-weight:700;text-transform:uppercase;white-space:nowrap;">Registro</th>
-            <th style="padding:10px 14px;text-align:left;font-size:10px;letter-spacing:1px;color:#aaa;font-weight:700;text-transform:uppercase;white-space:nowrap;">Ultimo login</th>
-            <th style="padding:10px 14px;text-align:left;font-size:10px;letter-spacing:1px;color:#aaa;font-weight:700;text-transform:uppercase;white-space:nowrap;">Total gastado</th>
-            <th style="padding:10px 14px;text-align:left;font-size:10px;letter-spacing:1px;color:#aaa;font-weight:700;text-transform:uppercase;white-space:nowrap;">Platillo favorito</th>
-          </tr>
-        </thead>
-        <tbody id="admin-clientes-tbody">
-          <tr><td colspan="6" style="padding:20px;text-align:center;color:#aaa;">Cargando...</td></tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-
-  <!-- PEDIDOS -->
-  <div style="background:white;border-radius:16px;border:1px solid rgba(0,0,0,0.06);overflow:hidden;margin-bottom:16px;">
-    <div style="padding:16px 20px;border-bottom:1px solid #f0ede6;display:flex;align-items:center;justify-content:space-between;">
-      <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:14px;font-weight:800;color:#111;">&#128203; Pedidos Web</div>
-      <div style="display:flex;gap:8px;">
-        <button onclick="renderAdmin()" style="background:var(--green-pale);border:1px solid var(--green-light);border-radius:8px;padding:6px 12px;font-size:11px;font-weight:600;color:var(--green);cursor:pointer;">Actualizar</button>
-        <button onclick="exportarCSV('pedidos')" style="background:#f0ede6;border:1px solid #e2ddd5;border-radius:8px;padding:6px 12px;font-size:11px;font-weight:600;color:#555;cursor:pointer;">Exportar CSV</button>
-        <button onclick="limpiarPedidos()" style="background:#fff0f0;border:1px solid #ffc0c0;border-radius:8px;padding:6px 12px;font-size:11px;font-weight:600;color:#c1121f;cursor:pointer;">Limpiar</button>
-      </div>
-    </div>
-    <div style="overflow-x:auto;">
-      <table style="width:100%;border-collapse:collapse;font-family:'Outfit',sans-serif;">
-        <thead>
-          <tr style="background:#fafaf8;">
-            <th style="padding:10px 14px;text-align:left;font-size:10px;letter-spacing:1px;color:#aaa;font-weight:700;text-transform:uppercase;white-space:nowrap;">#Pedido</th>
-            <th style="padding:10px 14px;text-align:left;font-size:10px;letter-spacing:1px;color:#aaa;font-weight:700;text-transform:uppercase;white-space:nowrap;">Cliente</th>
-            <th style="padding:10px 14px;text-align:left;font-size:10px;letter-spacing:1px;color:#aaa;font-weight:700;text-transform:uppercase;white-space:nowrap;">Entrega</th>
-            <th style="padding:10px 14px;text-align:left;font-size:10px;letter-spacing:1px;color:#aaa;font-weight:700;text-transform:uppercase;white-space:nowrap;">Platillos</th>
-            <th style="padding:10px 14px;text-align:left;font-size:10px;letter-spacing:1px;color:#aaa;font-weight:700;text-transform:uppercase;white-space:nowrap;">Total</th>
-            <th style="padding:10px 14px;text-align:left;font-size:10px;letter-spacing:1px;color:#aaa;font-weight:700;text-transform:uppercase;white-space:nowrap;">Estado</th>
-            <th style="padding:10px 14px;text-align:left;font-size:10px;letter-spacing:1px;color:#aaa;font-weight:700;text-transform:uppercase;white-space:nowrap;">Fecha</th>
-          </tr>
-        </thead>
-        <tbody id="admin-pedidos-tbody">
-          <tr><td colspan="7" style="padding:20px;text-align:center;color:#aaa;">Cargando...</td></tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-
-  <!-- LOG -->
-  <div style="background:white;border-radius:16px;border:1px solid rgba(0,0,0,0.06);overflow:hidden;margin-bottom:16px;">
-    <div style="padding:16px 20px;border-bottom:1px solid #f0ede6;display:flex;align-items:center;justify-content:space-between;">
-      <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:14px;font-weight:800;color:#111;">&#128336; Historial de actividad</div>
-      <button onclick="limpiarLogs()" style="background:#fff0f0;border:1px solid #ffc0c0;border-radius:8px;padding:6px 12px;font-size:11px;font-weight:600;color:#c1121f;cursor:pointer;">Limpiar historial</button>
-    </div>
-    <div style="overflow-x:auto;">
-      <table style="width:100%;border-collapse:collapse;font-family:'Outfit',sans-serif;">
-        <thead>
-          <tr style="background:#fafaf8;">
-            <th style="padding:8px 14px;text-align:left;font-size:10px;letter-spacing:1px;color:#aaa;font-weight:700;text-transform:uppercase;">Fecha</th>
-            <th style="padding:8px 14px;text-align:left;font-size:10px;letter-spacing:1px;color:#aaa;font-weight:700;text-transform:uppercase;">Tipo</th>
-            <th style="padding:8px 14px;text-align:left;font-size:10px;letter-spacing:1px;color:#aaa;font-weight:700;text-transform:uppercase;">Usuario</th>
-            <th style="padding:8px 14px;text-align:left;font-size:10px;letter-spacing:1px;color:#aaa;font-weight:700;text-transform:uppercase;">Detalle</th>
-          </tr>
-        </thead>
-        <tbody id="admin-log-tbody">
-          <tr><td colspan="4" style="padding:20px;text-align:center;color:#aaa;">Sin actividad</td></tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-
-  <!-- Ir al menu -->
-  <button onclick="renderMenu();showScreen('menu');" style="background:var(--green);color:white;border:none;border-radius:12px;padding:14px;font-family:'Plus Jakarta Sans',sans-serif;font-size:14px;font-weight:700;cursor:pointer;width:100%;">
-    Ver el menu como cliente
-  </button>
-
-</div>
-</div>
-
 <!-- 
- PANTALLA: CONFIRMACION PREVIA A WHATSAPP
+ PANTALLA ADMIN
  -->
-<div class="screen" id="screen-envio">
+<div class="screen" id="screen-admin">
+  <div style="max-width:700px;margin:0 auto;">
 
   <div class="envio-card">
 
@@ -3473,11 +3346,6 @@ body:not(.on-menu) #nav-logo-wrap { display: flex; }
 
 </div>
 
-<!-- 
- PANTALLA ADMIN
- -->
-<div class="screen" id="screen-admin">
-  <div style="max-width:700px;margin:0 auto;">
 
     <!-- Header -->
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;">
@@ -3794,6 +3662,8 @@ function limpiarPedidos() {
 
 // === CONTADOR DE CONEXIONES ===
 function registrarConexion() {
+  // No contar conexiones del administrador
+  if (currentUser && currentUser.phone === ADMIN_PHONE) return;
   try {
     var count = parseInt(localStorage.getItem('cch_total_conexiones') || '0') + 1;
     localStorage.setItem('cch_total_conexiones', count.toString());
@@ -3802,6 +3672,8 @@ function registrarConexion() {
       ? localStorage.getItem('cch_conexiones_hoy') || '0' : '0') + 1;
     localStorage.setItem('cch_conexiones_hoy', hoyCount.toString());
     localStorage.setItem('cch_conexiones_hoy_date', hoy);
+    // Guardar en Blobs también
+    guardarEnBlobs('actividad', { tipo: 'Conexion', usuario: currentUser.nombre, telefono: currentUser.phone, detalle: 'Inicio de sesion' });
   } catch(e) {}
 }
 
