@@ -3517,7 +3517,13 @@ body:not(.on-menu) #nav-logo-wrap { display: flex; }
     </div>
 
     <!-- Tabla de usuarios -->
-    <div style="background:white;border-radius:18px;border:1px solid rgba(0,0,0,0.06);overflow:hidden;">
+    <div style="background:white;border-radius:18px;border:1px solid rgba(0,0,0,0.06);overflow:hidden;margin-bottom:16px;">
+      <div style="padding:16px 20px;border-bottom:1px solid #f0ede6;display:flex;align-items:center;justify-content:space-between;">
+        <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:14px;font-weight:800;color:#111;">📅 Gestión de días de entrega</div>
+        <div style="font-size:11px;color:#888;">Toca una fecha para bloquearla o desbloquearla</div>
+      </div>
+      <div style="padding:16px 20px;" id="admin-calendar-bloq"></div>
+    </div>
       <div style="padding:18px 20px;border-bottom:1px solid #f0ede6;display:flex;align-items:center;justify-content:space-between;">
         <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:14px;font-weight:800;color:#111;">Usuarios registrados</div>
         <button onclick="renderAdmin()" style="background:var(--green-pale);border:1px solid var(--green-light);border-radius:8px;padding:6px 12px;font-size:11px;font-weight:600;color:var(--green);cursor:pointer;">Actualizar</button>
@@ -4084,6 +4090,16 @@ async function handleRegister() {
 
 // === NOTION ===
 var DATA_API = 'https://chefchefharfer.netlify.app/.netlify/functions/save-data';
+var MANAGE_DAYS_API = 'https://chefchefharfer.netlify.app/.netlify/functions/manage-days';
+var diasBloqueados = []; // fechas bloqueadas por admin, formato 'YYYY-MM-DD'
+
+async function cargarDiasBloqueados() {
+  try {
+    var res = await fetch(MANAGE_DAYS_API);
+    var data = await res.json();
+    if (data.ok) diasBloqueados = data.diasBloqueados || [];
+  } catch(e) { diasBloqueados = []; }
+}
 
 async function guardarEnBlobs(tipo, data) {
   try {
@@ -4753,7 +4769,10 @@ function esDiaDisponible(fecha) {
   // Sólo Mar/Jue/Sab
   var dow = fecha.getDay();
   if (DIAS_ENTREGA.indexOf(dow) === -1) return false;
-  // Cierre: 12pm del día previo (hora local — Tepatitlán = UTC-6)
+  // Verificar si el admin bloqueó esta fecha
+  var fechaStr = fecha.toISOString().slice(0, 10);
+  if (diasBloqueados.indexOf(fechaStr) !== -1) return false;
+  // Cierre: 12pm del día previo
   var ahora = new Date();
   var deadline = new Date(fecha);
   deadline.setDate(deadline.getDate() - 1);
@@ -4972,7 +4991,7 @@ function renderMiniCart() {
   if (totalEl) totalEl.textContent = '$' + getCartTotal().toLocaleString('es-MX');
 }
 
-function irAConfirmar() {
+async function irAConfirmar() {
   if (!getCartItemCount()) { showToast('Agrega al menos un platillo', 'error'); return; }
   // Si no hay sesion, pedirla antes de finalizar el pedido
   if (!currentUser) {
@@ -5011,6 +5030,7 @@ function irAConfirmar() {
   iniciarSeccionDireccion();
 
   // Calcular y mostrar fechas disponibles en los botones de día
+  await cargarDiasBloqueados();
   calcularFechasEntrega();
   showScreen('confirm');
   setTimeout(function() { renderCartPanel(); }, 80);
@@ -5247,6 +5267,122 @@ function getDireccionFinal() {
 
 
 // === ADMIN PANEL ===
+// === GESTIÓN DE DÍAS BLOQUEADOS (ADMIN) ===
+async function renderCalendarioAdmin() {
+  var contenedor = document.getElementById('admin-calendar-bloq');
+  if (!contenedor) return;
+  contenedor.innerHTML = '<div style="color:#aaa;font-size:13px;">Cargando...</div>';
+
+  // Cargar días bloqueados actuales
+  await cargarDiasBloqueados();
+
+  var ahora = new Date();
+  var meses = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+  var DIAS_HDR_LOCAL = ['Dom','Lun','Mar','Mie','Jue','Vie','Sáb'];
+
+  // Inicio de esta semana (domingo)
+  var inicioSem = new Date(ahora);
+  inicioSem.setDate(ahora.getDate() - ahora.getDay());
+  inicioSem.setHours(0,0,0,0);
+
+  contenedor.innerHTML = '';
+
+  // Header días
+  var hdr = document.createElement('div');
+  hdr.style.cssText = 'display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:4px;';
+  DIAS_HDR_LOCAL.forEach(function(d) {
+    var h = document.createElement('div');
+    h.style.cssText = 'text-align:center;font-size:9px;font-weight:700;color:#aaa;letter-spacing:0.5px;text-transform:uppercase;padding:2px 0;';
+    h.textContent = d;
+    hdr.appendChild(h);
+  });
+  contenedor.appendChild(hdr);
+
+  // 4 semanas
+  for (var sem = 0; sem < 4; sem++) {
+    var row = document.createElement('div');
+    row.style.cssText = 'display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:4px;';
+
+    for (var i = 0; i < 7; i++) {
+      var fecha = new Date(inicioSem);
+      fecha.setDate(inicioSem.getDate() + sem * 7 + i);
+      fecha.setHours(0,0,0,0);
+
+      var dow = fecha.getDay();
+      var esDiaEntrega = [2,4,6].indexOf(dow) !== -1;
+      var fechaStr = fecha.toISOString().slice(0,10);
+      var esBloqueado = diasBloqueados.indexOf(fechaStr) !== -1;
+      var esPasado = fecha < ahora && fecha.toDateString() !== ahora.toDateString();
+
+      var celda = document.createElement('div');
+      celda.style.cssText = 'text-align:center;border-radius:8px;padding:6px 2px;min-height:44px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:13px;font-weight:700;box-sizing:border-box;';
+
+      var num = document.createElement('div');
+      num.textContent = fecha.getDate();
+      var mes = document.createElement('div');
+      mes.style.cssText = 'font-size:8px;font-weight:500;text-transform:uppercase;margin-top:2px;';
+      mes.textContent = esDiaEntrega ? meses[fecha.getMonth()] : '';
+
+      if (!esDiaEntrega || esPasado) {
+        celda.style.opacity = '0.2';
+        num.style.color = '#999';
+      } else if (esBloqueado) {
+        celda.style.cssText += 'background:#fff0f0;border:1.5px solid #ffc0c0;cursor:pointer;';
+        num.style.color = '#c1121f';
+        mes.style.color = '#c1121f';
+        celda.title = 'Bloqueado — toca para desbloquear';
+        celda.onclick = (function(fs) { return function() { toggleDiaBloqueado(fs); }; })(fechaStr);
+      } else {
+        celda.style.cssText += 'background:#f0faf3;border:1.5px solid #d5ead9;cursor:pointer;';
+        num.style.color = '#067c49';
+        mes.style.color = '#067c49';
+        celda.title = 'Disponible — toca para bloquear';
+        celda.onclick = (function(fs) { return function() { toggleDiaBloqueado(fs); }; })(fechaStr);
+      }
+
+      celda.appendChild(num);
+      celda.appendChild(mes);
+      row.appendChild(celda);
+    }
+    contenedor.appendChild(row);
+  }
+
+  // Leyenda
+  var leyenda = document.createElement('div');
+  leyenda.style.cssText = 'display:flex;gap:16px;margin-top:12px;font-size:11px;color:#888;';
+  leyenda.innerHTML = '<span style="display:flex;align-items:center;gap:5px;"><span style="width:12px;height:12px;border-radius:3px;background:#f0faf3;border:1px solid #d5ead9;display:inline-block;"></span>Disponible</span><span style="display:flex;align-items:center;gap:5px;"><span style="width:12px;height:12px;border-radius:3px;background:#fff0f0;border:1px solid #ffc0c0;display:inline-block;"></span>Bloqueado</span>';
+  contenedor.appendChild(leyenda);
+}
+
+async function toggleDiaBloqueado(fechaStr) {
+  var esBloqueado = diasBloqueados.indexOf(fechaStr) !== -1;
+  var accion = esBloqueado ? 'desbloquear' : 'bloquear';
+  var confirmMsg = esBloqueado
+    ? '¿Desbloquear ' + fechaStr + '? Los clientes podrán elegir esta fecha.'
+    : '¿Bloquear ' + fechaStr + '? Los clientes NO podrán elegir esta fecha.';
+  if (!confirm(confirmMsg)) return;
+
+  try {
+    var res = await fetch(MANAGE_DAYS_API, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ fecha: fechaStr, accion: accion })
+    });
+    var data = await res.json();
+    if (data.ok) {
+      diasBloqueados = data.diasBloqueados;
+      showToast(esBloqueado ? 'Fecha desbloqueada' : 'Fecha bloqueada', 'success');
+      renderCalendarioAdmin();
+    } else {
+      showToast('Error al actualizar', 'error');
+    }
+  } catch(e) {
+    showToast('Error de conexión', 'error');
+  }
+}
+
+// === GESTIÓN DE DÍAS BLOQUEADOS (ADMIN) FIN ===
+
 var GET_DATA_API = 'https://chefchefharfer.netlify.app/.netlify/functions/get-data';
 
 async function cargarDatosAdmin() {
@@ -5293,6 +5429,9 @@ async function renderAdmin() {
   setEl('admin-total-usuarios', clientes.length);
   setEl('admin-total-pedidos', pedidos.length);
   setEl('admin-total-ventas', '$' + pedidos.reduce(function(s,p){ return s+(p.total||0); },0).toLocaleString('es-MX'));
+
+  // Renderizar calendario de días bloqueados
+  renderCalendarioAdmin();
 
   // Clientes
   var tcBody = document.getElementById('admin-clientes-tbody');
