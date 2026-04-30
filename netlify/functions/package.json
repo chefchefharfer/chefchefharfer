@@ -1,8 +1,0 @@
-{
-  "name": "chefchefharfer",
-  "version": "1.0.0",
-  "description": "Chef Chef Harfer - Meal Kits Tepatitlan",
-  "dependencies": {
-    "@netlify/blobs": "^8.1.0"
-  }
-}
