@@ -1,8 +1,8 @@
 // netlify/functions/aviso-entrega.js
 // Chef Chef Harfer — Cron job: envía aviso de entrega a las 8am hora México
-// Se ejecuta automáticamente todos los días a las 14:00 UTC (8am México)
+// Se ejecuta automáticamente todos los días a las 14:00 UTC (8am México CST)
+// Declarado como scheduled function en netlify.toml
 
-const { schedule } = require('@netlify/functions');
 const { getStore } = require('@netlify/blobs');
 
 const RESEND_API = 'https://api.resend.com/emails';
@@ -11,7 +11,7 @@ const LOGO_URL = 'https://chefchefharfer.github.io/chefchefharfer/Logo%20chef%20
 const WA_LINK = 'https://wa.me/523782901365';
 
 function emailWrapper(content) {
-  return `<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+  return `<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"></head>
 <body style="margin:0;padding:0;background:#f5f3ee;font-family:'Helvetica Neue',Arial,sans-serif;">
   <div style="max-width:560px;margin:40px auto;background:white;border-radius:20px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.08);">
     <div style="background:#111111;padding:28px 40px;text-align:center;">
@@ -61,18 +61,13 @@ async function enviarAvisoEntrega(pedido) {
   const res = await fetch(RESEND_API, {
     method: 'POST',
     headers: { 'Authorization': `Bearer ${process.env.RESEND_KEY}`, 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      from: FROM,
-      to: [pedido.email],
-      subject: `🚚 Hoy es tu día de entrega — Chef Chef Harfer`,
-      html
-    })
+    body: JSON.stringify({ from: FROM, to: [pedido.email], subject: `🚚 Hoy es tu día de entrega — Chef Chef Harfer`, html })
   });
   return res.ok;
 }
 
-const handler = schedule('0 14 * * *', async () => {
-  // Corre a las 14:00 UTC = 8:00 AM hora México (CST UTC-6)
+// Handler estándar — el schedule se declara en netlify.toml
+exports.handler = async function(event) {
   console.log('Iniciando aviso de entrega:', new Date().toISOString());
 
   if (!process.env.RESEND_KEY) {
@@ -84,7 +79,6 @@ const handler = schedule('0 14 * * *', async () => {
     const store = getStore({ name: 'pedidos', consistency: 'strong' });
     const { blobs } = await store.list();
 
-    // Determinar qué día es hoy en México
     const hoy = new Date().toLocaleDateString('es-MX', { weekday: 'long', timeZone: 'America/Mexico_City' });
     const diasMap = { 'martes': 'Martes', 'jueves': 'Jueves', 'sábado': 'Sabado' };
     const diaHoy = diasMap[hoy.toLowerCase()] || '';
@@ -100,7 +94,6 @@ const handler = schedule('0 14 * * *', async () => {
     for (const blob of blobs) {
       try {
         const pedido = JSON.parse(await store.get(blob.key));
-        // Solo pedidos del día de hoy, sin aviso enviado, no cancelados, con email
         if (pedido && pedido.dia === diaHoy && !pedido.avisoEnviado && pedido.status !== 'Cancelado' && pedido.email) {
           const ok = await enviarAvisoEntrega(pedido);
           if (ok) {
@@ -116,13 +109,11 @@ const handler = schedule('0 14 * * *', async () => {
       }
     }
 
-    console.log(`Avisos enviados: ${enviados}`);
+    console.log('Avisos enviados:', enviados);
     return { statusCode: 200 };
 
   } catch (err) {
     console.error('aviso-entrega error:', err.message);
     return { statusCode: 500 };
   }
-});
-
-exports.handler = handler;
+};
