@@ -3261,6 +3261,20 @@ body:not(.on-menu) #nav-logo-wrap { display: flex; }
     <div id="cart-panel">
       <div class="cart-empty">Tu carrito esta vacio. Regresa al menu.</div>
     </div>
+    <!-- CUPÓN DE DESCUENTO -->
+    <div id="cupon-section" style="display:none;margin-top:16px;">
+      <div style="font-size:11px;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;color:var(--muted);margin-bottom:8px;">¿Tienes un cupón?</div>
+      <div style="display:flex;gap:8px;align-items:center;">
+        <input type="text" id="input-cupon" placeholder="Ej: MERCADO99"
+          style="flex:1;border-radius:12px;background:#f7f5f0;border:1.5px solid #e2ddd5;color:#252523;font-family:'Outfit',sans-serif;font-size:14px;padding:11px 14px;outline:none;text-transform:uppercase;letter-spacing:1px;">
+        <button onclick="aplicarCupon()"
+          style="background:var(--green);color:#fff;border:none;border-radius:12px;padding:11px 18px;font-family:'Outfit',sans-serif;font-size:14px;font-weight:700;cursor:pointer;white-space:nowrap;">
+          Aplicar
+        </button>
+      </div>
+      <div id="cupon-mensaje" style="font-size:13px;margin-top:8px;min-height:18px;"></div>
+    </div>
+
     <button class="btn btn-pay" id="cart-pay-btn" onclick="confirmarYEnviar()" style="display:none">
       Pagar mi pedido
     </button>
@@ -3661,6 +3675,22 @@ var currentUser = null;
 var cart = {};
 var loginMode = 'login';
 var pendingCheckout = false;
+var descuentoAplicado = 0; // porcentaje de descuento activo (0 = sin descuento)
+var cuponAplicado = '';    // código del cupón activo
+
+// Catálogo de cupones válidos
+var CUPONES = {
+  'MARKET15': {
+    descuento: 15,
+    validoDesde: new Date('2026-05-06T00:00:00'),
+    validoHasta: new Date('2026-05-08T00:00:00')
+  },
+  'MARKET20': {
+    descuento: 20,
+    validoDesde: new Date('2026-05-06T00:00:00'),
+    validoHasta: new Date('2026-05-08T00:00:00')
+  }
+};
 var diaSeleccionado = null;
 var turnoSeleccionado = null;
 var dirConfirmada = false;
@@ -4489,11 +4519,40 @@ function deleteFromCart(key) {
   renderCartPanel();
 }
 
-function getCartTotal() {
+function getCartSubtotal() {
   return Object.values(cart).reduce(function(s, i) {
     var precio = i.porciones === 4 ? i.platillo.precio2p * 2 : i.platillo.precio2p;
     return s + precio * i.cantidad;
   }, 0);
+}
+
+function getCartTotal() {
+  var subtotal = getCartSubtotal();
+  if (descuentoAplicado > 0) {
+    return Math.round(subtotal * (1 - descuentoAplicado / 100));
+  }
+  return subtotal;
+}
+
+function aplicarCupon() {
+  var input = document.getElementById('input-cupon');
+  var msg = document.getElementById('cupon-mensaje');
+  var codigo = (input.value || '').trim().toUpperCase();
+  if (!codigo) { msg.style.color = '#c0392b'; msg.textContent = 'Escribe un código de cupón.'; return; }
+
+  var cupon = CUPONES[codigo];
+  if (!cupon) { msg.style.color = '#c0392b'; msg.textContent = 'Cupón no válido.'; return; }
+
+  var ahora = new Date();
+  if (ahora < cupon.validoDesde) { msg.style.color = '#c0392b'; msg.textContent = 'Este cupón aún no está activo.'; return; }
+  if (ahora >= cupon.validoHasta) { msg.style.color = '#c0392b'; msg.textContent = 'Este cupón ya expiró.'; return; }
+
+  descuentoAplicado = cupon.descuento;
+  cuponAplicado = codigo;
+  msg.style.color = 'var(--green)';
+  msg.textContent = '✓ Cupón aplicado — ' + cupon.descuento + '% de descuento';
+  input.disabled = true;
+  renderCartPanel();
 }
 
 function getCartItemCount() {
@@ -4595,13 +4654,41 @@ function renderCartPanel() {
   totalRow.className = 'cart-total-row';
   var totalLabel = document.createElement('span');
   totalLabel.className = 'cart-total-label';
-  totalLabel.textContent = 'Total';
   var totalAmount = document.createElement('span');
   totalAmount.className = 'cart-total-amount';
-  totalAmount.textContent = '$' + total.toLocaleString('es-MX') + ' MXN';
+
+  if (descuentoAplicado > 0) {
+    // Subtotal row
+    var subtotalRow = document.createElement('div');
+    subtotalRow.className = 'cart-total-row';
+    subtotalRow.style.cssText = 'opacity:0.7;font-size:14px;';
+    var subLabel = document.createElement('span'); subLabel.className = 'cart-total-label'; subLabel.textContent = 'Subtotal';
+    var subAmt = document.createElement('span'); subAmt.className = 'cart-total-amount'; subAmt.textContent = '$' + total.toLocaleString('es-MX') + ' MXN';
+    subtotalRow.appendChild(subLabel); subtotalRow.appendChild(subAmt);
+    panel.appendChild(subtotalRow);
+    // Discount row
+    var descRow = document.createElement('div');
+    descRow.className = 'cart-total-row';
+    descRow.style.cssText = 'color:var(--green);font-size:14px;';
+    var descLabel = document.createElement('span'); descLabel.className = 'cart-total-label'; descLabel.textContent = 'Descuento (' + cuponAplicado + ')';
+    var descAmt = document.createElement('span'); descAmt.className = 'cart-total-amount'; descAmt.textContent = '−' + descuentoAplicado + '%';
+    descRow.appendChild(descLabel); descRow.appendChild(descAmt);
+    panel.appendChild(descRow);
+    // Total row
+    totalLabel.textContent = 'Total';
+    totalAmount.textContent = '$' + getCartTotal().toLocaleString('es-MX') + ' MXN';
+  } else {
+    totalLabel.textContent = 'Total';
+    totalAmount.textContent = '$' + total.toLocaleString('es-MX') + ' MXN';
+  }
+
   totalRow.appendChild(totalLabel);
   totalRow.appendChild(totalAmount);
   panel.appendChild(totalRow);
+
+  // Mostrar sección de cupón
+  var cuponSection = document.getElementById('cupon-section');
+  if (cuponSection) cuponSection.style.display = 'block';
 }
 
 // === CONFIRMAR ===
@@ -4914,10 +5001,18 @@ function confirmarYEnviar() {
 
   // Build resumen
   var total = getCartTotal();
+  var subtotal = getCartSubtotal();
   var items = Object.values(cart);
   var turnoLabel = turnoSeleccionado === 'Manana' ? 'Manana (10am-1pm)' : 'Tarde (4pm-7pm)';
   var resumen = diaSeleccionado + ' - ' + turnoLabel + '\n';
-  resumen += items.length + ' platillo(s)  -  Total: $' + total.toLocaleString('es-MX') + ' MXN';
+  resumen += items.length + ' platillo(s)';
+  if (descuentoAplicado > 0) {
+    resumen += '  -  Subtotal: $' + subtotal.toLocaleString('es-MX') + ' MXN\n';
+    resumen += 'Descuento ' + cuponAplicado + ' (−' + descuentoAplicado + '%):  −$' + (subtotal - total).toLocaleString('es-MX') + ' MXN\n';
+    resumen += 'Total: $' + total.toLocaleString('es-MX') + ' MXN';
+  } else {
+    resumen += '  -  Total: $' + total.toLocaleString('es-MX') + ' MXN';
+  }
   var resumenEl = document.getElementById('envio-resumen-texto');
   if (resumenEl) resumenEl.textContent = resumen;
   showScreen('envio');
@@ -4974,6 +5069,11 @@ async function abrirWhatsApp() {
     var sub = precio * i.cantidad;
     msg += '- ' + i.platillo.nombre + ' (Kit ' + i.porciones + 'p x' + i.cantidad + ') $' + sub + '\n';
   });
+  if (descuentoAplicado > 0) {
+    var subtotalWA = getCartSubtotal();
+    msg += '\nSubtotal: $' + subtotalWA.toLocaleString('es-MX') + ' MXN\n';
+    msg += 'Descuento ' + cuponAplicado + ' (−' + descuentoAplicado + '%): −$' + (subtotalWA - total).toLocaleString('es-MX') + ' MXN\n';
+  }
   msg += '\n*Total: $' + total.toLocaleString('es-MX') + ' MXN*\n';
   msg += 'Solicito el link de pago. Gracias!';
 
