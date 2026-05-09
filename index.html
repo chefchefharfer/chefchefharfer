@@ -4069,11 +4069,11 @@ function guardarPedidoNotion(user, items, total, orderId, dia, direccion) {
 
 
 // === CORREO VIA NETLIFY ===
-var EMAIL_API = 'https://chefchefharfer.mx/api';
+var EMAIL_API_BASE = 'https://chefchefharfer.mx/api';
  
 async function enviarEmail(tipo, to, data) {
   try {
-    var res = await fetch(EMAIL_API, {
+    var res = await fetch(EMAIL_API_BASE + '/' + tipo, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ tipo: tipo, to: to, data: data })
