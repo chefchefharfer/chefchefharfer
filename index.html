@@ -3958,8 +3958,8 @@ async function handleRegister() {
 }
 
 // === NOTION ===
-var DATA_API = 'https://chefchefharfer.netlify.app/.netlify/functions/save-data';
-var MANAGE_DAYS_API = 'https://chefchefharfer.netlify.app/.netlify/functions/manage-days';
+var DATA_API = 'https://chefchefharfer.mx/api/save-data';
+var MANAGE_DAYS_API = 'https://chefchefharfer.mx/api/manage-days';
 var diasBloqueados = []; // fechas bloqueadas por admin, formato 'YYYY-MM-DD'
 
 async function cargarDiasBloqueados() {
@@ -5329,7 +5329,7 @@ async function toggleDiaBloqueado(fechaStr) {
 
 // === GESTIÓN DE DÍAS BLOQUEADOS (ADMIN) FIN ===
 
-var GET_DATA_API = 'https://chefchefharfer.netlify.app/.netlify/functions/get-data';
+var GET_DATA_API = 'https://chefchefharfer.mx/api/get-data';
 
 async function cargarDatosAdmin() {
   try {
