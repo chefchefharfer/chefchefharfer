@@ -3353,19 +3353,19 @@ body:not(.on-menu) #nav-logo-wrap { display: flex; }
       </div>
     </div>
 
-    <!-- Botones acceso rapido -->
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px;">
-      <a href="https://notion.so" target="_blank" style="background:white;border:1.5px solid var(--border);border-radius:14px;padding:16px 18px;text-decoration:none;display:flex;align-items:center;gap:10px;">
-        <span style="font-size:20px;">👥</span>
-        <div><div style="font-size:13px;font-weight:700;color:#111;">Clientes</div><div style="font-size:11px;color:#888;">Ver en Notion</div></div>
-      </a>
-      <a href="https://notion.so" target="_blank" style="background:white;border:1.5px solid var(--border);border-radius:14px;padding:16px 18px;text-decoration:none;display:flex;align-items:center;gap:10px;">
-        <span style="font-size:20px;">📋</span>
-        <div><div style="font-size:13px;font-weight:700;color:#111;">Pedidos</div><div style="font-size:11px;color:#888;">Ver en Notion</div></div>
-      </a>
+    <!-- Stats pedidos -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px;">
+      <div style="background:white;border-radius:16px;padding:20px;border:1px solid rgba(0,0,0,0.06);text-align:center;">
+        <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:32px;font-weight:800;color:#bdac41;" id="admin-total-pedidos">0</div>
+        <div style="font-size:11px;color:#888;margin-top:4px;font-weight:500;letter-spacing:0.3px;">PEDIDOS TOTALES</div>
+      </div>
+      <div style="background:white;border-radius:16px;padding:20px;border:1px solid rgba(0,0,0,0.06);text-align:center;">
+        <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:32px;font-weight:800;color:var(--green);" id="admin-total-ventas">$0</div>
+        <div style="font-size:11px;color:#888;margin-top:4px;font-weight:500;letter-spacing:0.3px;">VENTAS TOTALES</div>
+      </div>
     </div>
 
-    <!-- Tabla de usuarios -->
+    <!-- Calendario dias bloqueados -->
     <div style="background:white;border-radius:18px;border:1px solid rgba(0,0,0,0.06);overflow:hidden;margin-bottom:16px;">
       <div style="padding:16px 20px;border-bottom:1px solid #f0ede6;display:flex;align-items:center;justify-content:space-between;">
         <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:14px;font-weight:800;color:#111;">📅 Gestión de días de entrega</div>
@@ -3373,8 +3373,11 @@ body:not(.on-menu) #nav-logo-wrap { display: flex; }
       </div>
       <div style="padding:16px 20px;" id="admin-calendar-bloq"></div>
     </div>
-      <div style="padding:18px 20px;border-bottom:1px solid #f0ede6;display:flex;align-items:center;justify-content:space-between;">
-        <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:14px;font-weight:800;color:#111;">Usuarios registrados</div>
+
+    <!-- Tabla de clientes -->
+    <div style="background:white;border-radius:18px;border:1px solid rgba(0,0,0,0.06);overflow:hidden;margin-bottom:16px;">
+      <div style="padding:16px 20px;border-bottom:1px solid #f0ede6;display:flex;align-items:center;justify-content:space-between;">
+        <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:14px;font-weight:800;color:#111;">👥 Clientes registrados</div>
         <button onclick="renderAdmin()" style="background:var(--green-pale);border:1px solid var(--green-light);border-radius:8px;padding:6px 12px;font-size:11px;font-weight:600;color:var(--green);cursor:pointer;">Actualizar</button>
       </div>
       <div style="overflow-x:auto;">
@@ -3390,6 +3393,35 @@ body:not(.on-menu) #nav-logo-wrap { display: flex; }
           </thead>
           <tbody id="admin-users-tbody">
             <tr><td colspan="5" style="padding:20px;text-align:center;color:#aaa;">Cargando...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Tabla de pedidos -->
+    <div style="background:white;border-radius:18px;border:1px solid rgba(0,0,0,0.06);overflow:hidden;margin-bottom:16px;">
+      <div style="padding:16px 20px;border-bottom:1px solid #f0ede6;display:flex;align-items:center;justify-content:space-between;">
+        <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:14px;font-weight:800;color:#111;">📦 Entregas</div>
+        <div style="font-size:11px;color:#888;">Formato igual a Notion · Entregas</div>
+      </div>
+      <div style="overflow-x:auto;">
+        <table style="width:100%;border-collapse:collapse;font-family:'Outfit',sans-serif;font-size:13px;">
+          <thead>
+            <tr style="background:#fafaf8;">
+              <th style="padding:10px 12px;text-align:left;font-size:10px;letter-spacing:1px;color:#aaa;font-weight:700;text-transform:uppercase;"># Pedido</th>
+              <th style="padding:10px 12px;text-align:left;font-size:10px;letter-spacing:1px;color:#aaa;font-weight:700;text-transform:uppercase;">Nombre</th>
+              <th style="padding:10px 12px;text-align:left;font-size:10px;letter-spacing:1px;color:#aaa;font-weight:700;text-transform:uppercase;">Telefono</th>
+              <th style="padding:10px 12px;text-align:left;font-size:10px;letter-spacing:1px;color:#aaa;font-weight:700;text-transform:uppercase;">Dia</th>
+              <th style="padding:10px 12px;text-align:left;font-size:10px;letter-spacing:1px;color:#aaa;font-weight:700;text-transform:uppercase;">Horario</th>
+              <th style="padding:10px 12px;text-align:left;font-size:10px;letter-spacing:1px;color:#aaa;font-weight:700;text-transform:uppercase;">Platillos</th>
+              <th style="padding:10px 12px;text-align:left;font-size:10px;letter-spacing:1px;color:#aaa;font-weight:700;text-transform:uppercase;">Total</th>
+              <th style="padding:10px 12px;text-align:left;font-size:10px;letter-spacing:1px;color:#aaa;font-weight:700;text-transform:uppercase;">Direccion</th>
+              <th style="padding:10px 12px;text-align:left;font-size:10px;letter-spacing:1px;color:#aaa;font-weight:700;text-transform:uppercase;">Estado</th>
+              <th style="padding:10px 12px;text-align:left;font-size:10px;letter-spacing:1px;color:#aaa;font-weight:700;text-transform:uppercase;">Fecha</th>
+            </tr>
+          </thead>
+          <tbody id="admin-pedidos-tbody">
+            <tr><td colspan="10" style="padding:20px;text-align:center;color:#aaa;">Cargando...</td></tr>
           </tbody>
         </table>
       </div>
@@ -5357,13 +5389,11 @@ async function cargarDatosAdmin() {
 async function renderAdmin() {
   if (!currentUser || currentUser.phone !== ADMIN_PHONE) return;
 
-  // Mostrar indicador de carga
   var setEl = function(id, val) { var el = document.getElementById(id); if (el) el.textContent = val; };
   setEl('admin-total-usuarios', '...');
   setEl('admin-total-pedidos', '...');
   setEl('admin-total-ventas', '...');
 
-  // Cargar datos desde Netlify Blobs (con fallback a localStorage)
   var datos = await cargarDatosAdmin();
   var clientes = datos.clientes;
   var pedidos = datos.pedidos;
@@ -5374,17 +5404,16 @@ async function renderAdmin() {
   setEl('admin-conexiones-hoy', (localStorage.getItem('cch_conexiones_hoy_date') === hoy) ? (localStorage.getItem('cch_conexiones_hoy') || '0') : '0');
   setEl('admin-total-usuarios', clientes.length);
   setEl('admin-total-pedidos', pedidos.length);
-  setEl('admin-total-ventas', '$' + pedidos.reduce(function(s,p){ return s+(p.total||0); },0).toLocaleString('es-MX'));
+  setEl('admin-total-ventas', '$' + pedidos.reduce(function(s,p){ return s+(parseFloat(p.total)||0); },0).toLocaleString('es-MX'));
 
-  // Renderizar calendario de días bloqueados
   renderCalendarioAdmin();
 
   // Clientes
-  var tcBody = document.getElementById('admin-clientes-tbody');
+  var tcBody = document.getElementById('admin-users-tbody');
   if (tcBody) {
     tcBody.innerHTML = '';
     if (!clientes.length) {
-      tcBody.innerHTML = '<tr><td colspan="6" style="padding:16px;text-align:center;color:#aaa;font-size:13px;">Sin clientes registrados</td></tr>';
+      tcBody.innerHTML = '<tr><td colspan="5" style="padding:16px;text-align:center;color:#aaa;font-size:13px;">Sin clientes registrados</td></tr>';
     } else {
       clientes.forEach(function(c) {
         var tr = document.createElement('tr');
@@ -5394,54 +5423,69 @@ async function renderAdmin() {
           '<td style="padding:10px 14px;color:#555;font-size:13px;">' + esc(c.phone) + '</td>' +
           '<td style="padding:10px 14px;color:#555;font-size:12px;">' + esc(c.email) + '</td>' +
           '<td style="padding:10px 14px;color:#888;font-size:12px;">' + esc(c.direccion || 'Sin guardar') + '</td>' +
-          '<td style="padding:10px 14px;text-align:center;font-size:13px;font-weight:700;color:#067c49;">' + esc(c.totalPedidos||0) + '</td>' +
-          '<td style="padding:10px 14px;color:#aaa;font-size:11px;">' + esc(c.fechaRegistro||'-') + '</td>';
+          '<td style="padding:10px 14px;color:#aaa;font-size:11px;">' + esc(c.fecha_registro ? new Date(c.fecha_registro).toLocaleDateString('es-MX') : '-') + '</td>';
         tcBody.appendChild(tr);
       });
     }
   }
 
-  // Pedidos
+  // Pedidos — formato igual a Notion Entregas
   var tpBody = document.getElementById('admin-pedidos-tbody');
   if (tpBody) {
     tpBody.innerHTML = '';
     if (!pedidos.length) {
-      tpBody.innerHTML = '<tr><td colspan="7" style="padding:16px;text-align:center;color:#aaa;font-size:13px;">Sin pedidos registrados</td></tr>';
+      tpBody.innerHTML = '<tr><td colspan="10" style="padding:16px;text-align:center;color:#aaa;font-size:13px;">Sin pedidos registrados</td></tr>';
     } else {
       pedidos.forEach(function(p) {
-        var estadoColor = p.estado === 'Confirmado' ? '#067c49' : p.estado === 'Entregado' ? '#bdac41' : '#c1121f';
+        var estado = p.estado || 'Pendiente';
+        var estadoColor = estado === 'Entregado' ? '#067c49' : estado === 'Cancelado' ? '#c1121f' : '#bdac41';
+        var platillosTexto = '';
+        try {
+          var plats = typeof p.platillos === 'string' ? JSON.parse(p.platillos) : p.platillos;
+          if (Array.isArray(plats)) {
+            platillosTexto = plats.map(function(pl) {
+              return (pl.nombre || pl) + (pl.porciones ? ' Kit ' + pl.porciones + 'p' : '') + (pl.cantidad > 1 ? ' x' + pl.cantidad : '');
+            }).join(', ');
+          } else { platillosTexto = p.platillos || '-'; }
+        } catch(e) { platillosTexto = p.platillos || '-'; }
+
         var tr = document.createElement('tr');
         tr.style.borderBottom = '1px solid #f0ede6';
-        var td7 = document.createElement('td');
-        td7.style.padding = '10px 14px';
+
+        var tdEstado = document.createElement('td');
+        tdEstado.style.padding = '10px 14px';
         var sel = document.createElement('select');
         sel.style.cssText = 'border:1.5px solid ' + estadoColor + ';border-radius:8px;padding:4px 8px;font-size:11px;font-weight:700;color:' + estadoColor + ';background:white;cursor:pointer;';
-        ['Pendiente','Confirmado','Entregado'].forEach(function(est) {
+        ['Pendiente','Entregado','Cancelado'].forEach(function(est) {
           var opt = document.createElement('option');
           opt.value = est;
           opt.textContent = est;
-          if (p.estado === est) opt.selected = true;
+          if (estado === est) opt.selected = true;
           sel.appendChild(opt);
         });
         (function(pid) {
           sel.addEventListener('change', function() { cambiarEstadoPedido(pid, this.value); });
-        })(p.id);
-        td7.appendChild(sel);
+        })(p.order_id || p.id);
+        tdEstado.appendChild(sel);
+
         tr.innerHTML =
-          '<td style="padding:10px 14px;font-weight:700;color:#111;font-size:12px;">#' + esc(p.id) + '</td>' +
-          '<td style="padding:10px 14px;font-weight:600;font-size:13px;">' + esc(p.cliente) + '</td>' +
-          '<td style="padding:10px 14px;color:#555;font-size:12px;">' + esc(p.dia) + ' ' + esc(p.turno) + '</td>' +
-          '<td style="padding:10px 14px;color:#555;font-size:11px;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="' + esc(p.platillos) + '">' + esc(p.platillos) + '</td>' +
-          '<td style="padding:10px 14px;font-weight:800;color:#067c49;font-size:14px;">$' + esc((p.total||0).toLocaleString('es-MX')) + '</td>' +
+          '<td style="padding:10px 14px;font-weight:700;color:#111;font-size:12px;">#' + esc(p.order_id || p.id) + '</td>' +
+          '<td style="padding:10px 14px;font-weight:600;font-size:13px;">' + esc(p.cliente_nombre || p.cliente || '-') + '</td>' +
+          '<td style="padding:10px 14px;color:#555;font-size:12px;">' + esc(p.cliente_phone || p.phone || '-') + '</td>' +
+          '<td style="padding:10px 14px;color:#555;font-size:12px;">' + esc(p.dia || '-') + '</td>' +
+          '<td style="padding:10px 14px;color:#555;font-size:12px;">' + esc(p.turno || '-') + '</td>' +
+          '<td style="padding:10px 14px;color:#555;font-size:11px;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="' + esc(platillosTexto) + '">' + esc(platillosTexto) + '</td>' +
+          '<td style="padding:10px 14px;font-weight:800;color:#067c49;font-size:14px;">$' + esc((parseFloat(p.total)||0).toLocaleString('es-MX')) + '</td>' +
+          '<td style="padding:10px 14px;color:#888;font-size:11px;max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + esc(p.direccion || '-') + '</td>' +
           '<td></td>' +
-          '<td style="padding:10px 14px;color:#aaa;font-size:11px;">' + esc(p.fecha||'-') + '</td>';
-        tr.cells[5].appendChild(sel);
+          '<td style="padding:10px 14px;color:#aaa;font-size:11px;">' + esc(p.fecha ? new Date(p.fecha).toLocaleDateString('es-MX') : '-') + '</td>';
+        tr.cells[8].appendChild(tdEstado);
         tpBody.appendChild(tr);
       });
     }
   }
 
-  // Log
+  // Log de actividad
   var logBody = document.getElementById('admin-log-tbody');
   if (logBody) {
     logBody.innerHTML = '';
@@ -5462,12 +5506,18 @@ async function renderAdmin() {
   }
 }
 
-function cambiarEstadoPedido(pedidoId, nuevoEstado) {
+async function cambiarEstadoPedido(pedidoId, nuevoEstado) {
   try {
-    var pedidos = JSON.parse(localStorage.getItem('cch_db_pedidos') || '[]');
-    var p = pedidos.find(function(x) { return x.id === pedidoId; });
-    if (p) { p.estado = nuevoEstado; localStorage.setItem('cch_db_pedidos', JSON.stringify(pedidos)); showToast('Estado: ' + nuevoEstado, 'success'); }
-  } catch(e) {}
+    await fetch('https://chefchefharfer.mx/api/pedido-estado', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ order_id: pedidoId, estado: nuevoEstado })
+    });
+    showToast('Estado: ' + nuevoEstado, 'success');
+    setTimeout(function() { renderAdmin(); }, 500);
+  } catch(e) {
+    showToast('Error al actualizar estado', 'error');
+  }
 }
 
 function exportarCSV(tipo) {
