@@ -3,51 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Chef Chef Harfer — Comida a Domicilio en Tepatitlán de Morelos</title>
-<meta name="description" content="Meal kits a domicilio en Tepatitlán de Morelos. Ingredientes frescos y porcionados, recetas listas para cocinar. Entregas martes, jueves y sábado. ¡Haz tu pedido en línea!">
-<meta name="keywords" content="comida a domicilio Tepatitlán, meal kits Tepatitlán, comida Tepatitlán de Morelos, ingredientes frescos Jalisco, recetas a domicilio, Chef Chef Harfer">
-<meta name="author" content="Chef Chef Harfer">
-<meta name="robots" content="index, follow">
-<link rel="canonical" href="https://chefchefharfer.mx/">
-
-<!-- Open Graph (para compartir en redes sociales) -->
-<meta property="og:type" content="website">
-<meta property="og:url" content="https://chefchefharfer.mx/">
-<meta property="og:title" content="Chef Chef Harfer — Comida a Domicilio en Tepatitlán de Morelos">
-<meta property="og:description" content="Meal kits a domicilio en Tepatitlán. Ingredientes frescos y porcionados, recetas listas para cocinar. Entregas martes, jueves y sábado.">
-<meta property="og:image" content="https://chefchefharfer.github.io/chefchefharfer/Logo%20chef%20chef.png">
-<meta property="og:locale" content="es_MX">
-<meta property="og:site_name" content="Chef Chef Harfer">
-
-<!-- Schema.org para Google -->
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "FoodEstablishment",
-  "name": "Chef Chef Harfer",
-  "description": "Meal kits a domicilio en Tepatitlán de Morelos. Ingredientes frescos y porcionados, recetas listas para cocinar.",
-  "url": "https://chefchefharfer.mx",
-  "logo": "https://chefchefharfer.github.io/chefchefharfer/Logo%20chef%20chef.png",
-  "image": "https://chefchefharfer.github.io/chefchefharfer/Logo%20chef%20chef.png",
-  "telephone": "+523782901365",
-  "address": {
-    "@type": "PostalAddress",
-    "addressLocality": "Tepatitlán de Morelos",
-    "addressRegion": "Jalisco",
-    "addressCountry": "MX"
-  },
-  "servesCuisine": "Mexicana, Internacional",
-  "hasDeliveryMethod": "http://purl.org/goodrelations/v1#DeliveryModeDirectDownload",
-  "areaServed": {
-    "@type": "City",
-    "name": "Tepatitlán de Morelos"
-  },
-  "sameAs": [
-    "https://instagram.com/chefchef.harfer",
-    "https://www.facebook.com/profile.php?id=61582969501407"
-  ]
-}
-</script>
+<title>Chef Chef Harfer — Haz tu pedido</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -3322,6 +3278,17 @@ body:not(.on-menu) #nav-logo-wrap { display: flex; }
     <button class="btn btn-pay" id="cart-pay-btn" onclick="confirmarYEnviar()" style="display:none">
       Pagar mi pedido
     </button>
+
+    <!-- BOTON PAGO CON TARJETA — PROXIMAMENTE -->
+    <div id="btn-tarjeta-pronto" style="display:none;margin-top:12px;">
+      <button disabled style="width:100%;background:#e8e0d0;color:#9a9590;border:none;border-radius:14px;padding:18px;font-family:'Plus Jakarta Sans',sans-serif;font-size:15px;font-weight:700;cursor:not-allowed;display:flex;align-items:center;justify-content:center;gap:10px;box-sizing:border-box;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+        Pagar con tarjeta
+      </button>
+      <div style="text-align:center;font-size:12px;color:#9a9590;margin-top:8px;font-family:'Outfit',sans-serif;letter-spacing:0.3px;">
+        🔒 Muy pronto podrás pagar directo aquí con tu tarjeta
+      </div>
+    </div>
   </div>
 
 </div>
@@ -4734,11 +4701,15 @@ function renderCartPanel() {
     panel.appendChild(emptyDiv);
     var payBtn0 = document.getElementById('cart-pay-btn');
     if (payBtn0) payBtn0.style.display = 'none';
+    var btnTarjeta0 = document.getElementById('btn-tarjeta-pronto');
+    if (btnTarjeta0) btnTarjeta0.style.display = 'none';
     return;
   }
 
   var payBtn = document.getElementById('cart-pay-btn');
   if (payBtn) payBtn.style.display = 'block';
+  var btnTarjeta = document.getElementById('btn-tarjeta-pronto');
+  if (btnTarjeta) btnTarjeta.style.display = 'block';
   panel.innerHTML = '';
   var total = 0;
 
