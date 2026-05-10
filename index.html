@@ -3,7 +3,51 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Chef Chef Harfer — Haz tu pedido</title>
+<title>Chef Chef Harfer — Comida a Domicilio en Tepatitlán de Morelos</title>
+<meta name="description" content="Meal kits a domicilio en Tepatitlán de Morelos. Ingredientes frescos y porcionados, recetas listas para cocinar. Entregas martes, jueves y sábado. ¡Haz tu pedido en línea!">
+<meta name="keywords" content="comida a domicilio Tepatitlán, meal kits Tepatitlán, comida Tepatitlán de Morelos, ingredientes frescos Jalisco, recetas a domicilio, Chef Chef Harfer">
+<meta name="author" content="Chef Chef Harfer">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://chefchefharfer.mx/">
+
+<!-- Open Graph (para compartir en redes sociales) -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://chefchefharfer.mx/">
+<meta property="og:title" content="Chef Chef Harfer — Comida a Domicilio en Tepatitlán de Morelos">
+<meta property="og:description" content="Meal kits a domicilio en Tepatitlán. Ingredientes frescos y porcionados, recetas listas para cocinar. Entregas martes, jueves y sábado.">
+<meta property="og:image" content="https://chefchefharfer.github.io/chefchefharfer/Logo%20chef%20chef.png">
+<meta property="og:locale" content="es_MX">
+<meta property="og:site_name" content="Chef Chef Harfer">
+
+<!-- Schema.org para Google -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FoodEstablishment",
+  "name": "Chef Chef Harfer",
+  "description": "Meal kits a domicilio en Tepatitlán de Morelos. Ingredientes frescos y porcionados, recetas listas para cocinar.",
+  "url": "https://chefchefharfer.mx",
+  "logo": "https://chefchefharfer.github.io/chefchefharfer/Logo%20chef%20chef.png",
+  "image": "https://chefchefharfer.github.io/chefchefharfer/Logo%20chef%20chef.png",
+  "telephone": "+523782901365",
+  "address": {
+    "@type": "PostalAddress",
+    "addressLocality": "Tepatitlán de Morelos",
+    "addressRegion": "Jalisco",
+    "addressCountry": "MX"
+  },
+  "servesCuisine": "Mexicana, Internacional",
+  "hasDeliveryMethod": "http://purl.org/goodrelations/v1#DeliveryModeDirectDownload",
+  "areaServed": {
+    "@type": "City",
+    "name": "Tepatitlán de Morelos"
+  },
+  "sameAs": [
+    "https://instagram.com/chefchef.harfer",
+    "https://www.facebook.com/profile.php?id=61582969501407"
+  ]
+}
+</script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -3902,11 +3946,6 @@ async function handleLogin() {
     }
     var user = data.cliente;
     user.pin = hashPin(pin, cleanedPhone);
-    // Preservar direccion del servidor si existe
-    if (!user.direccion || user.direccion === '') {
-      var localUser = getUserLocal(cleanedPhone);
-      if (localUser && localUser.direccion) user.direccion = localUser.direccion;
-    }
     saveUserLocal(user);
     currentUser = user;
     registrarActividad(user, 'Login', 'Inicio de sesion exitoso');
@@ -4424,9 +4463,8 @@ function subirImgPlatillo(id, e) {
 // === MENU ===
 function getCartCountForItem(id) {
   var total = 0;
-  Object.keys(cart).forEach(function(k) {
-    if (k.indexOf(id + '_') === 0) total += cart[k].cantidad;
-  });
+  if (cart[id + '_2']) total += cart[id + '_2'].cantidad;
+  if (cart[id + '_4']) total += cart[id + '_4'].cantidad;
   return total;
 }
 
@@ -4606,9 +4644,9 @@ function persistCart() {
 
 function addToCart(id, porciones) {
   var p = MENU.find(function(x) { return x.id === id; });
-  // Cada click crea una entrada separada para poder eliminarla individualmente
-  var key = id + '_' + porciones + '_' + Date.now();
-  cart[key] = { platillo: p, porciones: porciones, cantidad: 1, key: key };
+  var key = getCartKey(id, porciones);
+  if (cart[key]) { cart[key].cantidad += 1; }
+  else { cart[key] = { platillo: p, porciones: porciones, cantidad: 1 }; }
   persistCart();
   updateCartBar();
   renderMenu();
@@ -4616,7 +4654,8 @@ function addToCart(id, porciones) {
 
 function removeFromCart(key) {
   if (!cart[key]) return;
-  delete cart[key];
+  if (cart[key].cantidad > 1) { cart[key].cantidad -= 1; }
+  else { delete cart[key]; }
   persistCart();
   updateCartBar();
   renderCartPanel();
@@ -4726,6 +4765,20 @@ function renderCartPanel() {
     var controls = document.createElement('div');
     controls.className = 'cart-row-controls';
 
+    var minusBtn = document.createElement('button');
+    minusBtn.className = 'cart-qty-btn';
+    minusBtn.innerHTML = '&#8722;';
+    minusBtn.onclick = (function(k) { return function() { removeFromCart(k); }; })(key);
+
+    var qtySpan = document.createElement('span');
+    qtySpan.className = 'cart-qty-num';
+    qtySpan.textContent = i.cantidad;
+
+    var plusBtn = document.createElement('button');
+    plusBtn.className = 'cart-qty-btn plus';
+    plusBtn.textContent = '+';
+    plusBtn.onclick = (function(pid, por) { return function() { addToCart(pid, por); }; })(i.platillo.id, i.porciones);
+
     var subtotalSpan = document.createElement('span');
     subtotalSpan.className = 'cart-row-subtotal';
     subtotalSpan.textContent = '$' + subtotal;
@@ -4735,6 +4788,9 @@ function renderCartPanel() {
     deleteBtn.innerHTML = '&#215;';
     deleteBtn.onclick = (function(k) { return function() { deleteFromCart(k); }; })(key);
 
+    controls.appendChild(minusBtn);
+    controls.appendChild(qtySpan);
+    controls.appendChild(plusBtn);
     controls.appendChild(subtotalSpan);
     controls.appendChild(deleteBtn);
 
@@ -5080,12 +5136,6 @@ function confirmarYEnviar() {
     u.direccion = dirCompleta;
     saveUserLocal(u);
     currentUser = u;
-    // Actualizar direccion en el servidor
-    fetch('https://chefchefharfer.mx/api/save-data', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'x-api-secret': API_SECRET },
-      body: JSON.stringify({ tipo: 'cliente', data: { phone: u.phone, direccion: dirCompleta } })
-    }).catch(function(e) { console.warn('Error actualizando dir:', e.message); });
   } else if (u && u.direccion && !mismaDireccionConfirmada) {
     // Tiene dirección guardada pero no confirmó que sea la misma
     showToast('Confirma si enviamos a la misma direccion', 'error'); return;
@@ -5662,9 +5712,14 @@ window.addEventListener('load', function() {
   // Inicializar cart-pill (oculto si no hay items)
   var pill = document.getElementById('cart-pill');
   if (pill) pill.classList.remove('visible');
-  // Limpiar carrito al cargar la página — no persistir entre sesiones
-  try { localStorage.removeItem('cch_cart'); } catch(e) {}
-  cart = {};
+  // Si hay items en el carrito de antes (localStorage), restaurarlos
+  try {
+    var savedCart = localStorage.getItem('cch_cart');
+    if (savedCart) {
+      cart = JSON.parse(savedCart) || {};
+      updateCartBar();
+    }
+  } catch(e) {}
 });
 
 </script>
