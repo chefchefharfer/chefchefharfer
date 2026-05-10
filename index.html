@@ -3855,7 +3855,7 @@ function selectLoginMode(mode) {
 }
 
 // === LOGIN ===
-function handleLogin() {
+async function handleLogin() {
   var phone = document.getElementById('login-phone').value.trim();
   var pin   = document.getElementById('login-pin').value.trim();
   if (!isValidPhone(phone)) { showToast('Ingresa un numero valido de 10 digitos', 'error'); return; }
@@ -3863,36 +3863,65 @@ function handleLogin() {
   var cleanedPhone = cleanPhone(phone);
   // Admin access
   if (cleanedPhone === ADMIN_PHONE && verificarAdminPin(pin)) {
-    var adminUser = getUserLocal(ADMIN_PHONE) || { nombre: 'Administrador', phone: ADMIN_PHONE, email: 'admin@chefchefharfer.mx', pin: '' };
+    var adminUser = { nombre: 'Administrador', phone: ADMIN_PHONE, email: 'admin@chefchefharfer.mx', pin: '' };
     saveUserLocal(adminUser);
     currentUser = adminUser;
     loginSuccess();
     showToast('Bienvenido, Administrador', 'welcome');
     return;
   }
-  var user = getUserLocal(phone);
-  if (!user) {
-    showToast('No encontramos ese numero. Registrate.', 'error');
-    selectLoginMode('register');
-    document.getElementById('reg-phone').value = phone;
-    return;
-  }
-  if (user.pin !== pin && user.pin !== hashPin(pin, user.phone)) {
-    // Compatibilidad: acepta PIN en texto plano legacy y lo migra a hash
-    showToast('PIN incorrecto. Intentalo de nuevo.', 'error');
-    document.getElementById('login-pin').value = '';
-    return;
-  }
-  // Migrar PIN legacy a hash si aún estaba en texto plano
-  if (user.pin === pin) {
-    user.pin = hashPin(pin, user.phone);
+  showLoading('Verificando...');
+  try {
+    // Intentar con PIN hasheado primero
+    var res = await fetch('https://chefchefharfer.mx/api/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ phone: cleanedPhone, pin: hashPin(pin, cleanedPhone) })
+    });
+    var data = await res.json();
+    // Si falla, intentar con PIN en texto plano (cuentas legacy)
+    if (!data.ok) {
+      var res2 = await fetch('https://chefchefharfer.mx/api/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phone: cleanedPhone, pin: pin })
+      });
+      data = await res2.json();
+    }
+    hideLoading();
+    if (!data.ok) {
+      if (data.error === 'Usuario no encontrado') {
+        showToast('No encontramos ese numero. Registrate.', 'error');
+        selectLoginMode('register');
+        document.getElementById('reg-phone').value = phone;
+      } else {
+        showToast('PIN incorrecto. Intentalo de nuevo.', 'error');
+        document.getElementById('login-pin').value = '';
+      }
+      return;
+    }
+    var user = data.cliente;
+    user.pin = hashPin(pin, cleanedPhone);
     saveUserLocal(user);
+    currentUser = user;
+    registrarActividad(user, 'Login', 'Inicio de sesion exitoso');
+    actualizarClienteLogin(user.phone);
+    loginSuccess();
+    showToast('Hola de nuevo, ' + user.nombre.split(' ')[0] + '!', 'welcome');
+  } catch(e) {
+    hideLoading();
+    // Fallback a localStorage si el servidor no responde
+    var user = getUserLocal(phone);
+    if (!user) { showToast('Error de conexion. Intenta de nuevo.', 'error'); return; }
+    if (user.pin !== pin && user.pin !== hashPin(pin, user.phone)) {
+      showToast('PIN incorrecto.', 'error');
+      document.getElementById('login-pin').value = '';
+      return;
+    }
+    currentUser = user;
+    loginSuccess();
+    showToast('Hola de nuevo, ' + user.nombre.split(' ')[0] + '!', 'welcome');
   }
-  currentUser = user;
-  registrarActividad(user, 'Login', 'Inicio de sesion exitoso');
-  actualizarClienteLogin(user.phone);
-  loginSuccess();
-  showToast('Hola de nuevo, ' + user.nombre.split(' ')[0] + '!', 'welcome');
 }
 
 // === RECUPERACION DE PIN ===
@@ -3917,16 +3946,22 @@ async function enviarCodigoRecuperacion() {
   var emailIngresado = document.getElementById('recovery-email').value.trim().toLowerCase();
   if (!isValidPhone(phone)) { showToast('Ingresa un numero valido', 'error'); return; }
   if (!emailIngresado || emailIngresado.indexOf('@') < 0) { showToast('Ingresa tu correo registrado', 'error'); return; }
-  var user = getUserLocal(phone);
+  showLoading('Buscando cuenta...');
+  var user = null;
+  try {
+    var res = await fetch('https://chefchefharfer.mx/api/cliente?phone=' + cleanPhone(phone));
+    var data = await res.json();
+    if (data.ok) user = data.cliente;
+  } catch(e) {
+    user = getUserLocal(phone);
+  }
+  hideLoading();
   if (!user) { showToast('No encontramos ese numero', 'error'); return; }
-  // Verificar que el correo coincide con el registrado
   if (!user.email || user.email.toLowerCase() !== emailIngresado) {
     showToast('El correo no coincide con el registrado en esa cuenta', 'error');
     return;
   }
-  // Generar código de 6 dígitos
   codigoRecuperacion = Math.floor(100000 + Math.random() * 900000).toString();
-  // Enviar por correo
   showLoading('Enviando codigo...');
   try {
     await enviarCorreoRecuperacion(user, codigoRecuperacion);
@@ -3939,16 +3974,25 @@ async function enviarCodigoRecuperacion() {
   }
 }
 
-function verificarCodigo() {
+async function verificarCodigo() {
   var phone = document.getElementById('recovery-phone').value.trim();
   var codigo = document.getElementById('recovery-codigo').value.trim();
   var newPin = document.getElementById('recovery-new-pin').value.trim();
   if (!codigo || codigo !== codigoRecuperacion) { showToast('Codigo incorrecto', 'error'); return; }
   if (!newPin || newPin.length !== 4 || !/^[0-9]{4}$/.test(newPin)) { showToast('El nuevo PIN debe ser de 4 digitos', 'error'); return; }
+  var cleanedPhone = cleanPhone(phone);
+  var newPinHash = hashPin(newPin, cleanedPhone);
+  // Actualizar PIN en el servidor
+  try {
+    await fetch('https://chefchefharfer.mx/api/update-pin', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ phone: cleanedPhone, pin: newPinHash })
+    });
+  } catch(e) { console.warn('Error actualizando PIN en servidor:', e.message); }
+  // Actualizar tambien en localStorage
   var user = getUserLocal(phone);
-  if (!user) { showToast('Error al buscar la cuenta', 'error'); return; }
-  user.pin = hashPin(newPin, user.phone);
-  saveUserLocal(user);
+  if (user) { user.pin = newPinHash; saveUserLocal(user); }
   codigoRecuperacion = null;
   ocultarRecuperacion();
   showToast('PIN actualizado correctamente', 'success');
@@ -3965,16 +4009,39 @@ async function handleRegister() {
   if (!isValidPhone(phone)) { showToast('Numero de telefono invalido', 'error'); return; }
   if (!email || email.indexOf('@') < 0) { showToast('Ingresa un correo valido', 'error'); return; }
   if (!pin || pin.length !== 4 || !/^[0-9]{4}$/.test(pin)) { showToast('El PIN debe ser de 4 digitos numericos', 'error'); return; }
-  if (getUserLocal(cleanPhone(phone))) {
-    showToast('Este numero ya tiene cuenta. Inicia sesion.', 'error');
-    selectLoginMode('login');
-    document.getElementById('login-phone').value = phone;
-    return;
-  }
   var cleanedPhone = cleanPhone(phone);
+  showLoading('Verificando...');
+  // Verificar si ya existe en el servidor
+  try {
+    var checkRes = await fetch('https://chefchefharfer.mx/api/cliente?phone=' + cleanedPhone);
+    var checkData = await checkRes.json();
+    if (checkData.ok) {
+      hideLoading();
+      showToast('Este numero ya tiene cuenta. Inicia sesion.', 'error');
+      selectLoginMode('login');
+      document.getElementById('login-phone').value = phone;
+      return;
+    }
+  } catch(e) {
+    // Si el servidor no responde, verificar localStorage
+    if (getUserLocal(cleanedPhone)) {
+      hideLoading();
+      showToast('Este numero ya tiene cuenta. Inicia sesion.', 'error');
+      selectLoginMode('login');
+      document.getElementById('login-phone').value = phone;
+      return;
+    }
+  }
   var user = { nombre: nombre, phone: cleanedPhone, email: email, pin: hashPin(pin, cleanedPhone), fechaRegistro: new Date().toISOString() };
   showLoading('Creando tu cuenta...');
-  guardarClienteNotion(user);
+  // Guardar en servidor
+  try {
+    await fetch('https://chefchefharfer.mx/api/cliente', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ nombre: nombre, phone: cleanedPhone, email: email, pin: hashPin(pin, cleanedPhone) })
+    });
+  } catch(e) { console.warn('Error guardando en servidor:', e.message); }
   try { await enviarCorreoBienvenida(user); } catch(e) { console.warn('Email:', e.message); }
   try { saveUserLocal(user); } catch(e) {}
   hideLoading();
