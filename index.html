@@ -3949,7 +3949,7 @@ async function enviarCodigoRecuperacion() {
   showLoading('Buscando cuenta...');
   var user = null;
   try {
-    var res = await fetch('https://chefchefharfer.mx/api/cliente?phone=' + cleanPhone(phone));
+    var res = await fetch('https://chefchefharfer.mx/api/cliente?phone=' + cleanPhone(phone), { headers: { 'x-api-secret': API_SECRET } });
     var data = await res.json();
     if (data.ok) user = data.cliente;
   } catch(e) {
@@ -3986,7 +3986,7 @@ async function verificarCodigo() {
   try {
     await fetch('https://chefchefharfer.mx/api/update-pin', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'x-api-secret': API_SECRET },
       body: JSON.stringify({ phone: cleanedPhone, pin: newPinHash })
     });
   } catch(e) { console.warn('Error actualizando PIN en servidor:', e.message); }
@@ -4013,7 +4013,7 @@ async function handleRegister() {
   showLoading('Verificando...');
   // Verificar si ya existe en el servidor
   try {
-    var checkRes = await fetch('https://chefchefharfer.mx/api/cliente?phone=' + cleanedPhone);
+    var checkRes = await fetch('https://chefchefharfer.mx/api/cliente?phone=' + cleanedPhone, { headers: { 'x-api-secret': API_SECRET } });
     var checkData = await checkRes.json();
     if (checkData.ok) {
       hideLoading();
@@ -4038,7 +4038,7 @@ async function handleRegister() {
   try {
     await fetch('https://chefchefharfer.mx/api/cliente', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'x-api-secret': API_SECRET },
       body: JSON.stringify({ nombre: nombre, phone: cleanedPhone, email: email, pin: hashPin(pin, cleanedPhone) })
     });
   } catch(e) { console.warn('Error guardando en servidor:', e.message); }
@@ -4052,6 +4052,7 @@ async function handleRegister() {
 }
 
 // === NOTION ===
+var API_SECRET = 'ccf2026secreto';
 var DATA_API = 'https://chefchefharfer.mx/api/save-data';
 var MANAGE_DAYS_API = 'https://chefchefharfer.mx/api/manage-days';
 var diasBloqueados = []; // fechas bloqueadas por admin, formato 'YYYY-MM-DD'
@@ -4068,7 +4069,7 @@ async function guardarEnBlobs(tipo, data) {
   try {
     await fetch(DATA_API, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'x-api-secret': API_SECRET },
       body: JSON.stringify({ tipo, data })
     });
   } catch(e) { console.warn('save-data:', e.message); }
@@ -4169,7 +4170,7 @@ async function enviarEmail(tipo, to, data) {
   try {
     var res = await fetch(EMAIL_API_BASE + '/' + tipo, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'x-api-secret': API_SECRET },
       body: JSON.stringify({ tipo: tipo, to: to, data: data })
     });
     var d = await res.json();
@@ -5405,7 +5406,7 @@ async function toggleDiaBloqueado(fechaStr) {
   try {
     var res = await fetch(MANAGE_DAYS_API, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'x-api-secret': API_SECRET },
       body: JSON.stringify({ fecha: fechaStr, accion: accion })
     });
     var data = await res.json();
@@ -5428,9 +5429,9 @@ var GET_DATA_API = 'https://chefchefharfer.mx/api/get-data';
 async function cargarDatosAdmin() {
   try {
     var [rClientes, rPedidos, rActividad] = await Promise.all([
-      fetch(GET_DATA_API + '?tipo=clientes').then(r => r.json()),
-      fetch(GET_DATA_API + '?tipo=pedidos').then(r => r.json()),
-      fetch(GET_DATA_API + '?tipo=actividad').then(r => r.json())
+      fetch(GET_DATA_API + '?tipo=clientes', { headers: { 'x-api-secret': API_SECRET } }).then(r => r.json()),
+      fetch(GET_DATA_API + '?tipo=pedidos', { headers: { 'x-api-secret': API_SECRET } }).then(r => r.json()),
+      fetch(GET_DATA_API + '?tipo=actividad', { headers: { 'x-api-secret': API_SECRET } }).then(r => r.json())
     ]);
     return {
       clientes: (rClientes.ok && rClientes.data) || [],
@@ -5572,7 +5573,7 @@ async function cambiarEstadoPedido(pedidoId, nuevoEstado) {
   try {
     await fetch('https://chefchefharfer.mx/api/pedido-estado', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'x-api-secret': API_SECRET },
       body: JSON.stringify({ order_id: pedidoId, estado: nuevoEstado })
     });
     showToast('Estado: ' + nuevoEstado, 'success');
