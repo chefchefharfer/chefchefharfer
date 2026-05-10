@@ -3902,6 +3902,11 @@ async function handleLogin() {
     }
     var user = data.cliente;
     user.pin = hashPin(pin, cleanedPhone);
+    // Preservar direccion del servidor si existe
+    if (!user.direccion || user.direccion === '') {
+      var localUser = getUserLocal(cleanedPhone);
+      if (localUser && localUser.direccion) user.direccion = localUser.direccion;
+    }
     saveUserLocal(user);
     currentUser = user;
     registrarActividad(user, 'Login', 'Inicio de sesion exitoso');
@@ -4419,8 +4424,9 @@ function subirImgPlatillo(id, e) {
 // === MENU ===
 function getCartCountForItem(id) {
   var total = 0;
-  if (cart[id + '_2']) total += cart[id + '_2'].cantidad;
-  if (cart[id + '_4']) total += cart[id + '_4'].cantidad;
+  Object.keys(cart).forEach(function(k) {
+    if (k.indexOf(id + '_') === 0) total += cart[k].cantidad;
+  });
   return total;
 }
 
@@ -4600,9 +4606,9 @@ function persistCart() {
 
 function addToCart(id, porciones) {
   var p = MENU.find(function(x) { return x.id === id; });
-  var key = getCartKey(id, porciones);
-  if (cart[key]) { cart[key].cantidad += 1; }
-  else { cart[key] = { platillo: p, porciones: porciones, cantidad: 1 }; }
+  // Cada click crea una entrada separada para poder eliminarla individualmente
+  var key = id + '_' + porciones + '_' + Date.now();
+  cart[key] = { platillo: p, porciones: porciones, cantidad: 1, key: key };
   persistCart();
   updateCartBar();
   renderMenu();
@@ -4610,8 +4616,7 @@ function addToCart(id, porciones) {
 
 function removeFromCart(key) {
   if (!cart[key]) return;
-  if (cart[key].cantidad > 1) { cart[key].cantidad -= 1; }
-  else { delete cart[key]; }
+  delete cart[key];
   persistCart();
   updateCartBar();
   renderCartPanel();
@@ -4721,20 +4726,6 @@ function renderCartPanel() {
     var controls = document.createElement('div');
     controls.className = 'cart-row-controls';
 
-    var minusBtn = document.createElement('button');
-    minusBtn.className = 'cart-qty-btn';
-    minusBtn.innerHTML = '&#8722;';
-    minusBtn.onclick = (function(k) { return function() { removeFromCart(k); }; })(key);
-
-    var qtySpan = document.createElement('span');
-    qtySpan.className = 'cart-qty-num';
-    qtySpan.textContent = i.cantidad;
-
-    var plusBtn = document.createElement('button');
-    plusBtn.className = 'cart-qty-btn plus';
-    plusBtn.textContent = '+';
-    plusBtn.onclick = (function(pid, por) { return function() { addToCart(pid, por); }; })(i.platillo.id, i.porciones);
-
     var subtotalSpan = document.createElement('span');
     subtotalSpan.className = 'cart-row-subtotal';
     subtotalSpan.textContent = '$' + subtotal;
@@ -4744,9 +4735,6 @@ function renderCartPanel() {
     deleteBtn.innerHTML = '&#215;';
     deleteBtn.onclick = (function(k) { return function() { deleteFromCart(k); }; })(key);
 
-    controls.appendChild(minusBtn);
-    controls.appendChild(qtySpan);
-    controls.appendChild(plusBtn);
     controls.appendChild(subtotalSpan);
     controls.appendChild(deleteBtn);
 
@@ -5092,6 +5080,12 @@ function confirmarYEnviar() {
     u.direccion = dirCompleta;
     saveUserLocal(u);
     currentUser = u;
+    // Actualizar direccion en el servidor
+    fetch('https://chefchefharfer.mx/api/save-data', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-api-secret': API_SECRET },
+      body: JSON.stringify({ tipo: 'cliente', data: { phone: u.phone, direccion: dirCompleta } })
+    }).catch(function(e) { console.warn('Error actualizando dir:', e.message); });
   } else if (u && u.direccion && !mismaDireccionConfirmada) {
     // Tiene dirección guardada pero no confirmó que sea la misma
     showToast('Confirma si enviamos a la misma direccion', 'error'); return;
@@ -5668,14 +5662,9 @@ window.addEventListener('load', function() {
   // Inicializar cart-pill (oculto si no hay items)
   var pill = document.getElementById('cart-pill');
   if (pill) pill.classList.remove('visible');
-  // Si hay items en el carrito de antes (localStorage), restaurarlos
-  try {
-    var savedCart = localStorage.getItem('cch_cart');
-    if (savedCart) {
-      cart = JSON.parse(savedCart) || {};
-      updateCartBar();
-    }
-  } catch(e) {}
+  // Limpiar carrito al cargar la página — no persistir entre sesiones
+  try { localStorage.removeItem('cch_cart'); } catch(e) {}
+  cart = {};
 });
 
 </script>
