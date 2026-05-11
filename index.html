@@ -6073,9 +6073,9 @@ async function enviarPago(token_id, deviceSessionId, card_id) {
     }
 
     // Redirigir a 3D Secure si es necesario
-    if (d.redirect) {
+    if (d.redirect_url) {
       cerrarPanelPago();
-      window.location.href = d.redirect;
+      window.location.href = d.redirect_url;
       return;
     }
 
