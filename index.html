@@ -5863,15 +5863,15 @@ var openpayConfig = { merchant_id: '', public_key: '', sandbox: true };
 var guardarTarjeta = false;
 var tarjetaSeleccionada = null;
 
-async function cargarConfigOpenpay() {
-  try {
-    var r = await fetch('https://chefchefharfer.mx/api/openpay-config');
-    var d = await r.json();
-    openpayConfig = d;
-    OpenPay.setId(d.merchant_id);
-    OpenPay.setApiKey(d.public_key);
-    OpenPay.setSandboxMode(d.sandbox);
-  } catch(e) { console.warn('Openpay config error:', e.message); }
+function cargarConfigOpenpay() {
+  // Claves publicas de Openpay — estas son seguras en el HTML (nunca poner la privada aqui)
+  var OPENPAY_ID = 'mtgg8mpbu09f8zbg36kd';
+  var OPENPAY_PUBLIC_KEY = 'pk_44f8e986db3b49c8b3e2f18b3d48b069';
+  var OPENPAY_SANDBOX = true;
+  openpayConfig = { merchant_id: OPENPAY_ID, public_key: OPENPAY_PUBLIC_KEY, sandbox: OPENPAY_SANDBOX };
+  OpenPay.setId(OPENPAY_ID);
+  OpenPay.setApiKey(OPENPAY_PUBLIC_KEY);
+  OpenPay.setSandboxMode(OPENPAY_SANDBOX);
 }
 
 function abrirPanelPago() {
