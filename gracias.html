@@ -1,0 +1,677 @@
+require('dotenv').config();
+const express = require('express');
+const { Pool } = require('pg');
+const cron = require('node-cron');
+const Openpay = require('openpay');
+const app = express();
+app.use(express.json());
+
+const pool = new Pool({
+  user: 'postgres',
+  host: '127.0.0.1',
+  database: 'chefchefharfer',
+  password: process.env.DB_PASSWORD,
+  port: 5432
+});
+
+// Inicializar Openpay
+const openpay = new Openpay(
+  process.env.OPENPAY_ID,
+  process.env.OPENPAY_PRIVATE_KEY,
+  process.env.OPENPAY_SANDBOX === 'true'
+);
+
+pool.query(`
+  CREATE TABLE IF NOT EXISTS dias_bloqueados (
+    fecha VARCHAR(10) PRIMARY KEY
+  )
+`).catch(e => console.log('dias_bloqueados ya existe:', e.message));
+
+pool.query(`
+  CREATE TABLE IF NOT EXISTS pagos (
+    id SERIAL PRIMARY KEY,
+    order_id VARCHAR(50),
+    cliente_phone VARCHAR(20),
+    cliente_nombre VARCHAR(200),
+    openpay_charge_id VARCHAR(100),
+    openpay_customer_id VARCHAR(100),
+    monto DECIMAL(10,2),
+    estado VARCHAR(50) DEFAULT 'pendiente',
+    redirect_url TEXT,
+    fecha TIMESTAMP DEFAULT NOW()
+  )
+`).catch(e => console.log('pagos ya existe:', e.message));
+
+app.use(function(req, res, next) {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, x-api-secret');
+  res.header('Access-Control-Allow-Methods', 'GET,POST,OPTIONS');
+  if (req.method === 'OPTIONS') return res.sendStatus(200);
+  next();
+});
+
+const RUTAS_PUBLICAS = ['/api/ping', '/api/login', '/api/manage-days', '/api/pago-resultado'];
+function verificarSecret(req, res, next) {
+  if (RUTAS_PUBLICAS.includes(req.path)) return next();
+  const secret = req.headers['x-api-secret'] || req.body['_secret'] || req.query['_secret'];
+  if (secret !== process.env.API_SECRET) {
+    return res.status(403).json({ ok: false, error: 'No autorizado' });
+  }
+  next();
+}
+app.use(verificarSecret);
+
+function cleanPhone(p) {
+  return String(p).replace(/\D/g, '');
+}
+
+async function enviarCorreo(to, subject, html) {
+  const r = await fetch('https://api.resend.com/emails', {
+    method: 'POST',
+    headers: { 'Authorization': 'Bearer ' + process.env.RESEND_KEY, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ from: process.env.FROM_EMAIL, to: to, subject: subject, html: html })
+  });
+  return r.json();
+}
+
+function layoutBase(contenido) {
+  return `<!DOCTYPE html>
+<html lang="es">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"></head>
+<body style="margin:0;padding:0;background:#f5f3ee;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#f5f3ee;padding:32px 16px;">
+    <tr><td align="center">
+      <table width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;">
+        <tr><td align="center" style="background:#ffffff;border-radius:16px 16px 0 0;padding:32px 40px 24px;">
+          <img src="https://chefchefharfer.github.io/chefchefharfer/Logo%20chef%20chef.png" alt="Chef Chef Harfer" width="160" style="display:block;margin:0 auto 12px;">
+          <p style="margin:0;font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#9a9590;">MEAL KITS &nbsp;·&nbsp; TEPATITLAN DE MORELOS</p>
+        </td></tr>
+        <tr><td style="background:#ffffff;padding:8px 40px 36px;">${contenido}</td></tr>
+        <tr><td align="center" style="background:#1a1a1a;border-radius:0 0 16px 16px;padding:24px 40px;">
+          <p style="margin:0 0 8px;font-size:13px;color:rgba(255,255,255,0.5);">
+            <a href="https://instagram.com/chefchef.harfer" style="color:rgba(255,255,255,0.5);text-decoration:none;margin:0 8px;">Instagram</a>
+            &nbsp;·&nbsp;
+            <a href="https://wa.me/523782901365" style="color:rgba(255,255,255,0.5);text-decoration:none;margin:0 8px;">WhatsApp</a>
+            &nbsp;·&nbsp;
+            <a href="https://chefchefharfer.mx" style="color:rgba(255,255,255,0.5);text-decoration:none;margin:0 8px;">chefchefharfer.mx</a>
+          </p>
+          <p style="margin:0;font-size:11px;color:rgba(255,255,255,0.25);">© 2026 Chef Chef Harfer · Tepatitlan de Morelos, Jalisco</p>
+        </td></tr>
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>`;
+}
+
+function templateBienvenida(nombre) {
+  return layoutBase(`
+    <h1 style="margin:0 0 8px;font-size:26px;font-weight:800;color:#111;letter-spacing:-0.5px;">Hola, ${nombre}! 👋</h1>
+    <p style="margin:0 0 24px;font-size:15px;color:#666;line-height:1.6;">Tu cuenta en Chef Chef Harfer esta lista.</p>
+    <table width="100%" cellpadding="0" cellspacing="0">
+      <tr><td align="center">
+        <a href="https://chefchefharfer.mx" style="display:inline-block;background:#067c49;color:#ffffff;text-decoration:none;font-size:15px;font-weight:700;padding:16px 40px;border-radius:12px;">Ver el menu &rarr;</a>
+      </td></tr>
+    </table>
+  `);
+}
+
+function templateRecuperacion(nombre, codigo) {
+  return layoutBase(`
+    <h1 style="margin:0 0 8px;font-size:26px;font-weight:800;color:#111;letter-spacing:-0.5px;">Recuperacion de PIN</h1>
+    <p style="margin:0 0 28px;font-size:15px;color:#666;line-height:1.6;">Hola <strong>${nombre}</strong>, tu codigo de verificacion es:</p>
+    <table width="100%" cellpadding="0" cellspacing="0" style="background:#f0faf3;border:2px solid #c8edd9;border-radius:14px;margin-bottom:28px;">
+      <tr><td align="center" style="padding:32px;">
+        <p style="margin:0;font-size:48px;font-weight:800;color:#111;letter-spacing:12px;">${codigo}</p>
+        <p style="margin:8px 0 0;font-size:12px;color:#888;">Expira en 10 minutos</p>
+      </td></tr>
+    </table>
+  `);
+}
+
+function templateConfirmacion(nombre, orderId, dia, turno, direccion, platillos, total) {
+  const turnoLabel = turno === 'Manana' ? 'Manana (10am - 1pm)' : 'Tarde (4pm - 7pm)';
+  const itemsHtml = (platillos || []).map(function(p) {
+    return `<tr>
+      <td style="padding:12px 8px;font-size:13px;color:#333;border-bottom:1px solid #f0ede6;">${p.nombre}</td>
+      <td style="padding:12px 8px;font-size:13px;color:#666;border-bottom:1px solid #f0ede6;text-align:center;">Kit ${p.porciones}p x ${p.cantidad}</td>
+      <td style="padding:12px 8px;font-size:13px;font-weight:700;color:#067c49;border-bottom:1px solid #f0ede6;text-align:right;">$${p.subtotal}</td>
+    </tr>`;
+  }).join('');
+  return layoutBase(`
+    <h1 style="margin:0 0 4px;font-size:26px;font-weight:800;color:#111;letter-spacing:-0.5px;">Pedido recibido! 🎉</h1>
+    <p style="margin:0 0 28px;font-size:15px;color:#666;line-height:1.6;">Hola <strong>${nombre}</strong>, confirmamos tu pedido <strong>#${orderId}</strong>.</p>
+    <table width="100%" cellpadding="0" cellspacing="0" style="background:#f5f3ee;border-radius:12px;padding:20px 24px;margin-bottom:24px;">
+      <tr><td style="padding:6px 0;">
+        <p style="margin:0;font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#9a9590;">ENTREGA</p>
+        <p style="margin:4px 0 0;font-size:15px;font-weight:700;color:#111;">${dia} - ${turnoLabel}</p>
+      </td></tr>
+      <tr><td style="padding:12px 0 6px;">
+        <p style="margin:0;font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#9a9590;">DIRECCION</p>
+        <p style="margin:4px 0 0;font-size:14px;color:#444;">${direccion || 'Por confirmar'}</p>
+      </td></tr>
+    </table>
+    <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:8px;">
+      <thead><tr style="background:#f5f3ee;">
+        <th style="padding:10px 8px;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#9a9590;text-align:left;">Platillo</th>
+        <th style="padding:10px 8px;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#9a9590;text-align:center;">Kit</th>
+        <th style="padding:10px 8px;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#9a9590;text-align:right;">Subtotal</th>
+      </tr></thead>
+      <tbody>${itemsHtml}</tbody>
+      <tfoot><tr>
+        <td colspan="2" style="padding:16px 8px 4px;font-size:15px;font-weight:700;color:#111;">Total</td>
+        <td style="padding:16px 8px 4px;font-size:22px;font-weight:800;color:#067c49;text-align:right;">$${total} MXN</td>
+      </tr></tfoot>
+    </table>
+  `);
+}
+
+function templatePagoExitoso(nombre, orderId, dia, turno, total) {
+  const turnoLabel = turno === 'Manana' ? 'Manana (10am - 1pm)' : 'Tarde (4pm - 7pm)';
+  return layoutBase(`
+    <h1 style="margin:0 0 8px;font-size:26px;font-weight:800;color:#111;letter-spacing:-0.5px;">¡Pago confirmado! ✅</h1>
+    <p style="margin:0 0 24px;font-size:15px;color:#666;line-height:1.6;">Hola <strong>${nombre}</strong>, recibimos tu pago del pedido <strong>#${orderId}</strong>. ¡Gracias por tu compra!</p>
+    <table width="100%" cellpadding="0" cellspacing="0" style="background:#f0faf3;border:2px solid #c8edd9;border-radius:14px;margin-bottom:24px;">
+      <tr><td style="padding:24px;">
+        <p style="margin:0 0 6px;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#067c49;">ENTREGA PROGRAMADA</p>
+        <p style="margin:0;font-size:18px;font-weight:800;color:#111;">${dia} — ${turnoLabel}</p>
+        <p style="margin:16px 0 6px;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#067c49;">TOTAL PAGADO</p>
+        <p style="margin:0;font-size:28px;font-weight:800;color:#067c49;">$${total} MXN</p>
+      </td></tr>
+    </table>
+    <table width="100%" cellpadding="0" cellspacing="0" style="background:#fff8e1;border:1px solid #ffd54f;border-radius:12px;margin-bottom:24px;">
+      <tr><td style="padding:16px 20px;">
+        <p style="margin:0;font-size:13px;color:#795548;line-height:1.6;">Refrigera tus ingredientes al recibirlos y consomelos en un maximo de 3 dias para disfrutar la frescura al 100%.</p>
+      </td></tr>
+    </table>
+    <p style="margin:0;font-size:13px;color:#aaa;line-height:1.6;">Tienes dudas? <a href="https://wa.me/523782901365" style="color:#067c49;">Escribenos por WhatsApp</a>.</p>
+  `);
+}
+
+function templateRecordatorio(nombre, orderId, turno, direccion, platillos) {
+  const turnoLabel = turno === 'Manana' ? 'Manana (10am - 1pm)' : 'Tarde (4pm - 7pm)';
+  const itemsHtml = (platillos || []).map(function(p) {
+    var nombre_p = p.nombre || p;
+    return `<tr><td style="padding:10px 8px;font-size:13px;color:#333;border-bottom:1px solid #f0ede6;">${nombre_p}</td></tr>`;
+  }).join('');
+  return layoutBase(`
+    <h1 style="margin:0 0 8px;font-size:26px;font-weight:800;color:#111;letter-spacing:-0.5px;">Hoy es tu dia de entrega! 🚚</h1>
+    <p style="margin:0 0 24px;font-size:15px;color:#666;line-height:1.6;">Hola <strong>${nombre}</strong>, hoy recibes tu pedido <strong>#${orderId}</strong>.</p>
+    <table width="100%" cellpadding="0" cellspacing="0" style="background:#f0faf3;border:2px solid #c8edd9;border-radius:14px;margin-bottom:24px;">
+      <tr><td style="padding:20px 24px;">
+        <p style="margin:0 0 6px;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#067c49;">TURNO DE ENTREGA</p>
+        <p style="margin:0;font-size:18px;font-weight:800;color:#111;">${turnoLabel}</p>
+      </td></tr>
+      <tr><td style="padding:0 24px 20px;">
+        <p style="margin:0 0 6px;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#067c49;">DIRECCION</p>
+        <p style="margin:0;font-size:14px;color:#444;">${direccion || 'Por confirmar'}</p>
+      </td></tr>
+    </table>
+    <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:24px;">
+      <thead><tr style="background:#f5f3ee;">
+        <th style="padding:10px 8px;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#9a9590;text-align:left;">Tus platillos de hoy</th>
+      </tr></thead>
+      <tbody>${itemsHtml}</tbody>
+    </table>
+    <table width="100%" cellpadding="0" cellspacing="0" style="background:#fff8e1;border:1px solid #ffd54f;border-radius:12px;margin-bottom:24px;">
+      <tr><td style="padding:16px 20px;">
+        <p style="margin:0;font-size:13px;color:#795548;line-height:1.6;">Refrigera tus ingredientes al recibirlos. Consomelos en un maximo de 3 dias.</p>
+      </td></tr>
+    </table>
+  `);
+}
+
+// === CRON JOB ===
+cron.schedule('0 8 * * *', async function() {
+  console.log('[CRON] Verificando pedidos para hoy...');
+  try {
+    const hoy = new Date().toISOString().slice(0, 10);
+    const r = await pool.query(
+      `SELECT p.*, c.email, c.nombre as cliente_nombre_reg 
+       FROM pedidos p 
+       LEFT JOIN clientes c ON p.cliente_phone = c.phone 
+       WHERE p.fecha_entrega = $1 AND p.estado = 'Pendiente'`,
+      [hoy]
+    );
+    for (const pedido of r.rows) {
+      const email = pedido.email;
+      const nombre = pedido.cliente_nombre || pedido.cliente_nombre_reg || 'Cliente';
+      if (!email) continue;
+      let platillos = [];
+      try { platillos = typeof pedido.platillos === 'string' ? JSON.parse(pedido.platillos) : pedido.platillos; } catch(e) {}
+      await enviarCorreo(email, 'Hoy es tu dia de entrega! 🚚 — Chef Chef Harfer',
+        templateRecordatorio(nombre.split(' ')[0], pedido.order_id, pedido.turno, pedido.direccion, platillos));
+      await enviarCorreo('chefchef.harfer@gmail.com', '[Admin] Entrega hoy — Pedido #' + pedido.order_id + ' — ' + nombre,
+        templateRecordatorio(nombre.split(' ')[0], pedido.order_id, pedido.turno, pedido.direccion, platillos));
+    }
+  } catch(e) { console.error('[CRON] Error:', e.message); }
+}, { timezone: 'America/Mexico_City' });
+
+// === RUTAS OPENPAY ===
+
+// RUTA: Crear cargo con 3D Secure
+app.post('/api/pago/crear', async (req, res) => {
+  const { token_id, monto, order_id, nombre, email, phone, dia, turno, direccion, platillos, guardar_tarjeta, device_session_id } = req.body;
+  if (!token_id || !monto || !order_id) return res.json({ ok: false, error: 'Faltan datos' });
+
+  try {
+    // Buscar o crear cliente en Openpay
+    let openpay_customer_id = null;
+    const clienteDB = await pool.query('SELECT openpay_customer_id FROM clientes WHERE phone=$1', [cleanPhone(phone)]);
+    
+    if (clienteDB.rows.length && clienteDB.rows[0].openpay_customer_id) {
+      openpay_customer_id = clienteDB.rows[0].openpay_customer_id;
+    } else {
+      // Crear cliente en Openpay
+      const customer = await new Promise((resolve, reject) => {
+        openpay.customers.create({
+          name: nombre.split(' ')[0],
+          last_name: nombre.split(' ').slice(1).join(' ') || '',
+          email: email,
+          phone_number: cleanPhone(phone)
+        }, function(err, body) {
+          if (err) reject(err); else resolve(body);
+        });
+      });
+      openpay_customer_id = customer.id;
+      // Guardar customer_id en la base de datos
+      await pool.query('UPDATE clientes SET openpay_customer_id=$1 WHERE phone=$2', [openpay_customer_id, cleanPhone(phone)]);
+    }
+
+    // Crear cargo con 3D Secure
+    const chargeData = {
+      source_id: token_id,
+      method: 'card',
+      amount: parseFloat(monto),
+      currency: 'MXN',
+      description: 'Chef Chef Harfer — Pedido #' + order_id,
+      order_id: order_id,
+      device_session_id: device_session_id,
+      redirect_url: 'https://chefchefharfer.mx/gracias.html',
+      use_3d_secure: true
+    };
+
+    // Si el cliente quiere guardar tarjeta
+    if (guardar_tarjeta) {
+      chargeData.capture = true;
+    }
+
+    const charge = await new Promise((resolve, reject) => {
+      openpay.customers.charges.create(openpay_customer_id, chargeData, function(err, body) {
+        if (err) reject(err); else resolve(body);
+      });
+    });
+
+    // Guardar pago en base de datos
+    await pool.query(
+      'INSERT INTO pagos (order_id, cliente_phone, cliente_nombre, openpay_charge_id, openpay_customer_id, monto, estado, redirect_url) VALUES ($1,$2,$3,$4,$5,$6,$7,$8)',
+      [order_id, cleanPhone(phone), nombre, charge.id, openpay_customer_id, monto, charge.status, charge.payment_method?.url || null]
+    );
+
+    // Si tiene URL de 3D Secure, mandar al cliente ahí
+    if (charge.payment_method && charge.payment_method.url) {
+      return res.json({ ok: true, redirect: charge.payment_method.url, charge_id: charge.id });
+    }
+
+    // Pago directo sin 3D Secure (aprobado inmediatamente)
+    if (charge.status === 'completed') {
+      await procesarPagoExitoso(order_id, nombre, email, dia, turno, direccion, platillos, monto, charge.id);
+      return res.json({ ok: true, status: 'completed', charge_id: charge.id });
+    }
+
+    res.json({ ok: true, status: charge.status, charge_id: charge.id });
+  } catch(e) {
+    console.error('Openpay error:', e);
+    const msg = e.error_code ? obtenerMensajeError(e.error_code) : 'Error al procesar el pago';
+    res.json({ ok: false, error: msg, error_code: e.error_code });
+  }
+});
+
+// RUTA: Resultado del pago (redirect desde 3D Secure)
+app.get('/api/pago-resultado', async (req, res) => {
+  const { id } = req.query;
+  if (!id) return res.redirect('https://chefchefharfer.mx/gracias.html?status=error');
+
+  try {
+    // Buscar el pago en nuestra base de datos
+    const pagoResult = await pool.query('SELECT * FROM pagos WHERE openpay_charge_id=$1', [id]);
+    if (!pagoResult.rows.length) return res.redirect('https://chefchefharfer.mx/gracias.html?status=error');
+
+    const pago = pagoResult.rows[0];
+
+    // Verificar estado del cargo en Openpay
+    const clienteResult = await pool.query('SELECT * FROM clientes WHERE phone=$1', [pago.cliente_phone]);
+    const openpay_customer_id = clienteResult.rows[0]?.openpay_customer_id;
+
+    const charge = await new Promise((resolve, reject) => {
+      openpay.customers.charges.get(openpay_customer_id, id, function(err, body) {
+        if (err) reject(err); else resolve(body);
+      });
+    });
+
+    if (charge.status === 'completed') {
+      // Actualizar estado en nuestra base de datos
+      await pool.query('UPDATE pagos SET estado=$1 WHERE openpay_charge_id=$2', ['completed', id]);
+      await pool.query('UPDATE pedidos SET estado=$1 WHERE order_id=$2', ['Pagado', pago.order_id]);
+
+      // Obtener info del pedido para el correo
+      const pedidoResult = await pool.query('SELECT * FROM pedidos WHERE order_id=$1', [pago.order_id]);
+      const pedido = pedidoResult.rows[0];
+      const clienteInfo = clienteResult.rows[0];
+
+      if (clienteInfo && clienteInfo.email) {
+        await procesarPagoExitoso(
+          pago.order_id, pago.cliente_nombre, clienteInfo.email,
+          pedido?.dia, pedido?.turno, pedido?.direccion, null, pago.monto, id
+        );
+      }
+
+      return res.redirect('https://chefchefharfer.mx/gracias.html?status=success&order=' + pago.order_id);
+    }
+
+    if (charge.status === 'failed') {
+      await pool.query('UPDATE pagos SET estado=$1 WHERE openpay_charge_id=$2', ['failed', id]);
+      return res.redirect('https://chefchefharfer.mx/gracias.html?status=error&code=' + (charge.error_code || ''));
+    }
+
+    res.redirect('https://chefchefharfer.mx/gracias.html?status=pending&order=' + pago.order_id);
+  } catch(e) {
+    console.error('Pago resultado error:', e.message);
+    res.redirect('https://chefchefharfer.mx/gracias.html?status=error');
+  }
+});
+
+// RUTA: Obtener tarjetas guardadas del cliente
+app.get('/api/tarjetas', async (req, res) => {
+  const phone = req.query.phone;
+  if (!phone) return res.json({ ok: false, error: 'Falta phone' });
+  try {
+    const r = await pool.query('SELECT openpay_customer_id FROM clientes WHERE phone=$1', [cleanPhone(phone)]);
+    if (!r.rows.length || !r.rows[0].openpay_customer_id) return res.json({ ok: true, tarjetas: [] });
+    
+    const tarjetas = await new Promise((resolve, reject) => {
+      openpay.customers.cards.list(r.rows[0].openpay_customer_id, {}, function(err, body) {
+        if (err) reject(err); else resolve(body);
+      });
+    });
+    res.json({ ok: true, tarjetas: tarjetas.slice(0, 3) }); // max 3 tarjetas
+  } catch(e) { res.json({ ok: true, tarjetas: [] }); }
+});
+
+// RUTA: Cobrar con tarjeta guardada
+app.post('/api/pago/tarjeta-guardada', async (req, res) => {
+  const { card_id, monto, order_id, nombre, email, phone, dia, turno, direccion, platillos, device_session_id } = req.body;
+  if (!card_id || !monto || !order_id) return res.json({ ok: false, error: 'Faltan datos' });
+  try {
+    const r = await pool.query('SELECT openpay_customer_id FROM clientes WHERE phone=$1', [cleanPhone(phone)]);
+    if (!r.rows.length || !r.rows[0].openpay_customer_id) return res.json({ ok: false, error: 'Cliente no encontrado' });
+    const openpay_customer_id = r.rows[0].openpay_customer_id;
+
+    const charge = await new Promise((resolve, reject) => {
+      openpay.customers.charges.create(openpay_customer_id, {
+        source_id: card_id,
+        method: 'card',
+        amount: parseFloat(monto),
+        currency: 'MXN',
+        description: 'Chef Chef Harfer — Pedido #' + order_id,
+        order_id: order_id,
+        device_session_id: device_session_id,
+        redirect_url: 'https://chefchefharfer.mx/gracias.html',
+        use_3d_secure: true
+      }, function(err, body) {
+        if (err) reject(err); else resolve(body);
+      });
+    });
+
+    await pool.query(
+      'INSERT INTO pagos (order_id, cliente_phone, cliente_nombre, openpay_charge_id, openpay_customer_id, monto, estado) VALUES ($1,$2,$3,$4,$5,$6,$7)',
+      [order_id, cleanPhone(phone), nombre, charge.id, openpay_customer_id, monto, charge.status]
+    );
+
+    if (charge.payment_method && charge.payment_method.url) {
+      return res.json({ ok: true, redirect: charge.payment_method.url, charge_id: charge.id });
+    }
+
+    if (charge.status === 'completed') {
+      await procesarPagoExitoso(order_id, nombre, email, dia, turno, direccion, platillos, monto, charge.id);
+      return res.json({ ok: true, status: 'completed' });
+    }
+
+    res.json({ ok: true, status: charge.status });
+  } catch(e) {
+    const msg = e.error_code ? obtenerMensajeError(e.error_code) : 'Error al procesar el pago';
+    res.json({ ok: false, error: msg, error_code: e.error_code });
+  }
+});
+
+async function procesarPagoExitoso(order_id, nombre, email, dia, turno, direccion, platillos, monto, charge_id) {
+  try {
+    // Correo al cliente
+    await enviarCorreo(
+      email,
+      '¡Pago confirmado! Pedido #' + order_id + ' — Chef Chef Harfer',
+      templatePagoExitoso(nombre.split(' ')[0], order_id, dia, turno, monto)
+    );
+    // Correo al admin (silencioso)
+    await enviarCorreo(
+      'chefchef.harfer@gmail.com',
+      '[Pago recibido] Pedido #' + order_id + ' — ' + nombre + ' — $' + monto + ' MXN',
+      templatePagoExitoso(nombre.split(' ')[0], order_id, dia, turno, monto)
+    );
+  } catch(e) { console.error('Error enviando correo pago exitoso:', e.message); }
+}
+
+function obtenerMensajeError(error_code) {
+  const errores = {
+    1000: 'Ocurrio un error, intenta de nuevo.',
+    1004: 'Tu pago no pudo ser realizado, intenta de nuevo.',
+    2004: 'El numero de tarjeta es incorrecto.',
+    2005: 'La fecha de expiracion es invalida.',
+    2006: 'El CVV es incorrecto.',
+    3001: 'Tu pago no pudo ser realizado. Intenta con otra tarjeta.',
+    3002: 'Tu pago no pudo ser realizado. Intenta con otra tarjeta.',
+    3003: 'Tu pago no pudo ser realizado. Intenta con otra tarjeta.',
+    3004: 'Tu pago fue rechazado por el banco. Contacta a tu banco.',
+    3005: 'Tu pago fue rechazado por el banco. Contacta a tu banco.',
+    3006: 'Tu pago no pudo ser realizado, intenta de nuevo.',
+    3009: 'Tu tarjeta fue reportada como perdida o robada.',
+    3010: 'Tu banco ha restringido la tarjeta.',
+    3011: 'Tu banco ha declinado la tarjeta. Contacta a tu banco.',
+    3012: 'Tu banco requiere autorizacion. Contacta a tu banco.',
+    4001: 'Tu pago no pudo ser realizado. Fondos insuficientes.'
+  };
+  return errores[error_code] || 'Ocurrio un error, intenta de nuevo o comunicate con tu banco.';
+}
+
+// === RUTAS EXISTENTES ===
+
+app.post('/api/login', async (req, res) => {
+  const { phone, pin } = req.body;
+  if (!phone || !pin) return res.json({ ok: false, error: 'Faltan datos' });
+  try {
+    const r = await pool.query('SELECT * FROM clientes WHERE phone=$1', [cleanPhone(phone)]);
+    if (!r.rows.length) return res.json({ ok: false, error: 'Usuario no encontrado' });
+    const cliente = r.rows[0];
+    if (cliente.pin !== pin) return res.json({ ok: false, error: 'PIN incorrecto' });
+    res.json({ ok: true, cliente });
+  } catch(e) { res.json({ ok: false, error: e.message }); }
+});
+
+app.get('/api/cliente', async (req, res) => {
+  const phone = req.query.phone;
+  if (!phone) return res.json({ ok: false, error: 'Falta phone' });
+  try {
+    const r = await pool.query('SELECT * FROM clientes WHERE phone=$1', [cleanPhone(phone)]);
+    if (!r.rows.length) return res.json({ ok: false, error: 'No encontrado' });
+    res.json({ ok: true, cliente: r.rows[0] });
+  } catch(e) { res.json({ ok: false, error: e.message }); }
+});
+
+app.post('/api/cliente', async (req, res) => {
+  const { nombre, phone, email, direccion, pin } = req.body;
+  if (!phone) return res.json({ ok: false, error: 'Faltan datos' });
+  try {
+    await pool.query(
+      'INSERT INTO clientes (nombre, phone, email, direccion, pin) VALUES ($1,$2,$3,$4,$5) ON CONFLICT (phone) DO UPDATE SET nombre=$1, email=$3, direccion=$4',
+      [nombre, cleanPhone(phone), email, direccion, pin]
+    );
+    res.json({ ok: true });
+  } catch(e) { res.json({ ok: false, error: e.message }); }
+});
+
+app.post('/api/update-pin', async (req, res) => {
+  const { phone, pin } = req.body;
+  if (!phone || !pin) return res.json({ ok: false, error: 'Faltan datos' });
+  try {
+    await pool.query('UPDATE clientes SET pin=$1 WHERE phone=$2', [pin, cleanPhone(phone)]);
+    res.json({ ok: true });
+  } catch(e) { res.json({ ok: false, error: e.message }); }
+});
+
+app.post('/api/save-data', async (req, res) => {
+  const { tipo, data } = req.body;
+  try {
+    if (tipo === 'cliente' && data && data.phone) {
+      await pool.query(
+        'INSERT INTO clientes (nombre, phone, email, direccion, pin) VALUES ($1,$2,$3,$4,$5) ON CONFLICT (phone) DO UPDATE SET nombre=$1, email=$3, direccion=$4',
+        [data.nombre || '', cleanPhone(data.phone), data.email || '', data.direccion || '', data.pin || '']
+      );
+    }
+    if (tipo === 'pedido' && data && data.orderId) {
+      const platillosJson = JSON.stringify(data.platillos || []);
+      await pool.query(
+        `INSERT INTO pedidos (order_id, cliente_phone, cliente_nombre, dia, turno, direccion, platillos, total, fecha_entrega, hora_pedido)
+         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,NOW()) ON CONFLICT (order_id) DO NOTHING`,
+        [data.orderId, cleanPhone(data.phone || ''), data.cliente || '', data.dia || '',
+         data.turno || '', data.direccion || '', platillosJson,
+         parseFloat(data.total) || 0, data.fechaEntrega || null]
+      );
+    }
+    if (data && data.phone && data.direccion && tipo !== 'pedido') {
+      await pool.query('UPDATE clientes SET direccion=$1 WHERE phone=$2', [data.direccion, cleanPhone(data.phone)]);
+    }
+    res.json({ ok: true });
+  } catch(e) { console.error('save-data error:', e.message); res.json({ ok: true }); }
+});
+
+app.post('/api/pedido', async (req, res) => {
+  const { order_id, cliente_phone, cliente_nombre, dia, turno, direccion, platillos, total, fecha_entrega } = req.body;
+  try {
+    await pool.query(
+      `INSERT INTO pedidos (order_id, cliente_phone, cliente_nombre, dia, turno, direccion, platillos, total, fecha_entrega, hora_pedido)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,NOW())`,
+      [order_id, cleanPhone(cliente_phone), cliente_nombre, dia, turno, direccion, JSON.stringify(platillos), total, fecha_entrega || null]
+    );
+    res.json({ ok: true });
+  } catch(e) { res.json({ ok: false, error: e.message }); }
+});
+
+app.get('/api/clientes', async (req, res) => {
+  try {
+    const r = await pool.query('SELECT * FROM clientes ORDER BY fecha_registro DESC');
+    res.json({ ok: true, data: r.rows });
+  } catch(e) { res.json({ ok: false, error: e.message }); }
+});
+
+app.get('/api/pedidos', async (req, res) => {
+  try {
+    const r = await pool.query('SELECT * FROM pedidos ORDER BY hora_pedido DESC');
+    res.json({ ok: true, data: r.rows });
+  } catch(e) { res.json({ ok: false, error: e.message }); }
+});
+
+app.get('/api/get-data', async (req, res) => {
+  const tipo = req.query.tipo;
+  try {
+    if (tipo === 'clientes') {
+      const r = await pool.query('SELECT * FROM clientes ORDER BY fecha_registro DESC');
+      return res.json({ ok: true, data: r.rows });
+    }
+    if (tipo === 'pedidos') {
+      const r = await pool.query('SELECT * FROM pedidos ORDER BY hora_pedido DESC NULLS LAST');
+      return res.json({ ok: true, data: r.rows });
+    }
+    res.json({ ok: true, data: [] });
+  } catch(e) { res.json({ ok: false, error: e.message }); }
+});
+
+app.get('/api/manage-days', async (req, res) => {
+  try {
+    const r = await pool.query('SELECT fecha FROM dias_bloqueados');
+    res.json({ ok: true, diasBloqueados: r.rows.map(row => row.fecha) });
+  } catch(e) { res.json({ ok: true, diasBloqueados: [] }); }
+});
+
+app.post('/api/manage-days', async (req, res) => {
+  const { fecha, accion } = req.body;
+  if (!fecha) return res.json({ ok: false, error: 'Falta fecha' });
+  try {
+    if (accion === 'bloquear') await pool.query('INSERT INTO dias_bloqueados (fecha) VALUES ($1) ON CONFLICT DO NOTHING', [fecha]);
+    else if (accion === 'desbloquear') await pool.query('DELETE FROM dias_bloqueados WHERE fecha = $1', [fecha]);
+    const r = await pool.query('SELECT fecha FROM dias_bloqueados');
+    res.json({ ok: true, diasBloqueados: r.rows.map(row => row.fecha) });
+  } catch(e) { res.json({ ok: false, error: e.message }); }
+});
+
+app.post('/api/bienvenida', async (req, res) => {
+  const email = req.body.email || req.body.to;
+  const nombre = req.body.nombre || (req.body.data && req.body.data.nombre);
+  if (!nombre || !email) return res.json({ ok: false, error: 'Faltan datos' });
+  try {
+    await enviarCorreo(email, 'Bienvenido a Chef Chef Harfer', templateBienvenida(nombre.split(' ')[0]));
+    res.json({ ok: true });
+  } catch(e) { res.json({ ok: false, error: e.message }); }
+});
+
+app.post('/api/recuperacion', async (req, res) => {
+  const email = req.body.email || req.body.to;
+  const nombre = req.body.nombre || (req.body.data && req.body.data.nombre);
+  const codigo = req.body.codigo || (req.body.data && req.body.data.codigo);
+  if (!email || !codigo) return res.json({ ok: false, error: 'Faltan datos' });
+  try {
+    await enviarCorreo(email, 'Codigo de recuperacion - Chef Chef Harfer', templateRecuperacion((nombre||'').split(' ')[0], codigo));
+    res.json({ ok: true });
+  } catch(e) { res.json({ ok: false, error: e.message }); }
+});
+
+app.post('/api/confirmacion', async (req, res) => {
+  const email = req.body.email || req.body.to;
+  const nombre = req.body.nombre || (req.body.data && req.body.data.nombre);
+  const orderId = req.body.orderId || (req.body.data && req.body.data.orderId);
+  const dia = req.body.dia || (req.body.data && req.body.data.dia);
+  const turno = req.body.turno || (req.body.data && req.body.data.turno);
+  const direccion = req.body.direccion || (req.body.data && req.body.data.direccion);
+  const total = req.body.total || (req.body.data && req.body.data.total);
+  const platillos = req.body.platillos || (req.body.data && req.body.data.platillos);
+  if (!email) return res.json({ ok: false, error: 'Faltan datos' });
+  try {
+    await enviarCorreo(email, 'Pedido #' + orderId + ' confirmado - Chef Chef Harfer',
+      templateConfirmacion((nombre||'').split(' ')[0], orderId, dia, turno, direccion, platillos, total));
+    res.json({ ok: true });
+  } catch(e) { res.json({ ok: false, error: e.message }); }
+});
+
+app.post('/api/pedido-estado', async (req, res) => {
+  const { order_id, estado } = req.body;
+  if (!order_id || !estado) return res.json({ ok: false, error: 'Faltan datos' });
+  try {
+    await pool.query('UPDATE pedidos SET estado=$1 WHERE order_id=$2', [estado, order_id]);
+    res.json({ ok: true });
+  } catch(e) { res.json({ ok: false, error: e.message }); }
+});
+
+app.get('/api/ping', (req, res) => res.json({ ok: true, mensaje: 'Servidor CCF funcionando' }));
+
+// RUTA: Public key de Openpay (para el HTML)
+app.get('/api/openpay-config', (req, res) => {
+  res.json({
+    merchant_id: process.env.OPENPAY_ID,
+    public_key: process.env.OPENPAY_PUBLIC_KEY,
+    sandbox: process.env.OPENPAY_SANDBOX === 'true'
+  });
+});
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, '0.0.0.0', function() {
+  console.log('Servidor Chef Chef Harfer corriendo en puerto ' + PORT);
+});
