@@ -2889,6 +2889,135 @@ nav {
 }
 .dia-btn.selected .dia-fecha { color: var(--green); opacity: 1; }
 
+/* ========================================
+   FORMULARIO PAGO OPENPAY
+   ======================================== */
+.pago-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  z-index: 400;
+  align-items: flex-end;
+  justify-content: center;
+  backdrop-filter: blur(4px);
+}
+.pago-overlay.open { display: flex; }
+.pago-panel {
+  background: white;
+  border-radius: 24px 24px 0 0;
+  width: 100%;
+  max-width: 680px;
+  max-height: 92vh;
+  overflow-y: auto;
+  padding: 0 0 40px;
+  transform: translateY(100%);
+  transition: transform 0.4s cubic-bezier(0.34,1.2,0.64,1);
+}
+.pago-overlay.open .pago-panel { transform: translateY(0); }
+.pago-handle { width: 40px; height: 4px; background: #e0ddd6; border-radius: 2px; margin: 14px auto 0; }
+.pago-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 24px 12px;
+  border-bottom: 1px solid #f0ede6;
+}
+.pago-titulo {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 17px; font-weight: 800; color: #111; letter-spacing: -0.3px;
+}
+.pago-cerrar {
+  background: #f0ede6; border: none; border-radius: 50%;
+  width: 32px; height: 32px; font-size: 16px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; color: #7a7a72;
+}
+.pago-body { padding: 20px 24px; }
+.pago-total-box {
+  background: #f0faf3; border: 1.5px solid #c8edd9; border-radius: 14px;
+  padding: 16px 20px; margin-bottom: 20px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.pago-total-label { font-size: 13px; color: #067c49; font-weight: 600; }
+.pago-total-monto {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 24px; font-weight: 800; color: #067c49; letter-spacing: -0.5px;
+}
+.pago-field { margin-bottom: 14px; }
+.pago-field label {
+  display: block; font-size: 11px; font-weight: 700;
+  letter-spacing: 0.5px; text-transform: uppercase; color: #7a7a72; margin-bottom: 6px;
+}
+.pago-field input {
+  width: 100%; background: #f7f5f0; border: 1.5px solid #e2ddd5;
+  border-radius: 12px; color: #252523; font-family: 'Outfit', sans-serif;
+  font-size: 16px; padding: 13px 16px; outline: none; box-sizing: border-box;
+  transition: border-color 0.2s;
+}
+.pago-field input:focus { border-color: #067c49; }
+.pago-field input.error-input { border-color: #c1121f; }
+.pago-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.pago-marcas {
+  display: flex; align-items: center; gap: 8px; margin-bottom: 16px; flex-wrap: wrap;
+}
+.pago-marcas span { font-size: 11px; color: #9a9590; font-weight: 500; }
+.pago-marca-badge {
+  background: #f0ede6; border-radius: 6px; padding: 4px 10px;
+  font-size: 11px; font-weight: 700; color: #252523; letter-spacing: 0.3px;
+}
+.pago-guardar-row {
+  display: flex; align-items: center; gap: 10px;
+  background: #f7f5f0; border-radius: 12px; padding: 14px 16px;
+  margin-bottom: 16px; cursor: pointer;
+}
+.pago-guardar-check {
+  width: 20px; height: 20px; border-radius: 6px; border: 2px solid #e2ddd5;
+  background: white; flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+  transition: all 0.15s;
+}
+.pago-guardar-check.checked { background: #067c49; border-color: #067c49; }
+.pago-guardar-texto { font-size: 13px; color: #252523; font-weight: 500; line-height: 1.4; }
+.pago-guardar-sub { font-size: 11px; color: #9a9590; }
+.btn-pagar-tarjeta {
+  width: 100%; background: linear-gradient(135deg, #067c49, #059057);
+  color: white; border: none; border-radius: 14px; padding: 18px;
+  font-family: 'Plus Jakarta Sans', sans-serif; font-size: 16px; font-weight: 700;
+  cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px;
+  box-shadow: 0 4px 16px rgba(6,124,73,0.25); transition: all 0.2s;
+  margin-bottom: 12px;
+}
+.btn-pagar-tarjeta:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(6,124,73,0.3); }
+.btn-pagar-tarjeta:disabled { background: #e2ddd5; color: #9a9590; cursor: not-allowed; transform: none; box-shadow: none; }
+.pago-seguro {
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+  font-size: 11px; color: #9a9590; margin-bottom: 16px;
+}
+.pago-error-msg {
+  background: #fff0f0; border: 1px solid #ffc0c0; border-radius: 10px;
+  padding: 12px 16px; font-size: 13px; color: #c1121f; margin-bottom: 14px;
+  display: none; line-height: 1.5;
+}
+.pago-error-msg.visible { display: block; }
+.openpay-logo-row {
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  margin-top: 12px;
+}
+.tarjetas-guardadas { margin-bottom: 20px; }
+.tarjeta-item {
+  display: flex; align-items: center; gap: 12px;
+  background: #f7f5f0; border: 1.5px solid #e2ddd5; border-radius: 12px;
+  padding: 14px 16px; margin-bottom: 8px; cursor: pointer; transition: all 0.15s;
+}
+.tarjeta-item:hover { border-color: #067c49; background: #edf8f2; }
+.tarjeta-item.selected { border-color: #067c49; background: #edf8f2; }
+.tarjeta-brand { font-size: 20px; }
+.tarjeta-info { flex: 1; }
+.tarjeta-numero { font-size: 14px; font-weight: 600; color: #252523; }
+.tarjeta-exp { font-size: 11px; color: #9a9590; }
+.divider-o {
+  display: flex; align-items: center; gap: 12px;
+  font-size: 12px; color: #9a9590; margin: 16px 0; font-weight: 500;
+}
+.divider-o::before, .divider-o::after { content: ''; flex: 1; height: 1px; background: #e2ddd5; }
+
 /* Logo del nav: oculto en la página de inicio (el hero ya tiene el logo) */
 body.on-menu #nav-logo-wrap { display: none; }
 /* En cualquier otra pantalla el logo sí aparece */
@@ -2904,6 +3033,9 @@ body:not(.on-menu) #nav-logo-wrap { display: flex; }
 }
 
 </style>
+<!-- Openpay SDK -->
+<script src="https://js.openpay.mx/openpay.v1.min.js"></script>
+<script src="https://js.openpay.mx/openpay-data.v1.min.js"></script>
 </head>
 <body>
 
@@ -3279,14 +3411,15 @@ body:not(.on-menu) #nav-logo-wrap { display: flex; }
       Pagar mi pedido
     </button>
 
-    <!-- BOTON PAGO CON TARJETA — PROXIMAMENTE -->
+    <!-- BOTON PAGO CON TARJETA -->
     <div id="btn-tarjeta-pronto" style="display:none;margin-top:12px;">
-      <button disabled style="width:100%;background:#e8e0d0;color:#9a9590;border:none;border-radius:14px;padding:18px;font-family:'Plus Jakarta Sans',sans-serif;font-size:15px;font-weight:700;cursor:not-allowed;display:flex;align-items:center;justify-content:center;gap:10px;box-sizing:border-box;">
+      <button onclick="abrirPanelPago()" style="width:100%;background:linear-gradient(135deg,#1a1a2e,#16213e);color:white;border:none;border-radius:14px;padding:18px;font-family:'Plus Jakarta Sans',sans-serif;font-size:15px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;box-sizing:border-box;transition:all 0.2s;">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
         Pagar con tarjeta
       </button>
-      <div style="text-align:center;font-size:12px;color:#9a9590;margin-top:8px;font-family:'Outfit',sans-serif;letter-spacing:0.3px;">
-        🔒 Muy pronto podrás pagar directo aquí con tu tarjeta
+      <div style="text-align:center;font-size:11px;color:#9a9590;margin-top:8px;font-family:'Outfit',sans-serif;display:flex;align-items:center;justify-content:center;gap:4px;">
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        Pago seguro · Visa · Mastercard · Amex
       </div>
     </div>
   </div>
@@ -3497,6 +3630,89 @@ body:not(.on-menu) #nav-logo-wrap { display: flex; }
     <button class="mini-cart-btn-pagar" onclick="cerrarMiniCartYPagar()">
       Continuar al pago &rarr;
     </button>
+  </div>
+</div>
+
+<!-- PANEL PAGO CON TARJETA -->
+<div class="pago-overlay" id="pago-overlay">
+  <div class="pago-panel" id="pago-panel">
+    <div class="pago-handle"></div>
+    <div class="pago-header">
+      <div class="pago-titulo">Pagar con tarjeta</div>
+      <button class="pago-cerrar" onclick="cerrarPanelPago()">✕</button>
+    </div>
+    <div class="pago-body">
+
+      <!-- Total -->
+      <div class="pago-total-box">
+        <span class="pago-total-label">Total a pagar</span>
+        <span class="pago-total-monto" id="pago-monto-display">$0</span>
+      </div>
+
+      <!-- Tarjetas guardadas -->
+      <div id="pago-tarjetas-guardadas" style="display:none;">
+        <div class="tarjetas-guardadas" id="lista-tarjetas"></div>
+        <div class="divider-o">o paga con otra tarjeta</div>
+      </div>
+
+      <!-- Marcas aceptadas -->
+      <div class="pago-marcas">
+        <span>Aceptamos:</span>
+        <span class="pago-marca-badge">VISA</span>
+        <span class="pago-marca-badge">Mastercard</span>
+        <span class="pago-marca-badge">Amex</span>
+      </div>
+
+      <!-- Error -->
+      <div class="pago-error-msg" id="pago-error-msg"></div>
+
+      <!-- Formulario tarjeta -->
+      <div class="pago-field">
+        <label>Número de tarjeta</label>
+        <input type="text" id="pago-numero" placeholder="1234 5678 9012 3456" maxlength="19" inputmode="numeric" autocomplete="cc-number">
+      </div>
+      <div class="pago-field">
+        <label>Nombre en la tarjeta</label>
+        <input type="text" id="pago-nombre" placeholder="Como aparece en tu tarjeta" autocomplete="cc-name">
+      </div>
+      <div class="pago-grid">
+        <div class="pago-field">
+          <label>Expiración (MM/AA)</label>
+          <input type="text" id="pago-expiracion" placeholder="MM/AA" maxlength="5" inputmode="numeric" autocomplete="cc-exp">
+        </div>
+        <div class="pago-field">
+          <label>CVV</label>
+          <input type="password" id="pago-cvv" placeholder="•••" maxlength="4" inputmode="numeric" autocomplete="cc-csc">
+        </div>
+      </div>
+
+      <!-- Guardar tarjeta -->
+      <div class="pago-guardar-row" onclick="toggleGuardarTarjeta()">
+        <div class="pago-guardar-check" id="pago-guardar-check"></div>
+        <div>
+          <div class="pago-guardar-texto">Guardar tarjeta para futuros pedidos</div>
+          <div class="pago-guardar-sub">Tus datos se almacenan de forma segura (PCI DSS)</div>
+        </div>
+      </div>
+
+      <!-- Botón pagar -->
+      <button class="btn-pagar-tarjeta" id="btn-pagar-tarjeta" onclick="procesarPagoTarjeta()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+        Pagar ahora
+      </button>
+
+      <div class="pago-seguro">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        Pago seguro con cifrado SSL · 3D Secure activado
+      </div>
+
+      <!-- Logo Openpay -->
+      <div class="openpay-logo-row">
+        <span style="font-size:11px;color:#9a9590;">Procesado por</span>
+        <span style="font-size:13px;font-weight:700;color:#252523;">Openpay by BBVA</span>
+      </div>
+
+    </div>
   </div>
 </div>
 
@@ -5641,6 +5857,247 @@ function nuevoPedido() {
   showScreen('menu');
 }
 
+// === OPENPAY ===
+var API_SECRET = 'ccf2026secreto';
+var openpayConfig = { merchant_id: '', public_key: '', sandbox: true };
+var guardarTarjeta = false;
+var tarjetaSeleccionada = null;
+
+async function cargarConfigOpenpay() {
+  try {
+    var r = await fetch('https://chefchefharfer.mx/api/openpay-config');
+    var d = await r.json();
+    openpayConfig = d;
+    OpenPay.setId(d.merchant_id);
+    OpenPay.setApiKey(d.public_key);
+    OpenPay.setSandboxMode(d.sandbox);
+  } catch(e) { console.warn('Openpay config error:', e.message); }
+}
+
+function abrirPanelPago() {
+  if (!getCartItemCount()) { showToast('Agrega al menos un platillo', 'error'); return; }
+  if (!currentUser) { abrirLoginParaCheckout(); return; }
+  // Mostrar total
+  var total = getCartTotal();
+  var el = document.getElementById('pago-monto-display');
+  if (el) el.textContent = '$' + total.toLocaleString('es-MX') + ' MXN';
+  // Cargar tarjetas guardadas
+  cargarTarjetasGuardadas();
+  // Abrir panel
+  var overlay = document.getElementById('pago-overlay');
+  if (overlay) overlay.classList.add('open');
+  document.body.style.overflow = 'hidden';
+  // Limpiar errores
+  mostrarErrorPago('');
+  // Cargar config si no está
+  if (!openpayConfig.merchant_id) cargarConfigOpenpay();
+}
+
+function cerrarPanelPago() {
+  var overlay = document.getElementById('pago-overlay');
+  if (overlay) overlay.classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function toggleGuardarTarjeta() {
+  guardarTarjeta = !guardarTarjeta;
+  var check = document.getElementById('pago-guardar-check');
+  if (check) {
+    check.classList.toggle('checked', guardarTarjeta);
+    check.innerHTML = guardarTarjeta ? '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>' : '';
+  }
+}
+
+async function cargarTarjetasGuardadas() {
+  if (!currentUser) return;
+  var contenedor = document.getElementById('pago-tarjetas-guardadas');
+  var lista = document.getElementById('lista-tarjetas');
+  if (!contenedor || !lista) return;
+  try {
+    var r = await fetch('https://chefchefharfer.mx/api/tarjetas?phone=' + currentUser.phone, {
+      headers: { 'x-api-secret': API_SECRET }
+    });
+    var d = await r.json();
+    if (d.ok && d.tarjetas && d.tarjetas.length > 0) {
+      contenedor.style.display = 'block';
+      lista.innerHTML = '';
+      d.tarjetas.forEach(function(t) {
+        var brand = t.brand ? t.brand.toUpperCase() : 'CARD';
+        var iconos = { 'VISA': '💳', 'MASTERCARD': '💳', 'AMEX': '💳' };
+        var icono = iconos[brand] || '💳';
+        var div = document.createElement('div');
+        div.className = 'tarjeta-item';
+        div.innerHTML = '<span class="tarjeta-brand">' + icono + '</span><div class="tarjeta-info"><div class="tarjeta-numero">' + brand + ' •••• ' + (t.card_number || '****').slice(-4) + '</div><div class="tarjeta-exp">Expira ' + (t.expiration_month||'') + '/' + (t.expiration_year||'') + '</div></div>';
+        div.onclick = (function(tid) { return function() { seleccionarTarjetaGuardada(tid, div); }; })(t.id);
+        lista.appendChild(div);
+      });
+    } else {
+      contenedor.style.display = 'none';
+    }
+  } catch(e) { contenedor.style.display = 'none'; }
+}
+
+function seleccionarTarjetaGuardada(card_id, el) {
+  tarjetaSeleccionada = card_id;
+  document.querySelectorAll('.tarjeta-item').forEach(function(i) { i.classList.remove('selected'); });
+  el.classList.add('selected');
+}
+
+function mostrarErrorPago(msg) {
+  var el = document.getElementById('pago-error-msg');
+  if (!el) return;
+  if (msg) { el.textContent = msg; el.classList.add('visible'); }
+  else { el.textContent = ''; el.classList.remove('visible'); }
+}
+
+function formatearNumeroTarjeta(input) {
+  var v = input.value.replace(/\D/g, '').substring(0, 16);
+  input.value = v.replace(/(.{4})/g, '$1 ').trim();
+}
+
+function formatearExpiracion(input) {
+  var v = input.value.replace(/\D/g, '').substring(0, 4);
+  if (v.length >= 2) v = v.substring(0,2) + '/' + v.substring(2);
+  input.value = v;
+}
+
+// Formateo automático de campos
+document.addEventListener('DOMContentLoaded', function() {
+  var numInput = document.getElementById('pago-numero');
+  var expInput = document.getElementById('pago-expiracion');
+  if (numInput) numInput.addEventListener('input', function() { formatearNumeroTarjeta(this); });
+  if (expInput) expInput.addEventListener('input', function() { formatearExpiracion(this); });
+});
+
+async function procesarPagoTarjeta() {
+  mostrarErrorPago('');
+  var btn = document.getElementById('btn-pagar-tarjeta');
+
+  // Si hay tarjeta guardada seleccionada
+  if (tarjetaSeleccionada) {
+    await pagarConTarjetaGuardada();
+    return;
+  }
+
+  // Validar campos
+  var numero = (document.getElementById('pago-numero').value || '').replace(/\s/g, '');
+  var nombre = (document.getElementById('pago-nombre').value || '').trim();
+  var exp = (document.getElementById('pago-expiracion').value || '').trim();
+  var cvv = (document.getElementById('pago-cvv').value || '').trim();
+
+  if (!numero || numero.length < 15) { mostrarErrorPago('El número de tarjeta es incorrecto.'); return; }
+  if (!nombre) { mostrarErrorPago('Escribe el nombre como aparece en tu tarjeta.'); return; }
+  if (!exp || exp.length < 5) { mostrarErrorPago('La fecha de expiración es inválida.'); return; }
+  if (!cvv || cvv.length < 3) { mostrarErrorPago('El CVV es incorrecto.'); return; }
+
+  var expParts = exp.split('/');
+  var mes = expParts[0];
+  var anio = expParts[1];
+
+  if (!OpenPay.card.validateCardNumber(numero)) { mostrarErrorPago('El número de tarjeta es incorrecto.'); return; }
+  if (!OpenPay.card.validateExpiry(mes, anio)) { mostrarErrorPago('La fecha de expiración es inválida.'); return; }
+  if (!OpenPay.card.validateCVC(cvv)) { mostrarErrorPago('El CVV es incorrecto.'); return; }
+
+  btn.disabled = true;
+  btn.textContent = 'Procesando...';
+  showLoading('Procesando tu pago...');
+
+  // Obtener device session ID
+  var deviceSessionId = OpenPay.deviceData.setup();
+
+  // Tokenizar tarjeta
+  OpenPay.token.create({
+    card_number: numero,
+    holder_name: nombre,
+    expiration_year: anio,
+    expiration_month: mes,
+    cvv2: cvv
+  }, async function(res) {
+    var token_id = res.data.id;
+    await enviarPago(token_id, deviceSessionId, null);
+  }, function(err) {
+    hideLoading();
+    btn.disabled = false;
+    btn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg> Pagar ahora';
+    mostrarErrorPago(err.data && err.data.description ? err.data.description : 'Error al procesar la tarjeta. Verifica los datos.');
+  });
+}
+
+async function pagarConTarjetaGuardada() {
+  var btn = document.getElementById('btn-pagar-tarjeta');
+  btn.disabled = true;
+  btn.textContent = 'Procesando...';
+  showLoading('Procesando tu pago...');
+  var deviceSessionId = OpenPay.deviceData.setup();
+  await enviarPago(null, deviceSessionId, tarjetaSeleccionada);
+}
+
+async function enviarPago(token_id, deviceSessionId, card_id) {
+  var btn = document.getElementById('btn-pagar-tarjeta');
+  try {
+    var total = getCartTotal();
+    var orderId = Date.now().toString().slice(-6);
+    var u = currentUser;
+    var direccion = u.direccion || '';
+    var platillosArray = Object.values(cart).map(function(i) {
+      var precio = i.porciones === 4 ? i.platillo.precio2p * 2 : i.platillo.precio2p;
+      return { nombre: i.platillo.nombre, porciones: i.porciones, cantidad: i.cantidad, subtotal: precio * i.cantidad };
+    });
+
+    // Guardar pedido primero
+    guardarPedidoNotion(u, Object.values(cart), total, orderId, diaSeleccionado, direccion);
+
+    var ruta = card_id ? '/api/pago/tarjeta-guardada' : '/api/pago/crear';
+    var body = {
+      monto: total, order_id: orderId, nombre: u.nombre, email: u.email,
+      phone: u.phone, dia: diaSeleccionado, turno: turnoSeleccionado,
+      direccion: direccion, platillos: platillosArray,
+      guardar_tarjeta: guardarTarjeta, device_session_id: deviceSessionId
+    };
+    if (token_id) body.token_id = token_id;
+    if (card_id) body.card_id = card_id;
+
+    var r = await fetch('https://chefchefharfer.mx/api/' + (card_id ? 'pago/tarjeta-guardada' : 'pago/crear'), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-api-secret': API_SECRET },
+      body: JSON.stringify(body)
+    });
+    var d = await r.json();
+    hideLoading();
+
+    if (!d.ok) {
+      btn.disabled = false;
+      btn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg> Pagar ahora';
+      mostrarErrorPago(d.error || 'Error al procesar el pago.');
+      return;
+    }
+
+    // Redirigir a 3D Secure si es necesario
+    if (d.redirect) {
+      cerrarPanelPago();
+      window.location.href = d.redirect;
+      return;
+    }
+
+    // Pago completado directamente
+    if (d.status === 'completed') {
+      cerrarPanelPago();
+      cart = {};
+      diaSeleccionado = null;
+      turnoSeleccionado = null;
+      mismaDireccionConfirmada = false;
+      try { localStorage.removeItem('cch_cart'); } catch(e) {}
+      updateCartBar();
+      window.location.href = 'https://chefchefharfer.mx/gracias.html?status=success&order=' + orderId;
+    }
+  } catch(e) {
+    hideLoading();
+    btn.disabled = false;
+    btn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg> Pagar ahora';
+    mostrarErrorPago('Error de conexión. Intenta de nuevo.');
+  }
+}
+
 window.addEventListener('load', function() {
   // Deshabilitar clic derecho en imágenes del menu para evitar "Guardar imagen"
   document.addEventListener('contextmenu', function(e) {
@@ -5673,6 +6130,8 @@ window.addEventListener('load', function() {
   setTimeout(function() {
     if (typeof renderMenu === 'function') renderMenu();
   }, 50);
+  // Cargar config de Openpay
+  cargarConfigOpenpay();
   // Resetear formularios del login (por si alguien navega a login despues)
   var lf = document.getElementById('login-form');
   if (lf) lf.style.display = 'block';
