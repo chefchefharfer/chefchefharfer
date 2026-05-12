@@ -3041,7 +3041,7 @@ body:not(.on-menu) #nav-logo-wrap { display: flex; }
 
 <!-- NAV -->
 <nav>
- <div class="nav-logo" id="nav-logo-wrap">
+ <div class="nav-logo" id="nav-logo-wrap" onclick="volverAlInicio()" style="cursor:pointer;">
     <img src="https://chefchefharfer.github.io/chefchefharfer/Logo%20chef%20chef.png" alt="Chef Chef Harfer" style="height:52px;width:auto;max-width:200px;object-fit:contain;">
   </div>
  <div class="nav-right">
@@ -5842,6 +5842,20 @@ function exportarCSV(tipo) {
 function adminLogout() {
   cerrarSesion();
 }
+function volverAlInicio() {
+  cart = {};
+  try { localStorage.removeItem('cch_cart'); } catch(e) {}
+  updateCartBar();
+  document.querySelectorAll('.screen').forEach(function(s) { s.classList.remove('active'); });
+  var loginPage = document.getElementById('login-page');
+  if (loginPage) loginPage.style.display = 'none';
+  var menuScreen = document.getElementById('screen-menu');
+  if (menuScreen) menuScreen.classList.add('active');
+  document.body.className = 'on-menu';
+  renderMenu();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
 function nuevoPedido() {
   cart = {};
   diaSeleccionado = null;
@@ -6140,13 +6154,7 @@ window.addEventListener('load', function() {
   var pill = document.getElementById('cart-pill');
   if (pill) pill.classList.remove('visible');
   // Si hay items en el carrito de antes (localStorage), restaurarlos
-  try {
-    var savedCart = localStorage.getItem('cch_cart');
-    if (savedCart) {
-      cart = JSON.parse(savedCart) || {};
-      updateCartBar();
-    }
-  } catch(e) {}
+  // Carrito siempre inicia vacio por sesion
 });
 
 </script>
