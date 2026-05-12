@@ -5897,6 +5897,27 @@ function cargarConfigOpenpay() {
 function abrirPanelPago() {
   if (!getCartItemCount()) { showToast('Agrega al menos un platillo', 'error'); return; }
   if (!currentUser) { abrirLoginParaCheckout(); return; }
+
+  // Validar que el cliente completó toda la información antes de pagar
+  if (!diaSeleccionado) {
+    showToast('Selecciona tu día de entrega antes de pagar', 'error');
+    var elDia = document.getElementById('calendario-entrega');
+    if (elDia) { elDia.scrollIntoView({ behavior: 'smooth', block: 'center' }); elDia.style.outline = '2.5px solid #c1121f'; setTimeout(function(){ elDia.style.outline = ''; }, 2500); }
+    return;
+  }
+  if (!turnoSeleccionado) {
+    showToast('Selecciona tu turno de entrega antes de pagar', 'error');
+    var elTurno = document.querySelector('.turnos-container') || document.getElementById('turno-man');
+    if (elTurno) { elTurno.scrollIntoView({ behavior: 'smooth', block: 'center' }); elTurno.style.outline = '2.5px solid #c1121f'; setTimeout(function(){ elTurno.style.outline = ''; }, 2500); }
+    return;
+  }
+  if (!mismaDireccionConfirmada && (!currentUser.direccion || !currentUser.direccion.trim())) {
+    showToast('Ingresa tu dirección de entrega antes de pagar', 'error');
+    var elDir = document.getElementById('input-direccion') || document.querySelector('.direccion-section');
+    if (elDir) { elDir.scrollIntoView({ behavior: 'smooth', block: 'center' }); elDir.style.outline = '2.5px solid #c1121f'; setTimeout(function(){ elDir.style.outline = ''; }, 2500); }
+    return;
+  }
+
   // Mostrar total
   var total = getCartTotal();
   var el = document.getElementById('pago-monto-display');
