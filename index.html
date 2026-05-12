@@ -3020,6 +3020,7 @@ nav {
 
 /* Logo del nav: oculto en la página de inicio (el hero ya tiene el logo) */
 body.on-menu #nav-logo-wrap { display: none; }
+body.on-menu { background: #111111 !important; }
 /* En cualquier otra pantalla el logo sí aparece */
 body:not(.on-menu) #nav-logo-wrap { display: flex; }
 
@@ -4267,7 +4268,6 @@ async function handleRegister() {
     });
   } catch(e) { console.warn('Error guardando en servidor:', e.message); }
   try { await enviarCorreoBienvenida(user); } catch(e) { console.warn('Email:', e.message); }
-  user.direccion = '';
   try { saveUserLocal(user); } catch(e) {}
   hideLoading();
   currentUser = user;
@@ -5453,8 +5453,7 @@ function iniciarSeccionDireccion() {
     if (bloqExistente) bloqExistente.style.display = 'block';
     if (bloqNuevo) bloqNuevo.style.display = 'none';
     var toggle = document.getElementById('toggle-dir-same');
-    mismaDireccionConfirmada = true;
-    if (toggle) toggle.classList.add('active');
+    if (toggle) toggle.classList.toggle('active', mismaDireccionConfirmada);
   } else {
     if (bloqExistente) bloqExistente.style.display = 'none';
     if (bloqNuevo) bloqNuevo.style.display = 'block';
@@ -5844,20 +5843,6 @@ function exportarCSV(tipo) {
 function adminLogout() {
   cerrarSesion();
 }
-function volverAlInicio() {
-  cart = {};
-  try { localStorage.removeItem('cch_cart'); } catch(e) {}
-  updateCartBar();
-  document.querySelectorAll('.screen').forEach(function(s) { s.classList.remove('active'); });
-  var loginPage = document.getElementById('login-page');
-  if (loginPage) loginPage.style.display = 'none';
-  var menuScreen = document.getElementById('screen-menu');
-  if (menuScreen) menuScreen.classList.add('active');
-  document.body.className = 'on-menu';
-  renderMenu();
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-}
-
 function volverAlInicio() {
   cart = {};
   try { localStorage.removeItem('cch_cart'); } catch(e) {}
