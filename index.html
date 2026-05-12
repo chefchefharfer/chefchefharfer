@@ -3020,7 +3020,6 @@ nav {
 
 /* Logo del nav: oculto en la página de inicio (el hero ya tiene el logo) */
 body.on-menu #nav-logo-wrap { display: none; }
-body.on-menu { background: #111111 !important; }
 /* En cualquier otra pantalla el logo sí aparece */
 body:not(.on-menu) #nav-logo-wrap { display: flex; }
 
@@ -4644,8 +4643,9 @@ function subirImgPlatillo(id, e) {
 // === MENU ===
 function getCartCountForItem(id) {
   var total = 0;
-  if (cart[id + '_2']) total += cart[id + '_2'].cantidad;
-  if (cart[id + '_4']) total += cart[id + '_4'].cantidad;
+  Object.keys(cart).forEach(function(k) {
+    if (k.startsWith(id + '_')) total += cart[k].cantidad;
+  });
   return total;
 }
 
@@ -4825,9 +4825,8 @@ function persistCart() {
 
 function addToCart(id, porciones) {
   var p = MENU.find(function(x) { return x.id === id; });
-  var key = getCartKey(id, porciones);
-  if (cart[key]) { cart[key].cantidad += 1; }
-  else { cart[key] = { platillo: p, porciones: porciones, cantidad: 1 }; }
+  var key = id + '_' + porciones + '_' + Date.now();
+  cart[key] = { platillo: p, porciones: porciones, cantidad: 1 };
   persistCart();
   updateCartBar();
   renderMenu();
