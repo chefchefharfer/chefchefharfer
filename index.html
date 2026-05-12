@@ -3020,6 +3020,7 @@ nav {
 
 /* Logo del nav: oculto en la página de inicio (el hero ya tiene el logo) */
 body.on-menu #nav-logo-wrap { display: none; }
+body.on-menu { background: #111111 !important; }
 /* En cualquier otra pantalla el logo sí aparece */
 body:not(.on-menu) #nav-logo-wrap { display: flex; }
 
@@ -4262,6 +4263,7 @@ async function handleRegister() {
     });
   } catch(e) { console.warn('Error guardando en servidor:', e.message); }
   try { await enviarCorreoBienvenida(user); } catch(e) { console.warn('Email:', e.message); }
+  user.direccion = '';
   try { saveUserLocal(user); } catch(e) {}
   hideLoading();
   currentUser = user;
@@ -4638,8 +4640,9 @@ function subirImgPlatillo(id, e) {
 // === MENU ===
 function getCartCountForItem(id) {
   var total = 0;
-  if (cart[id + '_2']) total += cart[id + '_2'].cantidad;
-  if (cart[id + '_4']) total += cart[id + '_4'].cantidad;
+  Object.keys(cart).forEach(function(k) {
+    if (k.startsWith(id + '_')) total += cart[k].cantidad;
+  });
   return total;
 }
 
@@ -4819,9 +4822,8 @@ function persistCart() {
 
 function addToCart(id, porciones) {
   var p = MENU.find(function(x) { return x.id === id; });
-  var key = getCartKey(id, porciones);
-  if (cart[key]) { cart[key].cantidad += 1; }
-  else { cart[key] = { platillo: p, porciones: porciones, cantidad: 1 }; }
+  var key = id + '_' + porciones + '_' + Date.now();
+  cart[key] = { platillo: p, porciones: porciones, cantidad: 1 };
   persistCart();
   updateCartBar();
   renderMenu();
@@ -5836,6 +5838,20 @@ function exportarCSV(tipo) {
 function adminLogout() {
   cerrarSesion();
 }
+function volverAlInicio() {
+  cart = {};
+  try { localStorage.removeItem('cch_cart'); } catch(e) {}
+  updateCartBar();
+  document.querySelectorAll('.screen').forEach(function(s) { s.classList.remove('active'); });
+  var loginPage = document.getElementById('login-page');
+  if (loginPage) loginPage.style.display = 'none';
+  var menuScreen = document.getElementById('screen-menu');
+  if (menuScreen) menuScreen.classList.add('active');
+  document.body.className = 'on-menu';
+  renderMenu();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
 function volverAlInicio() {
   cart = {};
   try { localStorage.removeItem('cch_cart'); } catch(e) {}
