@@ -3348,13 +3348,8 @@ body:not(.on-menu) #nav-logo-wrap { display: flex; }
     <div class="confirm-section-label">Direccion de entrega</div>
     <div id="dir-cliente-existente" style="display:none;">
       <div class="dir-registrada-texto" id="dir-existente-texto"></div>
-      <div class="dir-confirmar-row" style="margin-top:14px;">
-        <span class="dir-confirmar-label">Te enviamos a la misma direccion</span>
-        <button class="toggle-confirmar" id="toggle-dir-same" onclick="toggleMismaDireccion()">
-          <span class="toggle-knob"></span>
-        </button>
-      </div>
-      <button class="btn-cambiar-dir" onclick="mostrarFormDireccion()" style="margin-top:12px;">Cambiar direccion</button>
+      <p style="margin-top:10px;font-size:12px;color:var(--muted);">Entregaremos a esta direccion.</p>
+      <button class="btn-cambiar-dir" onclick="mostrarFormDireccion()" style="margin-top:12px;">Quiero cambiar la direccion de entrega</button>
     </div>
     <div id="dir-nueva-form">
       <div class="field" style="margin-bottom:10px;">
@@ -4643,9 +4638,8 @@ function subirImgPlatillo(id, e) {
 // === MENU ===
 function getCartCountForItem(id) {
   var total = 0;
-  Object.keys(cart).forEach(function(k) {
-    if (k.startsWith(id + '_')) total += cart[k].cantidad;
-  });
+  if (cart[id + '_2']) total += cart[id + '_2'].cantidad;
+  if (cart[id + '_4']) total += cart[id + '_4'].cantidad;
   return total;
 }
 
@@ -4825,8 +4819,9 @@ function persistCart() {
 
 function addToCart(id, porciones) {
   var p = MENU.find(function(x) { return x.id === id; });
-  var key = id + '_' + porciones + '_' + Date.now();
-  cart[key] = { platillo: p, porciones: porciones, cantidad: 1 };
+  var key = getCartKey(id, porciones);
+  if (cart[key]) { cart[key].cantidad += 1; }
+  else { cart[key] = { platillo: p, porciones: porciones, cantidad: 1 }; }
   persistCart();
   updateCartBar();
   renderMenu();
@@ -5321,8 +5316,8 @@ function confirmarYEnviar() {
     saveUserLocal(u);
     currentUser = u;
   } else if (u && u.direccion && !mismaDireccionConfirmada) {
-    // Tiene dirección guardada pero no confirmó que sea la misma
-    showToast('Confirma si enviamos a la misma direccion', 'error'); return;
+    // Direccion confirmada automaticamente
+    mismaDireccionConfirmada = true;
   } else if (!u || !u.direccion) {
     showToast('Escribe tu direccion de entrega', 'error'); return;
   }
@@ -5451,8 +5446,7 @@ function iniciarSeccionDireccion() {
     if (textoEl) textoEl.textContent = u.direccion;
     if (bloqExistente) bloqExistente.style.display = 'block';
     if (bloqNuevo) bloqNuevo.style.display = 'none';
-    var toggle = document.getElementById('toggle-dir-same');
-    if (toggle) toggle.classList.toggle('active', mismaDireccionConfirmada);
+    mismaDireccionConfirmada = true;
   } else {
     if (bloqExistente) bloqExistente.style.display = 'none';
     if (bloqNuevo) bloqNuevo.style.display = 'block';
