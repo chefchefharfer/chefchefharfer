@@ -5662,9 +5662,9 @@ var GET_DATA_API = 'https://chefchefharfer.mx/api/get-data';
 async function cargarDatosAdmin() {
   try {
     var [rClientes, rPedidos, rActividad] = await Promise.all([
-      fetch(GET_DATA_API + '?tipo=clientes').then(r => r.json()),
-      fetch(GET_DATA_API + '?tipo=pedidos').then(r => r.json()),
-      fetch(GET_DATA_API + '?tipo=actividad').then(r => r.json())
+fetch(GET_DATA_API + '?tipo=clientes', {headers: {'x-api-secret': 'ccf2026secreto'}}).then(r => r.json()),
+fetch(GET_DATA_API + '?tipo=pedidos', {headers: {'x-api-secret': 'ccf2026secreto'}}).then(r => r.json()),
+fetch(GET_DATA_API + '?tipo=actividad', {headers: {'x-api-secret': 'ccf2026secreto'}}).then(r => r.json())
     ]);
     return {
       clientes: (rClientes.ok && rClientes.data) || [],
