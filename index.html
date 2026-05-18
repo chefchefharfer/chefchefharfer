@@ -5611,7 +5611,7 @@ var tarjetaSeleccionada = null;
 function cargarConfigOpenpay() {
   // Claves publicas de Openpay — estas son seguras en el HTML (nunca poner la privada aqui)
   var OPENPAY_ID = 'mtgg8mpbu09f8zbg36kd';
-  var OPENPAY_PUBLIC_KEY = '';
+  var OPENPAY_PUBLIC_KEY = 'pk_f25dddae63594418b0c29f66bb312cd9'';
   var OPENPAY_SANDBOX = false;
   openpayConfig = { merchant_id: OPENPAY_ID, public_key: OPENPAY_PUBLIC_KEY, sandbox: OPENPAY_SANDBOX };
   OpenPay.setId(OPENPAY_ID);
@@ -5635,6 +5635,10 @@ function abrirPanelPago() {
     var elTurno = document.querySelector('.turnos-container') || document.getElementById('turno-man');
     if (elTurno) { elTurno.scrollIntoView({ behavior: 'smooth', block: 'center' }); elTurno.style.outline = '2.5px solid #c1121f'; setTimeout(function(){ elTurno.style.outline = ''; }, 2500); }
     return;
+  }
+  // Auto-confirmar direccion si ya la tiene guardada
+  if (currentUser.direccion && currentUser.direccion.trim()) {
+    mismaDireccionConfirmada = true;
   }
   if (!mismaDireccionConfirmada && (!currentUser.direccion || !currentUser.direccion.trim())) {
     showToast('Ingresa tu dirección de entrega antes de pagar', 'error');
