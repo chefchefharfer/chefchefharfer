@@ -5910,6 +5910,9 @@ function abrirPanelPago() {
     var elTurno = document.querySelector('.turnos-container') || document.getElementById('turno-man');
     if (elTurno) { elTurno.scrollIntoView({ behavior: 'smooth', block: 'center' }); elTurno.style.outline = '2.5px solid #c1121f'; setTimeout(function(){ elTurno.style.outline = ''; }, 2500); }
     return;
+  // Auto-confirmar dirección si ya la tiene guardada
+  if (currentUser.direccion && currentUser.direccion.trim()) {
+    mismaDireccionConfirmada = true;
   }
   if (!mismaDireccionConfirmada && (!currentUser.direccion || !currentUser.direccion.trim())) {
     showToast('Ingresa tu dirección de entrega antes de pagar', 'error');
