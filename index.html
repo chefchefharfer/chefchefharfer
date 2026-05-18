@@ -2545,105 +2545,7 @@ footer .social-links a:hover { color: white; }
 }
 
 
-/* ========================================
-   PANTALLA CONFIRMACION WHATSAPP
-   ======================================== */
 
-#screen-envio {
-  align-items: center;
-  justify-content: center;
-  min-height: 80vh;
-}
-
-#screen-envio.active {
-  display: flex !important;
-}
-
-.envio-card {
-  background: var(--white);
-  border-radius: 24px;
-  padding: 36px 28px;
-  text-align: center;
-  box-shadow: var(--shadow-md);
-  border: 1px solid rgba(0,0,0,0.06);
-  max-width: 420px;
-  width: 100%;
-}
-
-.envio-icon {
-  width: 80px;
-  height: 80px;
-  background: var(--green-pale);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0 auto 20px;
-}
-
-.envio-titulo {
-  font-family: 'Plus Jakarta Sans', sans-serif;
-  font-size: 22px;
-  font-weight: 800;
-  color: var(--black);
-  letter-spacing: -0.5px;
-  margin-bottom: 16px;
-}
-
-.envio-resumen {
-  background: var(--bg);
-  border-radius: 12px;
-  padding: 14px 16px;
-  font-size: 13px;
-  color: var(--text);
-  line-height: 1.6;
-  margin-bottom: 20px;
-  text-align: left;
-  border: 1px solid var(--border);
-}
-
-.envio-instruccion {
-  font-size: 13px;
-  color: var(--muted);
-  line-height: 1.7;
-  margin-bottom: 24px;
-}
-
-.btn-enviar-wa {
-  background: #25D366;
-  color: white;
-  border: none;
-  border-radius: 14px;
-  padding: 16px 24px;
-  font-family: 'Plus Jakarta Sans', sans-serif;
-  font-size: 15px;
-  font-weight: 700;
-  cursor: pointer;
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  transition: all 0.2s;
-  margin-bottom: 12px;
-  box-shadow: 0 4px 16px rgba(37,211,102,0.3);
-}
-.btn-enviar-wa:hover { background: #1fb855; transform: translateY(-1px); }
-
-.btn-envio-cancelar {
-  background: transparent;
-  border: 1.5px solid var(--border);
-  border-radius: 10px;
-  padding: 11px 20px;
-  font-family: 'Outfit', sans-serif;
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--muted);
-  cursor: pointer;
-  width: 100%;
-  transition: all 0.15s;
-}
-.btn-envio-cancelar:hover { border-color: var(--green); color: var(--green); }
 
 
 /* ========================================
@@ -3403,10 +3305,6 @@ body:not(.on-menu) #nav-logo-wrap { display: flex; }
       <div id="cupon-mensaje" style="font-size:13px;margin-top:8px;min-height:18px;"></div>
     </div>
 
-    <button class="btn btn-pay" id="cart-pay-btn" onclick="confirmarYEnviar()" style="display:none">
-      Pagar mi pedido
-    </button>
-
     <!-- BOTON PAGO CON TARJETA -->
     <div id="btn-tarjeta-pronto" style="display:none;margin-top:12px;">
       <button onclick="abrirPanelPago()" style="width:100%;background:linear-gradient(135deg,#1a1a2e,#16213e);color:white;border:none;border-radius:14px;padding:18px;font-family:'Plus Jakarta Sans',sans-serif;font-size:15px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;box-sizing:border-box;transition:all 0.2s;">
@@ -3422,42 +3320,7 @@ body:not(.on-menu) #nav-logo-wrap { display: flex; }
 
 </div>
 
-<!-- 
- PANTALLA: CONFIRMACION PREVIA A WHATSAPP
- -->
-<div class="screen" id="screen-envio">
 
-  <div class="envio-card">
-
-    <div class="envio-icon">
-      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#067c49" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 11.5a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 0.8h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.37a16 16 0 0 0 6.72 6.72l1.73-1.74a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 23 16.92z"/>
-      </svg>
-    </div>
-
-    <div class="envio-titulo">Tu pedido esta listo</div>
-
-    <div class="envio-resumen" id="envio-resumen-texto"></div>
-
-    <div class="envio-instruccion">
-      Al tocar el boton de abajo, te abriremos <strong>WhatsApp</strong> con tu solicitud lista para enviar.<br>
-      Solo presiona <strong>Enviar</strong> en WhatsApp y listo — nosotros te mandamos el link de pago.
-    </div>
-
-    <button class="btn-enviar-wa" id="btn-enviar-wa" onclick="abrirWhatsApp()">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="white">
-        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
-      </svg>
-      Enviar solicitud por WhatsApp
-    </button>
-
-    <button class="btn-envio-cancelar" onclick="showScreen('confirm')">
-      Revisar mi pedido
-    </button>
-
-  </div>
-
-</div>
 
 <!-- 
  PANTALLA ADMIN
@@ -3595,19 +3458,7 @@ body:not(.on-menu) #nav-logo-wrap { display: flex; }
   </div>
 </div>
 
-<div class="screen" id="screen-success">
- <div class="card success-card">
- <div class="success-icon"></div>
- <div class="success-title">Pedido enviado</div>
- <p class="success-sub">
- Tu pedido fue registrado y te abrimos WhatsApp para que lo envíes.<br>
- Te llegará el <strong>link de pago</strong> en breve. ¡Gracias por preferir Chef Chef Harfer! 
- </p>
- <button class="btn btn-primary" onclick="nuevoPedido()">
- Hacer otro pedido
- </button>
- </div>
-</div>
+
 
 <!-- MINI-CART PANEL -->
 <div class="mini-cart-overlay" id="mini-cart-overlay" onclick="cerrarMiniCart()"></div>
@@ -4908,15 +4759,11 @@ function renderCartPanel() {
     emptyDiv.className = 'cart-empty';
     emptyDiv.textContent = 'Tu carrito esta vacio. Regresa al menu.';
     panel.appendChild(emptyDiv);
-    var payBtn0 = document.getElementById('cart-pay-btn');
-    if (payBtn0) payBtn0.style.display = 'none';
     var btnTarjeta0 = document.getElementById('btn-tarjeta-pronto');
     if (btnTarjeta0) btnTarjeta0.style.display = 'none';
     return;
   }
 
-  var payBtn = document.getElementById('cart-pay-btn');
-  if (payBtn) payBtn.style.display = 'block';
   var btnTarjeta = document.getElementById('btn-tarjeta-pronto');
   if (btnTarjeta) btnTarjeta.style.display = 'block';
   panel.innerHTML = '';
@@ -5299,131 +5146,9 @@ async function irAConfirmar() {
 }
 
 
-function confirmarYEnviar() {
-  if (!diaSeleccionado) { showToast('Selecciona el dia de entrega', 'error'); return; }
-  if (!turnoSeleccionado) { showToast('Selecciona el turno de entrega', 'error'); return; }
-  if (!getCartItemCount()) { showToast('Tu carrito esta vacio', 'error'); return; }
-  var u = currentUser;
 
-  // Validar y armar dirección desde los 3 campos
-  if (document.getElementById('dir-nueva-form').style.display !== 'none') {
-    var calle   = (document.getElementById('input-dir-calle')   || {value:''}).value.trim();
-    var numero  = (document.getElementById('input-dir-numero')  || {value:''}).value.trim();
-    var colonia = (document.getElementById('input-dir-colonia') || {value:''}).value.trim();
-    if (!calle)   { showToast('Escribe el nombre de tu calle', 'error'); return; }
-    if (!colonia) { showToast('Escribe tu colonia', 'error'); return; }
-    var dirCompleta = calle + (numero ? ' #' + numero : '') + ', ' + colonia;
-    u.direccion = dirCompleta;
-    saveUserLocal(u);
-    currentUser = u;
-  } else if (u && u.direccion && !mismaDireccionConfirmada) {
-    // Direccion confirmada automaticamente
-    mismaDireccionConfirmada = true;
-  } else if (!u || !u.direccion) {
-    showToast('Escribe tu direccion de entrega', 'error'); return;
-  }
 
-  // Guardar pin si se colocó
-  if (pinLat && pinLng) {
-    if (currentUser) { currentUser.mapLat = pinLat; currentUser.mapLng = pinLng; saveUserLocal(currentUser); }
-  }
 
-  // Build resumen
-  var total = getCartTotal();
-  var subtotal = getCartSubtotal();
-  var items = Object.values(cart);
-  var turnoLabel = turnoSeleccionado === 'Manana' ? 'Manana (10am-1pm)' : 'Tarde (4pm-7pm)';
-  var resumen = diaSeleccionado + ' - ' + turnoLabel + '\n';
-  resumen += items.length + ' platillo(s)';
-  if (descuentoAplicado > 0) {
-    resumen += '  -  Subtotal: $' + subtotal.toLocaleString('es-MX') + ' MXN\n';
-    resumen += 'Descuento ' + cuponAplicado + ' (−' + descuentoAplicado + '%):  −$' + (subtotal - total).toLocaleString('es-MX') + ' MXN\n';
-    resumen += 'Total: $' + total.toLocaleString('es-MX') + ' MXN';
-  } else {
-    resumen += '  -  Total: $' + total.toLocaleString('es-MX') + ' MXN';
-  }
-  var resumenEl = document.getElementById('envio-resumen-texto');
-  if (resumenEl) resumenEl.textContent = resumen;
-  showScreen('envio');
-}
-
-// === ENVIAR PEDIDO ===
-async function abrirWhatsApp() {
-  var items = Object.values(cart);
-  if (!items.length) { showToast('Tu carrito esta vacio', 'error'); return; }
-  var total = getCartTotal();
-  var orderId = Date.now().toString().slice(-6);
-  var u = currentUser;
-  var direccion = (u && u.direccion) ? u.direccion : '';
-  var turnoLabel = turnoSeleccionado === 'Manana' ? 'Manana (10am-1pm)' : 'Tarde (4pm-7pm)';
-
-  showLoading('Registrando tu pedido...');
-  guardarPedidoNotion(u, items, total, orderId, diaSeleccionado, direccion);
-
-  // Correo de confirmación al cliente
-  var platillosArray = items.map(function(i) {
-    var precio = i.porciones === 4 ? i.platillo.precio2p * 2 : i.platillo.precio2p;
-    return { nombre: i.platillo.nombre, porciones: i.porciones, cantidad: i.cantidad, subtotal: precio * i.cantidad };
-  });
-  try {
-    await enviarConfirmacionPedido(u, {
-      orderId: orderId, dia: diaSeleccionado, turno: turnoSeleccionado,
-      direccion: direccion, platillos: platillosArray, total: total
-    });
-  } catch(e) { console.warn('Email confirmacion cliente:', e.message); }
-
-  // Aviso de nueva orden al admin
-  try {
-    await enviarEmail('confirmacion', 'chefchef.harfer@gmail.com', {
-      nombre: u.nombre, orderId: orderId, dia: diaSeleccionado, turno: turnoSeleccionado,
-      direccion: direccion, platillos: platillosArray, total: total
-    });
-  } catch(e) { console.warn('Email aviso admin:', e.message); }
-
-  hideLoading();
-
-  var mapLink = (pinLat && pinLng)
-    ? 'https://www.google.com/maps?q=' + pinLat.toFixed(6) + ',' + pinLng.toFixed(6)
-    : 'Sin ubicacion marcada';
-  var msg = 'Hola! Quiero hacer un pedido.\n\n';
-  msg += '*Pedido #*' + orderId + '\n';
-  msg += '*Nombre:* ' + u.nombre + '\n';
-  msg += '*Tel:* ' + u.phone + '\n';
-  msg += '*Entrega:* ' + diaSeleccionado + ' - ' + turnoLabel + '\n';
-  msg += '*Direccion:* ' + (direccion || 'No especificada') + '\n';
-  msg += '*Ubicacion:* ' + mapLink + '\n';
-  msg += '\n*Platillos:*\n';
-  items.forEach(function(i) {
-    var precio = i.porciones === 4 ? i.platillo.precio2p * 2 : i.platillo.precio2p;
-    var sub = precio * i.cantidad;
-    msg += '- ' + i.platillo.nombre + ' (Kit ' + i.porciones + 'p x' + i.cantidad + ') $' + sub + '\n';
-  });
-  if (descuentoAplicado > 0) {
-    var subtotalWA = getCartSubtotal();
-    msg += '\nSubtotal: $' + subtotalWA.toLocaleString('es-MX') + ' MXN\n';
-    msg += 'Descuento ' + cuponAplicado + ' (−' + descuentoAplicado + '%): −$' + (subtotalWA - total).toLocaleString('es-MX') + ' MXN\n';
-  }
-  msg += '\n*Total: $' + total.toLocaleString('es-MX') + ' MXN*\n';
-  msg += 'Solicito el link de pago. Gracias!';
-
-  if (currentUser) {
-    if (diaSeleccionado) currentUser.diaPref = diaSeleccionado;
-    if (turnoSeleccionado) currentUser.turnoPref = turnoSeleccionado;
-    saveUserLocal(currentUser);
-  }
-
-  // iOS Safari blocks window.open - use location.href for WhatsApp
-  var waUrl = 'https://wa.me/' + WA_NUMBER + '?text=' + encodeURIComponent(msg);
-  window.location.href = waUrl;
-  cart = {};
-  diaSeleccionado = null;
-  turnoSeleccionado = null;
-  mismaDireccionConfirmada = false;
-  pinLat = null; pinLng = null;
-  try { localStorage.removeItem('cch_cart'); } catch(e) {}
-  updateCartBar();
-  showScreen('success');
-}
 
 
 // === DIRECCION Y MAPA ===
@@ -5886,7 +5611,7 @@ var tarjetaSeleccionada = null;
 function cargarConfigOpenpay() {
   // Claves publicas de Openpay — estas son seguras en el HTML (nunca poner la privada aqui)
   var OPENPAY_ID = 'mtgg8mpbu09f8zbg36kd';
-  var OPENPAY_PUBLIC_KEY = '';
+  var OPENPAY_PUBLIC_KEY = 'pk_f25dddae63594418b0c29f66bb312cd9';
   var OPENPAY_SANDBOX = false;
   openpayConfig = { merchant_id: OPENPAY_ID, public_key: OPENPAY_PUBLIC_KEY, sandbox: OPENPAY_SANDBOX };
   OpenPay.setId(OPENPAY_ID);
@@ -5910,9 +5635,6 @@ function abrirPanelPago() {
     var elTurno = document.querySelector('.turnos-container') || document.getElementById('turno-man');
     if (elTurno) { elTurno.scrollIntoView({ behavior: 'smooth', block: 'center' }); elTurno.style.outline = '2.5px solid #c1121f'; setTimeout(function(){ elTurno.style.outline = ''; }, 2500); }
     return;
-  // Auto-confirmar dirección si ya la tiene guardada
-  if (currentUser.direccion && currentUser.direccion.trim()) {
-    mismaDireccionConfirmada = true;
   }
   if (!mismaDireccionConfirmada && (!currentUser.direccion || !currentUser.direccion.trim())) {
     showToast('Ingresa tu dirección de entrega antes de pagar', 'error');
@@ -6116,15 +5838,31 @@ async function enviarPago(token_id, deviceSessionId, card_id) {
       return;
     }
 
+    // Datos del pedido para correo de confirmacion
+    var pedidoParaCorreo = {
+      orderId: orderId, dia: diaSeleccionado, turno: turnoSeleccionado,
+      direccion: direccion, platillos: platillosArray, total: total
+    };
+
     // Redirigir a 3D Secure si es necesario
+    // Guardamos datos en sessionStorage para enviar correo al volver a gracias.html
     if (d.redirect_url) {
+      try {
+        sessionStorage.setItem('cch_pedido_pendiente', JSON.stringify({
+          user: { nombre: u.nombre, email: u.email, phone: u.phone },
+          pedido: pedidoParaCorreo
+        }));
+      } catch(e) {}
       cerrarPanelPago();
       window.location.href = d.redirect_url;
       return;
     }
 
-    // Pago completado directamente
+    // Pago completado directamente — enviar correo de confirmacion
     if (d.status === 'completed') {
+      try {
+        await enviarConfirmacionPedido(u, pedidoParaCorreo);
+      } catch(e) { console.warn('Email confirmacion:', e.message); }
       cerrarPanelPago();
       cart = {};
       diaSeleccionado = null;
