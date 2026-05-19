@@ -5634,11 +5634,16 @@ function abrirPanelPago() {
     if (elTurno) { elTurno.scrollIntoView({ behavior: 'smooth', block: 'center' }); elTurno.style.outline = '2.5px solid #c1121f'; setTimeout(function(){ elTurno.style.outline = ''; }, 2500); }
     return;
   }
-  // Auto-confirmar direccion si ya la tiene guardada
+// Auto-confirmar direccion si ya la tiene guardada O si puso pin en el mapa
   if (currentUser.direccion && currentUser.direccion.trim()) {
     mismaDireccionConfirmada = true;
   }
-  if (!mismaDireccionConfirmada && (!currentUser.direccion || !currentUser.direccion.trim())) {
+  if (!mismaDireccionConfirmada && pinLat && pinLng) {
+    // Tiene pin en el mapa — construir dirección automáticamente
+    currentUser.direccion = 'Ubicación en mapa: ' + pinLat.toFixed(5) + ', ' + pinLng.toFixed(5);
+    mismaDireccionConfirmada = true;
+  }
+  if (!mismaDireccionConfirmada) {
     showToast('Ingresa tu dirección de entrega antes de pagar', 'error');
     var elDir = document.getElementById('input-direccion') || document.querySelector('.direccion-section');
     if (elDir) { elDir.scrollIntoView({ behavior: 'smooth', block: 'center' }); elDir.style.outline = '2.5px solid #c1121f'; setTimeout(function(){ elDir.style.outline = ''; }, 2500); }
