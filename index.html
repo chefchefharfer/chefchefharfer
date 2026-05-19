@@ -3800,10 +3800,8 @@ var pinLng = null;
 
 // === STORAGE ===
 function hashPin(pin, phone) {
-  // Hash simple con salt del teléfono — evita PINs en texto plano en localStorage
-  var h = 0, s = pin + phone + 'cch26';
-  for (var i = 0; i < s.length; i++) { h = ((h << 5) - h) + s.charCodeAt(i); h |= 0; }
-  return 'h' + Math.abs(h).toString(36);
+  // Sin hash — PIN se maneja en texto plano (viaja por HTTPS)
+  return pin;
 }
 
 function saveUserLocal(user) {
