@@ -3377,6 +3377,43 @@ body:not(.on-menu) #nav-logo-wrap { display: flex; }
       <div style="padding:16px 20px;" id="admin-calendar-bloq"></div>
     </div>
 
+    <!-- Nueva receta -->
+    <div style="background:white;border-radius:18px;border:1px solid rgba(0,0,0,0.06);overflow:hidden;margin-bottom:16px;">
+      <div style="padding:16px 20px;border-bottom:1px solid #f0ede6;font-family:'Plus Jakarta Sans',sans-serif;font-size:14px;font-weight:800;color:#111;">🍽️ Agregar nueva receta al menú</div>
+      <div style="padding:20px;">
+        <div style="margin-bottom:14px;">
+          <label style="display:block;font-size:11px;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;color:#7a7a72;margin-bottom:7px;">Nombre del platillo</label>
+          <input type="text" id="np-nombre" placeholder="Ej: Tacos de Birria con Consomé" style="width:100%;background:#f7f5f0;border:1.5px solid #e2ddd5;border-radius:12px;color:#252523;font-family:'Outfit',sans-serif;font-size:15px;padding:12px 16px;outline:none;box-sizing:border-box;">
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;">
+          <div>
+            <label style="display:block;font-size:11px;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;color:#7a7a72;margin-bottom:7px;">Proteína</label>
+            <select id="np-proteina" style="width:100%;background:#f7f5f0;border:1.5px solid #e2ddd5;border-radius:12px;color:#252523;font-family:'Outfit',sans-serif;font-size:15px;padding:12px 16px;outline:none;box-sizing:border-box;">
+              <option value="Res">Res</option>
+              <option value="Pollo">Pollo</option>
+              <option value="Salmon">Salmón</option>
+              <option value="Camaron">Camarón</option>
+              <option value="Cerdo">Cerdo</option>
+              <option value="Pasta">Pasta</option>
+            </select>
+          </div>
+          <div>
+            <label style="display:block;font-size:11px;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;color:#7a7a72;margin-bottom:7px;">Precio 2 porciones</label>
+            <input type="number" id="np-precio" placeholder="180" min="1" style="width:100%;background:#f7f5f0;border:1.5px solid #e2ddd5;border-radius:12px;color:#252523;font-family:'Outfit',sans-serif;font-size:15px;padding:12px 16px;outline:none;box-sizing:border-box;">
+          </div>
+        </div>
+        <div style="margin-bottom:14px;">
+          <label style="display:block;font-size:11px;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;color:#7a7a72;margin-bottom:7px;">Foto del platillo</label>
+          <input type="file" id="np-imagen" accept="image/*" style="width:100%;background:#f7f5f0;border:1.5px solid #e2ddd5;border-radius:12px;color:#252523;font-family:'Outfit',sans-serif;font-size:14px;padding:10px 14px;outline:none;box-sizing:border-box;">
+          <div style="font-size:11px;color:#9a9590;margin-top:6px;">El precio de 4 porciones se calcula solo (precio × 2).</div>
+        </div>
+        <button onclick="crearPlatillo()" style="width:100%;background:var(--green);color:white;border:none;border-radius:12px;padding:14px;font-family:'Plus Jakarta Sans',sans-serif;font-size:15px;font-weight:700;cursor:pointer;">
+          Agregar al menú
+        </button>
+        <div id="np-mensaje" style="font-size:13px;margin-top:10px;min-height:18px;text-align:center;"></div>
+      </div>
+    </div>
+
     <!-- Tabla de clientes -->
     <div style="background:white;border-radius:18px;border:1px solid rgba(0,0,0,0.06);overflow:hidden;margin-bottom:16px;">
       <div style="padding:16px 20px;border-bottom:1px solid #f0ede6;display:flex;align-items:center;justify-content:space-between;">
@@ -3761,7 +3798,7 @@ function registrarConexion() {
 }
 
 var BASE_IMG = 'https://chefchefharfer.github.io/chefchefharfer/';
-var MENU = [
+var MENU_FALLBACK = [
   { id:'001', nombre:'Tiras de Res en Salsa de Jengibre con Arroz Esponjoso',                          proteina:'Res',     badge:'badge-res',     precio2p:180, img:BASE_IMG+'001%20-%20Tiras%20de%20Res%20en%20Salsa%20.jpg' },
   { id:'002', nombre:'Rib Eye Steak con Mantequilla de Alcaparras, Pure de Coliflor y Cebolla Caramelizada', proteina:'Res', badge:'badge-res',   precio2p:210, img:BASE_IMG+'002%20-%20Rib%20Eye%20Steak%20con%20Mantequilla%20.jpg' },
   { id:'003', nombre:'Salmon al Miso con Arroz de Coliflor y Espinacas al Sesamo',                     proteina:'Salmon',  badge:'badge-salmon',  precio2p:240, img:BASE_IMG+'003%20-%20Miso%20Salmon%20con%20Arroz%20.jpg' },
@@ -3772,6 +3809,23 @@ var MENU = [
   { id:'008', nombre:'Ceviche de Chicharron',                                                           proteina:'Cerdo',   badge:'badge-cerdo',   precio2p:190, img:BASE_IMG+'008%20-%20Ceviche%20de%20chicharron.jpg' },
   { id:'009', nombre:'Bagels con Salmon Ahumado',                                                       proteina:'Salmon',  badge:'badge-salmon',  precio2p:260, img:BASE_IMG+'009%20-%20Bagels%20con%20Salmon.jpg' }
 ];
+
+var MENU = MENU_FALLBACK.slice(); // arranca con el respaldo; la API lo reemplaza si responde
+
+async function cargarMenu() {
+  try {
+    var res = await fetch('https://chefchefharfer.mx/api/platillos');
+    var data = await res.json();
+    if (data.ok && data.platillos && data.platillos.length) {
+      MENU = data.platillos.map(function(p) {
+        return { id: p.id, nombre: p.nombre, proteina: p.proteina, badge: p.badge, precio2p: p.precio2p, img: p.img };
+      });
+    }
+  } catch (e) {
+    console.warn('Menu desde API fallo, usando respaldo:', e.message);
+  }
+  if (typeof renderMenu === 'function') renderMenu();
+}
 
 var currentUser = null;
 var cart = {};
@@ -5556,6 +5610,49 @@ function exportarCSV(tipo) {
   } catch(e) { showToast('Error al exportar', 'error'); }
 }
 
+async function crearPlatillo() {
+  var nombre = (document.getElementById('np-nombre').value || '').trim();
+  var proteina = document.getElementById('np-proteina').value;
+  var precio = parseInt(document.getElementById('np-precio').value || '0', 10);
+  var fileInput = document.getElementById('np-imagen');
+  var msg = document.getElementById('np-mensaje');
+
+  if (!nombre) { msg.style.color = '#c1121f'; msg.textContent = 'Escribe el nombre del platillo.'; return; }
+  if (!precio || precio < 1) { msg.style.color = '#c1121f'; msg.textContent = 'Escribe un precio válido.'; return; }
+  if (!fileInput.files || !fileInput.files[0]) { msg.style.color = '#c1121f'; msg.textContent = 'Selecciona una foto del platillo.'; return; }
+
+  msg.style.color = '#7a7a72';
+  msg.textContent = 'Subiendo platillo...';
+
+  var fd = new FormData();
+  fd.append('nombre', nombre);
+  fd.append('proteina', proteina);
+  fd.append('precio2p', precio);
+  fd.append('imagen', fileInput.files[0]);
+
+  try {
+    var res = await fetch('https://chefchefharfer.mx/api/platillos', {
+      method: 'POST',
+      headers: { 'x-api-secret': API_SECRET },
+      body: fd
+    });
+    var data = await res.json();
+    if (data.ok) {
+      msg.style.color = 'var(--green)';
+      msg.textContent = '✓ Platillo agregado correctamente';
+      document.getElementById('np-nombre').value = '';
+      document.getElementById('np-precio').value = '';
+      fileInput.value = '';
+      if (typeof cargarMenu === 'function') cargarMenu();
+    } else {
+      msg.style.color = '#c1121f';
+      msg.textContent = data.error || 'Error al agregar el platillo.';
+    }
+  } catch (e) {
+    msg.style.color = '#c1121f';
+    msg.textContent = 'Error de conexión. Intenta de nuevo.';
+  }
+}
 
 function adminLogout() {
   cerrarSesion();
@@ -5917,7 +6014,7 @@ window.addEventListener('load', function() {
   if (navUserWrap) navUserWrap.style.display = 'none';
   // Renderizar el menu
   setTimeout(function() {
-    if (typeof renderMenu === 'function') renderMenu();
+    if (typeof cargarMenu === 'function') cargarMenu();
   }, 50);
   // Cargar config de Openpay
   cargarConfigOpenpay();
