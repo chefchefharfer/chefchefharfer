@@ -3395,6 +3395,7 @@ body:not(.on-menu) #nav-logo-wrap { display: flex; }
               <option value="Camaron">Camarón</option>
               <option value="Cerdo">Cerdo</option>
               <option value="Pasta">Pasta</option>
+<option value="Otro">Otro</option>
             </select>
           </div>
           <div>
@@ -3405,7 +3406,14 @@ body:not(.on-menu) #nav-logo-wrap { display: flex; }
         <div style="margin-bottom:14px;">
           <label style="display:block;font-size:11px;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;color:#7a7a72;margin-bottom:7px;">Foto del platillo</label>
           <input type="file" id="np-imagen" accept="image/*" style="width:100%;background:#f7f5f0;border:1.5px solid #e2ddd5;border-radius:12px;color:#252523;font-family:'Outfit',sans-serif;font-size:14px;padding:10px 14px;outline:none;box-sizing:border-box;">
-          <div style="font-size:11px;color:#9a9590;margin-top:6px;">El precio de 4 porciones se calcula solo (precio × 2).</div>
+          <div style="display:flex;align-items:center;gap:10px;margin-top:10px;padding:12px 14px;background:#f7f5f0;border-radius:10px;border:1.5px solid #e2ddd5;cursor:pointer;" onclick="togglePorUnidad()">
+  <div id="chk-por-unidad" style="width:20px;height:20px;border-radius:6px;border:2px solid #e2ddd5;background:white;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all 0.15s;"></div>
+  <div>
+    <div style="font-size:13px;font-weight:600;color:#252523;">Vender por unidad (sin porciones)</div>
+    <div style="font-size:11px;color:#9a9590;">Usar para panes, postres o productos donde las porciones no aplican</div>
+  </div>
+</div>
+<div style="font-size:11px;color:#9a9590;margin-top:8px;" id="np-precio-nota">El precio de 4 porciones se calcula solo (precio × 2). Si marcas "por unidad", se vende con un solo precio.</div>
         </div>
         <button onclick="crearPlatillo()" style="width:100%;background:var(--green);color:white;border:none;border-radius:12px;padding:14px;font-family:'Plus Jakarta Sans',sans-serif;font-size:15px;font-weight:700;cursor:pointer;">
           Agregar al menú
@@ -3818,7 +3826,7 @@ async function cargarMenu() {
     var data = await res.json();
     if (data.ok && data.platillos && data.platillos.length) {
       MENU = data.platillos.map(function(p) {
-        return { id: p.id, nombre: p.nombre, proteina: p.proteina, badge: p.badge, precio2p: p.precio2p, img: p.img };
+        return { id: p.id, nombre: p.nombre, proteina: p.proteina, badge: p.badge, precio2p: p.precio2p, img: p.img, por_unidad: p.por_unidad };
       });
     }
   } catch (e) {
@@ -4685,23 +4693,44 @@ function renderMenu() {
     preciosRow.appendChild(item4);
     info.appendChild(preciosRow);
 
-    // Botones: 2p y 4p estilo referencia
-    var btn2 = document.createElement('button');
-    btn2.className = 'btn-add-cart';
-    btn2.textContent = '$' + precio2 + '  +  Kit 2p';
-    btn2.onclick = (function(pid, b) {
-      return function(e) { e.stopPropagation(); addToCart(pid, 2); showAddFeedback(b, '$' + precio2 + '  +  Kit 2p'); };
-    })(p.id, btn2);
+    // Botones: por unidad o 2p/4p según el tipo de producto
+    if (p.por_unidad) {
+      var preciosRow2 = document.createElement('div');
+      preciosRow2.className = 'prod-precios-row';
+      var itemU = document.createElement('div');
+      itemU.className = 'prod-precio-item';
+      var valU = document.createElement('div');
+      valU.className = 'prod-precio-valor';
+      valU.textContent = '$' + precio2;
+      itemU.appendChild(valU);
+      preciosRow2.appendChild(itemU);
+      info.replaceChild(preciosRow2, preciosRow);
 
-    var btn4 = document.createElement('button');
-    btn4.className = 'btn-add-cart btn-add-cart-alt';
-    btn4.textContent = '$' + precio4 + '  +  Kit 4p';
-    btn4.onclick = (function(pid, b) {
-      return function(e) { e.stopPropagation(); addToCart(pid, 4); showAddFeedback(b, '$' + precio4 + '  +  Kit 4p'); };
-    })(p.id, btn4);
+      var btnU = document.createElement('button');
+      btnU.className = 'btn-add-cart';
+      btnU.textContent = '$' + precio2 + '  +  Agregar';
+      btnU.onclick = (function(pid, b) {
+        return function(e) { e.stopPropagation(); addToCart(pid, 1); showAddFeedback(b, '$' + precio2 + '  +  Agregar'); };
+      })(p.id, btnU);
+      info.appendChild(btnU);
+    } else {
+      var btn2 = document.createElement('button');
+      btn2.className = 'btn-add-cart';
+      btn2.textContent = '$' + precio2 + '  +  Kit 2p';
+      btn2.onclick = (function(pid, b) {
+        return function(e) { e.stopPropagation(); addToCart(pid, 2); showAddFeedback(b, '$' + precio2 + '  +  Kit 2p'); };
+      })(p.id, btn2);
 
-    info.appendChild(btn2);
-    info.appendChild(btn4);
+      var btn4 = document.createElement('button');
+      btn4.className = 'btn-add-cart btn-add-cart-alt';
+      btn4.textContent = '$' + precio4 + '  +  Kit 4p';
+      btn4.onclick = (function(pid, b) {
+        return function(e) { e.stopPropagation(); addToCart(pid, 4); showAddFeedback(b, '$' + precio4 + '  +  Kit 4p'); };
+      })(p.id, btn4);
+
+      info.appendChild(btn2);
+      info.appendChild(btn4);
+    }
     card.appendChild(info);
     grid.appendChild(card);
   });
@@ -5628,6 +5657,7 @@ async function crearPlatillo() {
   fd.append('nombre', nombre);
   fd.append('proteina', proteina);
   fd.append('precio2p', precio);
+  fd.append('por_unidad', porUnidadActivo ? 'true' : 'false');
   fd.append('imagen', fileInput.files[0]);
 
   try {
@@ -5651,6 +5681,17 @@ async function crearPlatillo() {
   } catch (e) {
     msg.style.color = '#c1121f';
     msg.textContent = 'Error de conexión. Intenta de nuevo.';
+  }
+}
+
+var porUnidadActivo = false;
+function togglePorUnidad() {
+  porUnidadActivo = !porUnidadActivo;
+  var chk = document.getElementById('chk-por-unidad');
+  if (chk) {
+    chk.style.background = porUnidadActivo ? '#067c49' : 'white';
+    chk.style.borderColor = porUnidadActivo ? '#067c49' : '#e2ddd5';
+    chk.innerHTML = porUnidadActivo ? '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>' : '';
   }
 }
 
