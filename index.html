@@ -3422,6 +3422,29 @@ body:not(.on-menu) #nav-logo-wrap { display: flex; }
       </div>
     </div>
 
+<!-- Gestionar menú -->
+    <div style="background:white;border-radius:18px;border:1px solid rgba(0,0,0,0.06);overflow:hidden;margin-bottom:16px;">
+      <div style="padding:16px 20px;border-bottom:1px solid #f0ede6;display:flex;align-items:center;justify-content:space-between;">
+        <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:14px;font-weight:800;color:#111;">⚙️ Gestionar menú</div>
+        <button onclick="renderTablaMenu()" style="background:var(--green-pale);border:1px solid var(--green-light);border-radius:8px;padding:6px 12px;font-size:11px;font-weight:600;color:var(--green);cursor:pointer;">Actualizar</button>
+      </div>
+      <div style="overflow-x:auto;">
+        <table style="width:100%;border-collapse:collapse;font-family:'Outfit',sans-serif;font-size:13px;">
+          <thead>
+            <tr style="background:#fafaf8;">
+              <th style="padding:10px 12px;text-align:left;font-size:10px;letter-spacing:1px;color:#aaa;font-weight:700;text-transform:uppercase;">ID</th>
+              <th style="padding:10px 12px;text-align:left;font-size:10px;letter-spacing:1px;color:#aaa;font-weight:700;text-transform:uppercase;">Nombre</th>
+              <th style="padding:10px 12px;text-align:left;font-size:10px;letter-spacing:1px;color:#aaa;font-weight:700;text-transform:uppercase;">Precio 2p</th>
+              <th style="padding:10px 12px;text-align:center;font-size:10px;letter-spacing:1px;color:#aaa;font-weight:700;text-transform:uppercase;">Visible</th>
+            </tr>
+          </thead>
+          <tbody id="admin-menu-tbody">
+            <tr><td colspan="4" style="padding:20px;text-align:center;color:#aaa;">Cargando...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
     <!-- Tabla de clientes -->
     <div style="background:white;border-radius:18px;border:1px solid rgba(0,0,0,0.06);overflow:hidden;margin-bottom:16px;">
       <div style="padding:16px 20px;border-bottom:1px solid #f0ede6;display:flex;align-items:center;justify-content:space-between;">
@@ -5682,6 +5705,74 @@ async function crearPlatillo() {
     msg.style.color = '#c1121f';
     msg.textContent = 'Error de conexión. Intenta de nuevo.';
   }
+}
+
+// === GESTIONAR MENÚ ===
+async function renderTablaMenu() {
+  var tbody = document.getElementById('admin-menu-tbody');
+  if (!tbody) return;
+  tbody.innerHTML = '<tr><td colspan="4" style="padding:20px;text-align:center;color:#aaa;">Cargando...</td></tr>';
+  try {
+    var res = await fetch('https://chefchefharfer.mx/api/platillos/todos', {
+      headers: { 'x-api-secret': API_SECRET }
+    });
+    var data = await res.json();
+    if (!data.ok || !data.platillos.length) {
+      tbody.innerHTML = '<tr><td colspan="4" style="padding:20px;text-align:center;color:#aaa;">Sin platillos</td></tr>';
+      return;
+    }
+    tbody.innerHTML = '';
+    data.platillos.forEach(function(p) {
+      var tr = document.createElement('tr');
+      tr.style.borderBottom = '1px solid #f0ede6';
+      var activoColor = p.activo ? '#067c49' : '#c1121f';
+      var activoLabel = p.activo ? 'Visible' : 'Oculto';
+      tr.innerHTML =
+        '<td style="padding:10px 12px;font-weight:700;color:#555;font-size:12px;">' + esc(p.id) + '</td>' +
+        '<td style="padding:10px 12px;font-size:13px;color:#111;">' + esc(p.nombre) + '</td>' +
+        '<td style="padding:10px 12px;">' +
+          '<input type="number" value="' + p.precio2p + '" min="1" style="width:80px;border:1.5px solid #e2ddd5;border-radius:8px;padding:5px 8px;font-size:13px;font-family:\'Outfit\',sans-serif;" ' +
+          'onchange="actualizarPrecio(\'' + esc(p.id) + '\', this.value)">' +
+        '</td>' +
+        '<td style="padding:10px 12px;text-align:center;">' +
+          '<button onclick="togglePlatillo(\'' + esc(p.id) + '\', this)" style="background:' + activoColor + ';color:white;border:none;border-radius:8px;padding:6px 14px;font-size:11px;font-weight:700;cursor:pointer;">' + activoLabel + '</button>' +
+        '</td>';
+      tbody.appendChild(tr);
+    });
+  } catch(e) {
+    tbody.innerHTML = '<tr><td colspan="4" style="padding:20px;text-align:center;color:#c1121f;">Error al cargar</td></tr>';
+  }
+}
+
+async function actualizarPrecio(id, precio) {
+  try {
+    var res = await fetch('https://chefchefharfer.mx/api/platillos/precio', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-api-secret': API_SECRET },
+      body: JSON.stringify({ id: id, precio2p: parseInt(precio) })
+    });
+    var data = await res.json();
+    if (data.ok) { showToast('Precio actualizado', 'success'); cargarMenu(); }
+    else showToast('Error al actualizar precio', 'error');
+  } catch(e) { showToast('Error de conexión', 'error'); }
+}
+
+async function togglePlatillo(id, btn) {
+  try {
+    var res = await fetch('https://chefchefharfer.mx/api/platillos/toggle', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-api-secret': API_SECRET },
+      body: JSON.stringify({ id: id })
+    });
+    var data = await res.json();
+    if (data.ok) {
+      var esVisible = btn.textContent.trim() === 'Visible';
+      btn.textContent = esVisible ? 'Oculto' : 'Visible';
+      btn.style.background = esVisible ? '#c1121f' : '#067c49';
+      showToast(esVisible ? 'Platillo ocultado' : 'Platillo visible', 'success');
+      cargarMenu();
+    } else showToast('Error al cambiar estado', 'error');
+  } catch(e) { showToast('Error de conexión', 'error'); }
 }
 
 var porUnidadActivo = false;
