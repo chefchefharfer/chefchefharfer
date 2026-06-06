@@ -4053,7 +4053,7 @@ async function handleLogin() {
       }
       return;
     }
-    var user = data.cliente;
+    var user = data.data;
     user.pin = hashPin(pin, cleanedPhone);
     saveUserLocal(user);
     currentUser = user;
