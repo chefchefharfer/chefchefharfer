@@ -3611,10 +3611,11 @@ body:not(.on-menu) #nav-logo-wrap { display: flex; }
               <th style="padding:10px 12px;text-align:left;font-size:10px;letter-spacing:1px;color:#aaa;font-weight:700;text-transform:uppercase;">Nombre</th>
               <th style="padding:10px 12px;text-align:left;font-size:10px;letter-spacing:1px;color:#aaa;font-weight:700;text-transform:uppercase;">Precio 2p</th>
               <th style="padding:10px 12px;text-align:center;font-size:10px;letter-spacing:1px;color:#aaa;font-weight:700;text-transform:uppercase;">Visible</th>
+<th style="padding:10px 12px;text-align:left;font-size:10px;letter-spacing:1px;color:#aaa;font-weight:700;text-transform:uppercase;">Receta PDF</th>
             </tr>
           </thead>
           <tbody id="admin-menu-tbody">
-            <tr><td colspan="4" style="padding:20px;text-align:center;color:#aaa;">Cargando...</td></tr>
+            <tr><td colspan="5" style="padding:20px;text-align:center;color:#aaa;">Cargando...</td></tr>
           </tbody>
         </table>
       </div>
@@ -5905,6 +5906,33 @@ async function crearPlatillo() {
 }
 
 // === GESTIONAR MENÚ ===
+async function subirRecetaPDF(id, input) {
+  if (!input.files || !input.files[0]) return;
+  var fd = new FormData();
+  fd.append('id', id);
+  fd.append('receta', input.files[0]);
+  showLoading('Subiendo PDF...');
+  try {
+    var res = await fetch('https://chefchefharfer.mx/api/platillos/receta', {
+      method: 'POST',
+      headers: { 'x-api-secret': API_SECRET },
+      body: fd
+    });
+    var data = await res.json();
+    hideLoading();
+    if (data.ok) {
+      showToast('Receta PDF subida correctamente', 'success');
+      renderTablaMenu();
+      cargarMenu();
+    } else {
+      showToast('Error: ' + (data.error || 'desconocido'), 'error');
+    }
+  } catch(e) {
+    hideLoading();
+    showToast('Error de conexion', 'error');
+  }
+}
+
 async function renderTablaMenu() {
   var tbody = document.getElementById('admin-menu-tbody');
   if (!tbody) return;
@@ -5933,6 +5961,12 @@ async function renderTablaMenu() {
         '</td>' +
         '<td style="padding:10px 12px;text-align:center;">' +
           '<button onclick="togglePlatillo(\'' + esc(p.id) + '\', this)" style="background:' + activoColor + ';color:white;border:none;border-radius:8px;padding:6px 14px;font-size:11px;font-weight:700;cursor:pointer;">' + activoLabel + '</button>' +
+        '</td>' +
+        '<td style="padding:10px 12px;">' +
+          '<label style="display:inline-flex;align-items:center;gap:6px;background:#f7f5f0;border:1.5px dashed #e2ddd5;border-radius:8px;padding:5px 10px;font-size:11px;color:#7a7a72;cursor:pointer;">' +
+          (p.receta_url ? '✓ PDF' : '+ PDF') +
+          '<input type="file" accept="application/pdf" style="display:none;" onchange="subirRecetaPDF(\'' + esc(p.id) + '\', this)">' +
+          '</label>' +
         '</td>';
       tbody.appendChild(tr);
     });
@@ -6035,7 +6069,7 @@ var tarjetaSeleccionada = null;
 function cargarConfigOpenpay() {
   // Claves publicas de Openpay — estas son seguras en el HTML (nunca poner la privada aqui)
   var OPENPAY_ID = 'mtgg8mpbu09f8zbg36kd';
-  var OPENPAY_PUBLIC_KEY = 'pk_f25dddae63594418b0c29f66bb312cd9';
+  var OPENPAY_PUBLIC_KEY = 'pk_xdae63594418b0c29f66bb312cd9';
   var OPENPAY_SANDBOX = false;
   openpayConfig = { merchant_id: OPENPAY_ID, public_key: OPENPAY_PUBLIC_KEY, sandbox: OPENPAY_SANDBOX };
   OpenPay.setId(OPENPAY_ID);
