@@ -2963,6 +2963,132 @@ body:not(.on-menu) #nav-logo-wrap { display: flex; }
   .hero-seal svg { animation: none; }
 }
 
+/* ── VISOR RECETA ── */
+.receta-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.85);
+  z-index: 600;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(6px);
+}
+.receta-overlay.open { display: flex; }
+
+.receta-panel {
+  position: relative;
+  width: min(92vw, 560px);
+  max-height: 88vh;
+  background: #1a1a1a;
+  border-radius: 20px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.receta-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px;
+  background: #111;
+  border-bottom: 1px solid #2a2a2a;
+  flex-shrink: 0;
+}
+
+.receta-titulo {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  color: #f0f0f0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 300px;
+}
+
+.receta-cerrar {
+  background: #2a2a2a;
+  border: none;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  color: #aaa;
+  font-size: 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.receta-cerrar:hover { background: #c1121f; color: white; }
+
+.receta-canvas-wrap {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+  position: relative;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.receta-canvas-wrap canvas {
+  width: 100% !important;
+  height: auto !important;
+  border-radius: 8px;
+  display: block;
+  margin-bottom: 12px;
+}
+
+.receta-watermark {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  pointer-events: none;
+  z-index: 601;
+  overflow: hidden;
+}
+
+.receta-aviso {
+  text-align: center;
+  font-size: 11px;
+  color: #555;
+  padding: 8px 16px 16px;
+  flex-shrink: 0;
+}
+
+.receta-nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  padding: 10px 16px;
+  background: #111;
+  border-top: 1px solid #2a2a2a;
+  flex-shrink: 0;
+}
+
+.receta-nav button {
+  background: #2a2a2a;
+  border: none;
+  border-radius: 8px;
+  padding: 7px 16px;
+  color: #ccc;
+  font-family: 'Outfit', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.receta-nav button:hover { background: #067c49; color: white; }
+.receta-nav button:disabled { opacity: 0.3; cursor: default; }
+.receta-nav span {
+  font-size: 12px;
+  color: #666;
+  min-width: 60px;
+  text-align: center;
+}
+
 </style>
 <!-- Openpay SDK -->
 <script src="https://js.openpay.mx/openpay.v1.min.js"></script>
@@ -3450,7 +3576,13 @@ body:not(.on-menu) #nav-logo-wrap { display: flex; }
         <div style="margin-bottom:14px;">
           <label style="display:block;font-size:11px;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;color:#7a7a72;margin-bottom:7px;">Foto del platillo</label>
           <input type="file" id="np-imagen" accept="image/*" style="width:100%;background:#f7f5f0;border:1.5px solid #e2ddd5;border-radius:12px;color:#252523;font-family:'Outfit',sans-serif;font-size:14px;padding:10px 14px;outline:none;box-sizing:border-box;">
-          <div style="display:flex;align-items:center;gap:10px;margin-top:10px;padding:12px 14px;background:#f7f5f0;border-radius:10px;border:1.5px solid #e2ddd5;cursor:pointer;" onclick="togglePorUnidad()">
+        </div>
+        <div style="margin-bottom:14px;">
+          <label style="display:block;font-size:11px;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;color:#7a7a72;margin-bottom:7px;">Receta en PDF <span style="font-weight:400;text-transform:none;">(opcional)</span></label>
+          <input type="file" id="np-receta" accept="application/pdf" style="width:100%;background:#f7f5f0;border:1.5px solid #e2ddd5;border-radius:12px;color:#252523;font-family:'Outfit',sans-serif;font-size:14px;padding:10px 14px;outline:none;box-sizing:border-box;">
+          <div style="font-size:11px;color:#9a9590;margin-top:6px;">Solo los clientes con sesion pueden verla · No es descargable</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;margin-top:10px;padding:12px 14px;background:#f7f5f0;border-radius:10px;border:1.5px solid #e2ddd5;cursor:pointer;" onclick="togglePorUnidad()">
   <div id="chk-por-unidad" style="width:20px;height:20px;border-radius:6px;border:2px solid #e2ddd5;background:white;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all 0.15s;"></div>
   <div>
     <div style="font-size:13px;font-weight:600;color:#252523;">Vender por unidad (sin porciones)</div>
@@ -3458,7 +3590,6 @@ body:not(.on-menu) #nav-logo-wrap { display: flex; }
   </div>
 </div>
 <div style="font-size:11px;color:#9a9590;margin-top:8px;" id="np-precio-nota">El precio de 4 porciones se calcula solo (precio × 2). Si marcas "por unidad", se vende con un solo precio.</div>
-        </div>
         <button onclick="crearPlatillo()" style="width:100%;background:var(--green);color:white;border:none;border-radius:12px;padding:14px;font-family:'Plus Jakarta Sans',sans-serif;font-size:15px;font-weight:700;cursor:pointer;">
           Agregar al menú
         </button>
@@ -3893,7 +4024,7 @@ async function cargarMenu() {
     var data = await res.json();
     if (data.ok && data.platillos && data.platillos.length) {
       MENU = data.platillos.map(function(p) {
-        return { id: p.id, nombre: p.nombre, proteina: p.proteina, badge: p.badge, precio2p: p.precio2p, img: p.img, por_unidad: p.por_unidad };
+        return { id: p.id, nombre: p.nombre, proteina: p.proteina, badge: p.badge, precio2p: p.precio2p, img: p.img, por_unidad: p.por_unidad, receta_url: p.receta_url || null };
       });
     }
   } catch (e) {
@@ -4803,6 +4934,20 @@ function renderMenu() {
       info.appendChild(btn2);
       info.appendChild(btn4);
     }
+    // Botón Ver receta (solo si hay receta subida)
+    var recetaUrl = p.receta_url || null;
+    if (recetaUrl) {
+      var btnReceta = document.createElement('button');
+      btnReceta.style.cssText = 'display:flex;align-items:center;justify-content:center;gap:6px;width:100%;margin-top:6px;background:rgba(255,255,255,0.9);border:1.5px solid rgba(6,124,73,0.25);border-radius:8px;padding:8px 10px;font-family:\'Outfit\',sans-serif;font-size:11px;font-weight:600;color:#067c49;cursor:pointer;transition:all 0.15s;box-sizing:border-box;';
+      btnReceta.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg> Ver receta';
+      btnReceta.onmouseover = function(){ this.style.background='#067c49'; this.style.color='white'; };
+      btnReceta.onmouseout = function(){ this.style.background='rgba(255,255,255,0.9)'; this.style.color='#067c49'; };
+      btnReceta.onclick = (function(url, nombre) {
+        return function(e) { e.stopPropagation(); abrirReceta(url, nombre); };
+      })(recetaUrl, p.nombre);
+      info.appendChild(btnReceta);
+    }
+
     card.appendChild(info);
     grid.appendChild(card);
   });
@@ -5730,7 +5875,10 @@ async function crearPlatillo() {
   fd.append('proteina', proteina);
   fd.append('precio2p', precio);
   fd.append('por_unidad', porUnidadActivo ? 'true' : 'false');
-  fd.append('imagen', fileInput.files[0]);
+  var recetaInput = document.getElementById('np-receta');
+  if (recetaInput && recetaInput.files && recetaInput.files[0]) {
+    fd.append('receta', recetaInput.files[0]);
+  }
 
   try {
     var res = await fetch('https://chefchefharfer.mx/api/platillos', {
@@ -6213,7 +6361,153 @@ window.addEventListener('load', function() {
   // Carrito siempre inicia vacio por sesion
 });
 
+// === VISOR DE RECETA PROTEGIDO ===
+var recetaPdfDoc = null;
+var recetaPaginaActual = 1;
+var recetaTotalPaginas = 1;
+
+async function abrirReceta(url, nombre) {
+  if (!currentUser) { showToast('Inicia sesion para ver la receta', 'error'); return; }
+
+  var overlay = document.getElementById('receta-overlay');
+  var wrap = document.getElementById('receta-canvas-wrap');
+  var titulo = document.getElementById('receta-titulo');
+  var nav = document.getElementById('receta-nav');
+
+  titulo.textContent = nombre;
+  wrap.innerHTML = '<div style="text-align:center;padding:40px;color:#666;font-size:13px;">Cargando receta...</div>';
+  nav.style.display = 'none';
+  overlay.classList.add('open');
+  document.body.style.overflow = 'hidden';
+
+  // Bloquear clic derecho mientras el visor está abierto
+  document.addEventListener('contextmenu', bloquearContextMenu, true);
+
+  try {
+    // Cargar PDF via proxy del servidor (nunca directo al cliente)
+    var proxyUrl = 'https://chefchefharfer.mx/api/receta?url=' + encodeURIComponent(url);
+    var loadingTask = pdfjsLib.getDocument({ url: proxyUrl, withCredentials: false });
+    recetaPdfDoc = await loadingTask.promise;
+    recetaTotalPaginas = recetaPdfDoc.numPages;
+    recetaPaginaActual = 1;
+
+    if (recetaTotalPaginas > 1) {
+      nav.style.display = 'flex';
+    }
+
+    await renderPaginaReceta(1);
+    dibujarMarcaAgua();
+  } catch(e) {
+    wrap.innerHTML = '<div style="text-align:center;padding:40px;color:#c1121f;font-size:13px;">No se pudo cargar la receta. Intenta de nuevo.</div>';
+  }
+}
+
+async function renderPaginaReceta(num) {
+  var wrap = document.getElementById('receta-canvas-wrap');
+  wrap.innerHTML = '';
+
+  var page = await recetaPdfDoc.getPage(num);
+  var viewport = page.getViewport({ scale: 2.0 });
+
+  var canvas = document.createElement('canvas');
+  canvas.width = viewport.width;
+  canvas.height = viewport.height;
+  canvas.style.cssText = 'width:100%;height:auto;border-radius:8px;display:block;';
+
+  // Bloquear todas las interacciones de guardado
+  canvas.oncontextmenu = function(e) { e.preventDefault(); return false; };
+  canvas.ondragstart = function(e) { e.preventDefault(); return false; };
+
+  wrap.appendChild(canvas);
+
+  await page.render({ canvasContext: canvas.getContext('2d'), viewport: viewport }).promise;
+
+  // Actualizar navegación
+  document.getElementById('receta-pag-info').textContent = num + ' / ' + recetaTotalPaginas;
+  document.getElementById('receta-prev').disabled = num <= 1;
+  document.getElementById('receta-next').disabled = num >= recetaTotalPaginas;
+
+  recetaPaginaActual = num;
+  dibujarMarcaAgua();
+}
+
+function recetaPagina(dir) {
+  var nueva = recetaPaginaActual + dir;
+  if (nueva < 1 || nueva > recetaTotalPaginas) return;
+  renderPaginaReceta(nueva);
+}
+
+function dibujarMarcaAgua() {
+  var wmCanvas = document.getElementById('receta-watermark-canvas');
+  if (!wmCanvas || !currentUser) return;
+
+  wmCanvas.width = window.innerWidth;
+  wmCanvas.height = window.innerHeight;
+  wmCanvas.style.width = window.innerWidth + 'px';
+  wmCanvas.style.height = window.innerHeight + 'px';
+
+  var ctx = wmCanvas.getContext('2d');
+  ctx.clearRect(0, 0, wmCanvas.width, wmCanvas.height);
+
+  var texto = currentUser.nombre + ' · ' + currentUser.phone + ' · Chef Chef Harfer';
+  ctx.font = '13px Plus Jakarta Sans, sans-serif';
+  ctx.fillStyle = 'rgba(189,172,65,0.18)';
+  ctx.save();
+  ctx.translate(wmCanvas.width / 2, wmCanvas.height / 2);
+  ctx.rotate(-30 * Math.PI / 180);
+
+  var espacioX = 280;
+  var espacioY = 80;
+  for (var y = -wmCanvas.height; y < wmCanvas.height; y += espacioY) {
+    for (var x = -wmCanvas.width; x < wmCanvas.width; x += espacioX) {
+      ctx.fillText(texto, x, y);
+    }
+  }
+  ctx.restore();
+}
+
+function bloquearContextMenu(e) {
+  e.preventDefault();
+  return false;
+}
+
+function cerrarReceta(e) {
+  if (e && e.target !== document.getElementById('receta-overlay')) return;
+  var overlay = document.getElementById('receta-overlay');
+  overlay.classList.remove('open');
+  document.body.style.overflow = '';
+  document.removeEventListener('contextmenu', bloquearContextMenu, true);
+  recetaPdfDoc = null;
+  // Limpiar marca de agua
+  var wm = document.getElementById('receta-watermark-canvas');
+  if (wm) { var ctx = wm.getContext('2d'); ctx.clearRect(0, 0, wm.width, wm.height); }
+}
+
 </script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script>pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+
+<!-- VISOR RECETA PROTEGIDO -->
+<div class="receta-overlay" id="receta-overlay" onclick="cerrarReceta(event)">
+  <div class="receta-panel" onclick="event.stopPropagation()">
+    <div class="receta-header">
+      <div class="receta-titulo" id="receta-titulo">Receta</div>
+      <button class="receta-cerrar" onclick="cerrarReceta()">✕</button>
+    </div>
+    <div class="receta-canvas-wrap" id="receta-canvas-wrap">
+      <div id="receta-loading" style="text-align:center;padding:40px;color:#666;font-size:13px;">Cargando receta...</div>
+    </div>
+    <div class="receta-nav" id="receta-nav" style="display:none;">
+      <button id="receta-prev" onclick="recetaPagina(-1)">← Anterior</button>
+      <span id="receta-pag-info">1 / 1</span>
+      <button id="receta-next" onclick="recetaPagina(1)">Siguiente →</button>
+    </div>
+    <div class="receta-aviso">Solo consulta · No disponible para descarga</div>
+  </div>
+  <!-- Marca de agua flotante sobre todo -->
+  <canvas id="receta-watermark-canvas" class="receta-watermark" style="pointer-events:none;"></canvas>
+</div>
+
 </body>
 </html>
