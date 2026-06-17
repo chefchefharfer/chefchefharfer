@@ -1996,21 +1996,23 @@ footer .social-links a:hover { color: white; }
   .tienda-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }
 
-/* Card oscura */
 .prod-card {
-  background: #1a1a1a;
+  background: #ffffff;
   border-radius: 16px;
   overflow: hidden;
-  border: none;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.25);
+  border: 1px solid rgba(0,0,0,0.07);
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
   display: flex;
   flex-direction: column;
   min-width: 0;
   width: 100%;
   box-sizing: border-box;
-  transition: transform 0.2s ease;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
-.prod-card:hover { transform: translateY(-2px); }
+.prod-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+}
 
 /* Imagen cuadrada grande */
 .prod-img-wrap {
@@ -2169,7 +2171,7 @@ footer .social-links a:hover { color: white; }
    ======================================== */
 
 #screen-menu {
-  background: #111111 !important;
+  background: #f7f5f0 !important;
   min-height: 100vh;
 }
 
@@ -2214,9 +2216,9 @@ footer .social-links a:hover { color: white; }
 .btn-mis-datos:hover { border-color: var(--green); color: var(--green); }
 
 .aviso-cierre {
-  background: rgba(6,124,73,0.15);
-  border: 1px solid rgba(6,124,73,0.3);
-  color: #6ee7a0;
+  background: rgba(6,124,73,0.08);
+  border: 1px solid rgba(6,124,73,0.18);
+  color: #067c49;
   border-radius: 12px;
   padding: 10px 14px;
   font-size: 12px;
@@ -2280,17 +2282,17 @@ footer .social-links a:hover { color: white; }
   justify-content: center;
   gap: 4px;
   cursor: pointer;
-  background: #242424;
+  background: #f0ece4;
 }
-.prod-img-placeholder:hover { background: #2e2e2e; }
+.prod-img-placeholder:hover { background: #e8e2d8; }
 .prod-img-placeholder-icon {
   font-size: 22px;
-  color: #444;
+  color: #c0b8a8;
   line-height: 1;
 }
 .prod-img-placeholder-text {
   font-size: 9px;
-  color: #444;
+  color: #c0b8a8;
   letter-spacing: 0.5px;
   font-weight: 600;
   text-transform: uppercase;
@@ -2323,31 +2325,28 @@ footer .social-links a:hover { color: white; }
   display: none;
 }
 
-/* Info */
 .prod-info {
-  padding: 10px 10px 11px;
+  padding: 10px 10px 12px;
   display: flex;
   flex-direction: column;
   flex: 1;
   gap: 6px;
-  background: #1c1c1c;
+  background: #ffffff;
   min-width: 0;
 }
 
-/* ID */
 .plat-id {
   font-size: 10px;
   font-weight: 600;
   letter-spacing: 1px;
-  color: #555;
+  color: #b0a898;
 }
 
-/* Nombre */
 .plat-name {
   font-family: 'Plus Jakarta Sans', sans-serif;
   font-size: 11px;
   font-weight: 700;
-  color: #f0f0f0;
+  color: #111210;
   line-height: 1.3;
   word-break: break-word;
 }
@@ -2368,14 +2367,14 @@ footer .social-links a:hover { color: white; }
   font-family: 'Plus Jakarta Sans', sans-serif;
   font-size: 14px;
   font-weight: 800;
-  color: #ffffff;
+  color: #067c49;
   letter-spacing: -0.3px;
   line-height: 1;
 }
 
 .prod-precio-label {
   font-size: 9px;
-  color: #555;
+  color: #a09890;
   font-weight: 500;
   letter-spacing: 0.2px;
 }
@@ -2922,7 +2921,7 @@ nav {
 
 /* Logo del nav: oculto en la página de inicio (el hero ya tiene el logo) */
 body.on-menu #nav-logo-wrap { display: none; }
-body.on-menu { background: #111111 !important; }
+body.on-menu { background: #f7f5f0 !important; }
 /* En cualquier otra pantalla el logo sí aparece */
 body:not(.on-menu) #nav-logo-wrap { display: flex; }
 
@@ -2933,6 +2932,35 @@ body:not(.on-menu) #nav-logo-wrap { display: flex; }
   align-items: center;
   gap: 2px;
   padding: 16px 8px 14px;
+}
+
+/* ── SELLO HERO ── */
+.hero-seal {
+  position: absolute;
+  z-index: 1;
+  right: clamp(-20px, 2vw, 32px);
+  bottom: -24px;
+  width: 140px;
+  height: 140px;
+  opacity: 0.55;
+  pointer-events: none;
+}
+.hero-seal svg {
+  width: 100%;
+  height: 100%;
+  animation: spinSeal 34s linear infinite;
+}
+@keyframes spinSeal { to { transform: rotate(360deg); } }
+.seal-text {
+  fill: #bfa23f;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 9.1px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero-seal svg { animation: none; }
 }
 
 </style>
@@ -3129,11 +3157,30 @@ body:not(.on-menu) #nav-logo-wrap { display: flex; }
 <div class="screen" id="screen-menu" style="background:#111;">
 
   <!-- HERO visible siempre (invitado o con sesion) -->
-  <div class="hero-new" id="menu-hero">
-    <div class="hero-new-inner">
-      <img src="https://chefchefharfer.github.io/chefchefharfer/Logo%20chef%20chef.png" alt="Chef Chef Harfer" class="hero-logo">
-      <p class="hero-new-sub">Ingredientes frescos y porcionados, recetas listas.<br>Disfruta la experiencia.</p>
-      <div class="hero-new-location">
+  <div class="hero-new" id="menu-hero" style="background:linear-gradient(160deg,#faf8f3 0%,#f0ece3 60%,#e8e0d2 100%);border-bottom:1px solid #ddd8ce;position:relative;overflow:hidden;">
+    <div class="hero-new-inner" style="padding:52px 24px 44px;">
+
+      <!-- Sello giratorio -->
+      <div class="hero-seal" aria-hidden="true">
+        <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+          <defs><path id="sealCircle" d="M 50,50 m -37,0 a 37,37 0 1,1 74,0 a 37,37 0 1,1 -74,0" fill="none"/></defs>
+          <circle cx="50" cy="50" r="46" fill="none" stroke="#bfa23f" stroke-width="0.8" opacity="0.55"/>
+          <circle cx="50" cy="50" r="29" fill="none" stroke="#bfa23f" stroke-width="0.6" opacity="0.4"/>
+          <text class="seal-text"><textPath href="#sealCircle" startOffset="0%">COCINA DE CHEF &#183; HECHO EN TEPA &#183; </textPath></text>
+          <g stroke="#d8bf63" stroke-width="2" stroke-linecap="round" fill="none" opacity="0.85">
+            <path d="M44 38 L44 54 M44 46 L48 46"/>
+            <path d="M56 38 L56 62 M52 38 L52 47 Q52 50 56 50 Q60 50 60 47 L60 38"/>
+          </g>
+        </svg>
+      </div>
+
+      <img src="https://chefchefharfer.github.io/chefchefharfer/Logo%20chef%20chef.png" alt="Chef Chef Harfer" class="hero-logo" style="margin-bottom:16px;">
+
+      <h2 style="font-family:'Plus Jakarta Sans',sans-serif;font-size:clamp(22px,5vw,34px);font-weight:800;color:#111;letter-spacing:-0.5px;margin:0 0 10px;line-height:1.15;">Bienvenido a <em style="font-style:normal;color:#067c49;">Chef Chef</em></h2>
+
+      <p class="hero-new-sub" style="color:#6b6b63;max-width:340px;margin:0 auto;">Ingredientes frescos y porcionados, recetas listas.<br>Solo cocina.</p>
+
+      <div class="hero-new-location" style="margin-top:18px;">
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
         TEPATITLAN DE MORELOS
       </div>
