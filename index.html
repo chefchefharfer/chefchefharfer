@@ -8,7 +8,6 @@
 <meta name="theme-color" content="#436057">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Playfair+Display:wght@600;700&family=Raleway:wght@800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/dist/tabler-icons.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 <style>
 :root{
@@ -93,6 +92,17 @@ img{display:block;max-width:100%}
 .card-img img{width:100%;height:100%;object-fit:cover}
 .card-sec{position:absolute;top:6px;left:6px;font-size:10px;font-weight:600;padding:2px 8px;border-radius:20px;background:#fff;color:var(--rosa)}
 .card-sec.lg{background:var(--lg-verde);color:var(--lg-oro)}
+.kit-opc{display:flex;flex-direction:column;gap:6px;margin-top:6px}
+.kit-btn{display:flex;align-items:center;justify-content:space-between;gap:6px;width:100%;border:none;border-radius:10px;padding:7px 10px;background:var(--lg-verde);color:var(--lg-crema);text-align:left}
+.kit-btn span{display:flex;flex-direction:column;line-height:1.2;min-width:0}
+.kit-btn b{font-size:12px;font-weight:600}
+.kit-btn small{font-size:11px;opacity:.9;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.kit-btn i{font-size:16px;flex-shrink:0}
+.kit-btn.k4{background:var(--lg-naranja);color:var(--lg-negro)}
+.kit-btn:active{transform:scale(.97)}
+.kit-receta{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;margin-top:6px;border:1.5px solid var(--borde);background:#fff;border-radius:10px;padding:7px;font-size:12px;font-weight:600;color:var(--lg-verde)}
+.kit-receta:hover{border-color:var(--lg-verde)}
+.kit-card .card-nom{min-height:34px}
 .card-nom{font-size:13px;font-weight:600;line-height:1.3;margin:8px 2px 2px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:34px}
 .card-pie{display:flex;justify-content:space-between;align-items:center;margin:4px 2px 0}
 .card-precio{font-size:13px;color:var(--rosa);font-weight:600}
@@ -550,6 +560,65 @@ img{height:auto}
 .nav,.en-lg .nav{background:var(--verde-barra)}
 .nav .nav-carrito,.en-lg .nav .nav-carrito{border-color:var(--verde-barra)}
 @media (min-width:1000px){ .top{background:transparent} }
+
+/* ===== Logo Chef Chef más grande ===== */
+.top{align-items:center}
+.logo-chef img{height:72px;max-width:230px;padding:6px 14px;border-radius:14px}
+.logo-chef h1{font-size:34px !important;line-height:1.05}
+.marca-nota{font-size:12.5px;color:var(--gris);margin-top:4px;line-height:1.5}
+.marca-nota b{color:var(--lg-verde);font-weight:600}
+@media (min-width:600px){ .logo-chef img{height:88px;max-width:280px} .logo-chef h1{font-size:42px !important} .marca-nota{font-size:14px} }
+@media (min-width:1000px){ .logo-chef img{height:100px;max-width:320px} .logo-chef h1{font-size:48px !important} }
+
+/* ===== Instagram por sección ===== */
+.ig-btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-width:42px;height:42px;padding:0 10px;border-radius:12px;border:1.5px solid var(--lg-verde);color:var(--lg-verde);text-decoration:none;font-size:13px;font-weight:600;flex-shrink:0}
+.ig-btn i.ti{font-size:22px}
+.ig-btn span:empty{display:none}
+.ig-btn.lg{margin-left:auto;border-color:var(--lg-oro);color:var(--lg-crema);padding:0 14px}
+.ig-btn.lg i.ti{color:var(--lg-oro)}
+@media (max-width:380px){ .ig-btn.lg span{display:none} }
+.ig-card{display:flex;align-items:center;gap:12px;margin:22px 18px 8px;padding:14px;border-radius:16px;text-decoration:none;background:#fff;border:1.5px solid var(--borde);color:var(--tinta)}
+.ig-card:hover{border-color:var(--lg-verde)}
+.ig-ico{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:#fff;font-size:24px;background:linear-gradient(45deg,#F58529,#DD2A7B 55%,#8134AF)}
+.ig-txt{flex:1;min-width:0;display:flex;flex-direction:column}
+.ig-txt b{font-size:14px;font-weight:600}
+.ig-txt small{font-size:12px;color:var(--gris)}
+.ig-ver{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:600;color:var(--lg-verde);white-space:nowrap}
+.ig-card.lg{margin-bottom:26px}
+@media (min-width:600px){ .ig-card{margin:26px 28px 10px} }
+@media (min-width:1000px){ .ig-card{margin:34px 40px 10px;max-width:520px} }
+
+/* ===== Íconos propios (no dependen de internet) ===== */
+i.ti{display:inline-flex;align-items:center;justify-content:center;width:1em;height:1em;line-height:1;vertical-align:-.14em;font-style:normal;flex-shrink:0}
+i.ti svg{width:1em;height:1em;display:block}
+
+/* ===== Botón regresar visible ===== */
+.btn-atras{width:auto;padding:0 14px 0 10px;gap:6px;font-size:13px;font-weight:600}
+.btn-atras i.ti{font-size:18px}
+.btn-atras .txt-atras{line-height:1}
+
+/* ===== Carrito del centro: ícono negro ===== */
+.nav .nav-carrito i.ti{font-size:26px;color:var(--lg-negro)}
+
+/* ===== Opciones de kit: modernas ===== */
+.kit-opc{gap:8px}
+.kit-btn{background:#fff;color:var(--tinta);border:1.5px solid var(--borde);border-radius:12px;padding:7px 7px 7px 10px;transition:border-color .15s,background .15s}
+.kit-btn:hover{border-color:var(--lg-verde);background:#F7FAF8}
+.kit-btn.k4{background:#fff;color:var(--tinta)}
+.kit-btn.k4:hover{border-color:var(--lg-naranja);background:#FFF8F1}
+.kit-btn span b{font-size:11px;font-weight:500;color:var(--gris)}
+.kit-btn span small{font-size:15px;font-weight:700;color:var(--lg-verde);opacity:1}
+.kit-btn span em{font-style:normal;font-size:10px;font-weight:600;color:var(--rosa-osc)}
+.kit-cta{display:inline-flex;align-items:center;gap:5px;background:var(--lg-verde);color:var(--lg-crema);border-radius:20px;padding:7px 11px;font-size:11.5px;font-weight:600;white-space:nowrap;flex-shrink:0}
+.kit-btn.k4 .kit-cta{background:var(--lg-naranja);color:var(--lg-negro)}
+.kit-cta i.ti{font-size:14px}
+@media (max-width:400px){ .kit-cta i.ti{display:none} .kit-cta{padding:7px 10px} }
+.kit-btn > span:first-child{display:flex;flex-direction:column;flex:1;min-width:0}
+.kit-btn > span:first-child > *{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.kit-btn .kit-cta{flex-direction:row}
+@media (max-width:400px){ .kit-btn{padding:6px 6px 6px 9px;gap:4px} .kit-cta{font-size:11px;padding:6px 9px} .kit-btn span small{font-size:14px} }
+.kit-receta{border-style:dashed;color:var(--lg-verde);gap:6px}
+.kit-receta i.ti{font-size:16px}
 </style>
 <script src="https://js.openpay.mx/openpay.v1.min.js"></script>
 <script src="https://js.openpay.mx/openpay-data.v1.min.js"></script>
@@ -573,7 +642,7 @@ img{height:auto}
     <div class="banner-img" id="bn-img"></div>
   </div>
 
-  <div class="titulo-sec"><h3>¿Qué se te antoja hoy?</h3></div>
+  <div class="titulo-sec marca-sec"><div><h3>¿Qué se te antoja hoy?</h3><p class="marca-nota">Kits de comida, Lonches Gemma y Pastas son marcas de <b>Chef Chef</b>.</p></div></div>
   <div class="circ-lista">
     <button class="circ" onclick="irA('kits')">
       <div class="circ-img" id="cat-kits"></div>
@@ -593,20 +662,27 @@ img{height:auto}
 <!-- ================= KITS ================= -->
 <section class="view" id="v-kits">
   <div class="sec-head">
-    <button class="btn-atras" onclick="irA('inicio')" aria-label="Regresar"><i class="ti ti-arrow-left"></i></button>
-    <div><h2>Kits de comida</h2><p>Ingredientes porcionados y receta. Tú solo cocinas.</p></div>
+    <button class="btn-atras" onclick="irA('inicio')" aria-label="Regresar"><i class="ti ti-arrow-left"></i><span class="txt-atras">Volver</span></button>
+    <div style="flex:1;min-width:0"><h2>Kits de comida</h2><p>Ingredientes porcionados y receta. Tú solo cocinas.</p></div>
+    <a class="ig-btn" data-ig="kits" target="_blank" rel="noopener" aria-label="Instagram de Kits de comida"><i class="ti ti-brand-instagram"></i></a>
   </div>
   <div class="buscador sec"><i class="ti ti-search"></i><input type="search" id="buscar-kits" placeholder="Busca un kit" autocomplete="off"></div>
-  <div class="aviso">Entregas martes, jueves y sábado. Los pedidos cierran a las 12:00 pm del día anterior. Kits para 2 o 4 personas; si son más, suma kits.</div>
+  <div class="aviso">Entregas martes, jueves y sábado. Los pedidos cierran a las 12:00 pm del día anterior. Cada kit viene para 2 o 4 personas; si son más, suma kits.</div>
   <div class="grid" id="g-kits"></div>
+  <a class="ig-card" data-ig="kits" target="_blank" rel="noopener">
+    <span class="ig-ico"><i class="ti ti-brand-instagram"></i></span>
+    <span class="ig-txt"><b>Síguenos en Instagram</b><small data-ig-handle="kits"></small></span>
+    <span class="ig-ver">Ver perfil <i class="ti ti-arrow-right"></i></span>
+  </a>
 </section>
 
 <!-- ================= LONCHES GEMMA ================= -->
 <section class="view" id="v-lonches">
   <div class="lg-zone">
     <div class="lg-head">
-      <button class="btn-atras" onclick="irA('inicio')" aria-label="Regresar"><i class="ti ti-arrow-left"></i></button>
+      <button class="btn-atras" onclick="irA('inicio')" aria-label="Regresar"><i class="ti ti-arrow-left"></i><span class="txt-atras">Volver</span></button>
       <div class="lg-logo" id="lg-logo"></div>
+      <a class="ig-btn lg" data-ig="lonches" target="_blank" rel="noopener" aria-label="Instagram de Lonches Gemma"><i class="ti ti-brand-instagram"></i><span data-ig-handle="lonches"></span></a>
     </div>
     <div class="lg-hero">
       <div class="lg-hero-img" id="lg-hero-img"></div>
@@ -631,13 +707,18 @@ img{height:auto}
       <p>Agrégalo a tu pedido de lonches.</p>
       <div id="g-lonches"></div>
     </div>
+    <a class="ig-card lg" data-ig="lonches" target="_blank" rel="noopener">
+      <span class="ig-ico"><i class="ti ti-brand-instagram"></i></span>
+      <span class="ig-txt"><b>Síguenos en Instagram</b><small data-ig-handle="lonches"></small></span>
+      <span class="ig-ver">Ver perfil <i class="ti ti-arrow-right"></i></span>
+    </a>
   </div>
 </section>
 
 <!-- ================= CHECKOUT ================= -->
 <section class="view" id="v-checkout">
   <div class="sec-head">
-    <button class="btn-atras" onclick="irA('inicio')" aria-label="Regresar"><i class="ti ti-arrow-left"></i></button>
+    <button class="btn-atras" onclick="irA('inicio')" aria-label="Regresar"><i class="ti ti-arrow-left"></i><span class="txt-atras">Volver</span></button>
     <div><h2>Finalizar pedido</h2><p>Sin crear cuenta. Solo tus datos y listo.</p></div>
   </div>
 
@@ -722,7 +803,7 @@ img{height:auto}
 <!-- ================= INFO ================= -->
 <section class="view" id="v-info">
   <div class="sec-head">
-    <button class="btn-atras" onclick="irA('inicio')" aria-label="Regresar"><i class="ti ti-arrow-left"></i></button>
+    <button class="btn-atras" onclick="irA('inicio')" aria-label="Regresar"><i class="ti ti-arrow-left"></i><span class="txt-atras">Volver</span></button>
     <div><h2>Entregas y contacto</h2><p>Tepatitlán de Morelos, Jalisco</p></div>
   </div>
   <div class="info-card">
@@ -737,7 +818,8 @@ img{height:auto}
     ¿Dudas con tu pedido? Escríbenos por WhatsApp.
     <div class="redes">
       <a id="lnk-wa-info" target="_blank" rel="noopener"><i class="ti ti-brand-whatsapp"></i>WhatsApp</a>
-      <a href="https://instagram.com/chefchef.harfer" target="_blank" rel="noopener"><i class="ti ti-brand-instagram"></i>Instagram</a>
+      <a data-ig="kits" target="_blank" rel="noopener"><i class="ti ti-brand-instagram"></i>Kits</a>
+      <a data-ig="lonches" target="_blank" rel="noopener"><i class="ti ti-brand-instagram"></i>Lonches</a>
       <a href="https://www.facebook.com/profile.php?id=61582969501407" target="_blank" rel="noopener"><i class="ti ti-brand-facebook"></i>Facebook</a>
     </div>
   </div>
@@ -912,6 +994,12 @@ var CONFIG = {
 
   whatsapp: '523782901365',
 
+  // Redes sociales de cada sección
+  instagram: {
+    kits:    'https://www.instagram.com/chefchef.harfer/',
+    lonches: 'https://www.instagram.com/lonches.gemma/'
+  },
+
   banner: {
     etiqueta: 'Tepatitlán',
     titulo: 'Rico, fácil y hasta tu puerta',
@@ -924,6 +1012,11 @@ var CONFIG = {
     lonches: LOGO_LONCHES,
     pastas:  ICONO_PASTAS     // o el enlace de una foto
   },
+
+  // Recetas en PDF de los kits (opcional). Normalmente se suben desde #admin con "+ PDF".
+  // Si prefieres, pega aquí el enlace del PDF por número de kit, por ejemplo:
+  // recetasKits: { '001': BASE_IMG + 'recetas/001.pdf', '002': BASE_IMG + 'recetas/002.pdf' },
+  recetasKits: {},
 
   // El producto protagonista de Lonches Gemma (los demás se muestran como postres)
   lonchePrincipal: 'LG01',
@@ -1036,7 +1129,7 @@ function irA(v){
 function lonchesActivos(){ return CONFIG.lonches.filter(function(l){ return l.activo !== false; }); }
 
 function productoKit(p){
-  return { tipo:'kit', id:p.id, nombre:p.nombre, img:p.img, precio2p:p.precio2p, porUnidad:!!p.por_unidad, receta:p.receta_url||null, desc:p.proteina ? 'Proteína: '+p.proteina : '' };
+  return { tipo:'kit', id:p.id, nombre:p.nombre, img:p.img, precio2p:p.precio2p, porUnidad:!!p.por_unidad, receta:p.receta_url||(CONFIG.recetasKits||{})[p.id]||null, desc:p.proteina ? 'Proteína: '+p.proteina : '' };
 }
 function productoLonche(l){
   return { tipo:'lonche', id:l.id, nombre:l.nombre, img:l.img, precio:l.precio, desc:l.desc||'' };
@@ -1049,6 +1142,25 @@ function cantidadEnCarrito(tipo,id){
   var n=0; Object.keys(carrito).forEach(function(k){ var it=carrito[k]; if(it.tipo===tipo && it.id===id) n+=it.cantidad; }); return n;
 }
 
+// Tarjeta de kit: opción 2 personas, 4 personas y ver receta
+function tarjetaKitHTML(prod, enCar){
+  var id = esc(prod.id), p2 = prod.precio2p, p4 = prod.precio2p*2;
+  var n2 = cantidadKit(prod.id,2), n4 = cantidadKit(prod.id,4);
+  return '<div class="card kit-card" onclick="abrirProducto(\'kit\',\''+id+'\')">'+
+    '<div class="card-img">'+imgHTML(prod.img, prod.nombre, 'box')+'</div>'+
+    (enCar ? '<span class="en-carrito">'+enCar+'</span>' : '')+
+    '<div class="card-nom">'+esc(prod.nombre)+'</div>'+
+    '<div class="kit-opc">'+
+      '<button class="kit-btn" onclick="event.stopPropagation();agregarKit(\''+id+'\',2)"><span><b>2 personas</b><small>'+dinero(p2)+'</small>'+(n2?'<em>'+n2+' en tu pedido</em>':'')+'</span><span class="kit-cta"><i class="ti ti-shopping-cart-plus"></i>Comprar</span></button>'+
+      '<button class="kit-btn k4" onclick="event.stopPropagation();agregarKit(\''+id+'\',4)"><span><b>4 personas</b><small>'+dinero(p4)+'</small>'+(n4?'<em>'+n4+' en tu pedido</em>':'')+'</span><span class="kit-cta"><i class="ti ti-shopping-cart-plus"></i>Comprar</span></button>'+
+    '</div>'+
+    '<button class="kit-receta" onclick="event.stopPropagation();verReceta(\''+id+'\')"><i class="ti ti-file-text"></i>Ver receta</button>'+
+  '</div>';
+}
+function cantidadKit(id, porciones){ var it = carrito['kit|'+id+'|'+porciones]; return it ? it.cantidad : 0; }
+function agregarKit(id, porciones){ var p = buscarProducto('kit', id); if(p) agregar(p, porciones, 1); }
+function verReceta(id){ var p = buscarProducto('kit', id); if(!p) return; if(p.receta) abrirReceta(p.receta, p.nombre); else toast('La receta de este kit estará disponible muy pronto'); }
+
 function tarjetaHTML(prod, mostrarSeccion){
   var precio, sub;
   if(prod.tipo==='kit'){ precio = prod.precio2p; sub = prod.porUnidad ? 'por pieza' : 'kit 2 personas'; }
@@ -1056,6 +1168,7 @@ function tarjetaHTML(prod, mostrarSeccion){
   var enCar = cantidadEnCarrito(prod.tipo, prod.id);
   var etiqueta = '';
   if(mostrarSeccion){ etiqueta = prod.tipo==='kit' ? '<span class="card-sec">Kit</span>' : '<span class="card-sec lg">Lonches Gemma</span>'; }
+  if(prod.tipo==='kit' && !prod.porUnidad) return tarjetaKitHTML(prod, enCar);
   return '<div class="card" onclick="abrirProducto(\''+prod.tipo+'\',\''+esc(prod.id)+'\')">'+
     '<div class="card-img">'+imgHTML(prod.img, prod.nombre, prod.tipo==='kit'?'box':'bread')+etiqueta+'</div>'+
     (enCar ? '<span class="en-carrito">'+enCar+'</span>' : '')+
@@ -1163,7 +1276,7 @@ function abrirProducto(tipo,id){
     porc.innerHTML = '<button data-p="2" onclick="detPorciones(2)">2 personas</button><button data-p="4" onclick="detPorciones(4)">4 personas</button>';
   } else { porc.style.display='none'; porc.innerHTML=''; }
   var rb = $('det-receta');
-  if(p.receta){ rb.style.display='flex'; rb.onclick=function(){ abrirReceta(p.receta, p.nombre); }; } else { rb.style.display='none'; }
+  if(tipo==='kit'){ rb.style.display='flex'; rb.onclick=function(){ verReceta(p.id); }; } else { rb.style.display='none'; }
   pintarDetalle();
   abrirHoja('h-producto');
 }
@@ -1714,7 +1827,21 @@ async function subirRecetaPDF(id, input){
 function formatearTarjeta(){ var v=this.value.replace(/\D/g,'').slice(0,16); this.value=v.replace(/(.{4})/g,'$1 ').trim(); }
 function formatearVence(){ var v=this.value.replace(/\D/g,'').slice(0,4); if(v.length>=3) v=v.slice(0,2)+'/'+v.slice(2); this.value=v; }
 
+/* ============ ÍCONOS ============ */
+var ICONOS = {"plus": "<path d=\"M12 5v14M5 12h14\"/>", "minus": "<path d=\"M5 12h14\"/>", "x": "<path d=\"M18 6 6 18M6 6l12 12\"/>", "check": "<path d=\"m5 12 5 5L20 7\"/>", "lock": "<rect x=\"5\" y=\"11\" width=\"14\" height=\"10\" rx=\"2\"/><path d=\"M8 11V7a4 4 0 0 1 8 0v4\"/>", "arrow-left": "<path d=\"M5 12h14M5 12l6 6M5 12l6-6\"/>", "arrow-right": "<path d=\"M5 12h14M13 18l6-6M13 6l6 6\"/>", "shopping-cart": "<circle cx=\"6\" cy=\"19\" r=\"2\"/><circle cx=\"17\" cy=\"19\" r=\"2\"/><path d=\"M17 17H6V3H4\"/><path d=\"m6 5 14 1-1 7H6\"/>", "shopping-cart-plus": "<circle cx=\"6\" cy=\"19\" r=\"2\"/><circle cx=\"17\" cy=\"19\" r=\"2\"/><path d=\"M17 17H6V3H4\"/><path d=\"M6 5h6M19 7v6H6\"/><path d=\"M16 3v6M13 6h6\"/>", "bread": "<path d=\"M5 9a7 5 0 0 1 14 0c0 1.1-.9 2-2 2v8H7v-8c-1.1 0-2-.9-2-2z\"/>", "brand-whatsapp": "<path d=\"m3 21 1.65-3.8a9 9 0 1 1 3.4 2.9L3 21\"/><path d=\"M9 10a.5.5 0 0 0 1 0V9a.5.5 0 0 0-1 0v1a5 5 0 0 0 5 5h1a.5.5 0 0 0 0-1h-1a.5.5 0 0 0 0 1\"/>", "map-pin": "<circle cx=\"12\" cy=\"11\" r=\"3\"/><path d=\"m17.66 16.66-4.25 4.24a2 2 0 0 1-2.83 0l-4.24-4.24a8 8 0 1 1 11.32 0z\"/>", "credit-card": "<rect x=\"3\" y=\"5\" width=\"18\" height=\"14\" rx=\"3\"/><path d=\"M3 10h18M7 15h.01M11 15h2\"/>", "circle-check": "<circle cx=\"12\" cy=\"12\" r=\"9\"/><path d=\"m9 12 2 2 4-4\"/>", "box": "<path d=\"m12 3 8 4.5v9L12 21l-8-4.5v-9L12 3M12 12l8-4.5M12 12v9M12 12 4 7.5\"/>", "book": "<path d=\"M3 19a9 9 0 0 1 9 0 9 9 0 0 1 9 0M3 6a9 9 0 0 1 9 0 9 9 0 0 1 9 0M3 6v13M12 6v13M21 6v13\"/>", "wallet": "<path d=\"M17 8V5a1 1 0 0 0-1-1H6a2 2 0 0 0 0 4h12a1 1 0 0 1 1 1v3m0 4v3a1 1 0 0 1-1 1H6a2 2 0 0 1-2-2V6\"/><path d=\"M20 12v4h-4a2 2 0 0 1 0-4h4\"/>", "user": "<circle cx=\"12\" cy=\"7\" r=\"4\"/><path d=\"M6 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2\"/>", "truck-delivery": "<circle cx=\"7\" cy=\"17\" r=\"2\"/><circle cx=\"17\" cy=\"17\" r=\"2\"/><path d=\"M5 17H3v-4M2 5h11v12m-4 0h6m4 0h2v-6h-8m0-5h5l3 5\"/>", "trash": "<path d=\"M4 7h16M10 11v6M14 11v6M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2l1-12M9 7V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v3\"/>", "shield-check": "<path d=\"M12 3a12 12 0 0 0 8.5 3A12 12 0 0 1 12 21 12 12 0 0 1 3.5 6 12 12 0 0 0 12 3\"/><path d=\"m9 12 2 2 4-4\"/>", "search": "<circle cx=\"10\" cy=\"10\" r=\"7\"/><path d=\"m21 21-6-6\"/>", "receipt": "<path d=\"M5 21V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16l-3-2-2 2-2-2-2 2-2-2-3 2M9 7h6M9 11h6M13 15h2\"/>", "message-circle": "<path d=\"m3 20 1.3-3.9A9 8 0 1 1 7.7 19L3 20\"/>", "logout": "<path d=\"M14 8V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h7a2 2 0 0 0 2-2v-2M9 12h12l-3-3M18 15l3-3\"/>", "info-circle": "<circle cx=\"12\" cy=\"12\" r=\"9\"/><path d=\"M12 8h.01M11 12h1v4h1\"/>", "home": "<path d=\"M5 12H3l9-9 9 9h-2M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7M9 21v-6a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v6\"/>", "cash": "<rect x=\"7\" y=\"9\" width=\"14\" height=\"10\" rx=\"2\"/><circle cx=\"14\" cy=\"14\" r=\"2\"/><path d=\"M17 9V7a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2\"/>", "brand-instagram": "<rect x=\"4\" y=\"4\" width=\"16\" height=\"16\" rx=\"4\"/><circle cx=\"12\" cy=\"12\" r=\"3\"/><path d=\"M16.5 7.5v.01\"/>", "brand-facebook": "<path d=\"M7 10v4h3v7h4v-7h3l1-4h-4V8a1 1 0 0 1 1-1h3V3h-3a5 5 0 0 0-5 5v2H7\"/>", "cake": "<path d=\"M3 20h18v-8a3 3 0 0 0-3-3H6a3 3 0 0 0-3 3v8zM3 14.8c.9.3 2 .3 3-.3 1.7-1 3.3-1 5 0s3.3 1 5 0c1-.6 2.1-.6 3-.3M12 4l1.5 2.5a1.5 1.5 0 1 1-3 0L12 4z\"/>", "photo": "<rect x=\"3\" y=\"3\" width=\"18\" height=\"18\" rx=\"3\"/><path d=\"M15 8h.01M3 16l5-5c.9-.9 2.1-.9 3 0l5 5M14 14l1-1c.9-.9 2.1-.9 3 0l3 3\"/>", "salad": "<path d=\"M4 11h16a1 1 0 0 1 1 1v.5c0 1.5-2.5 5.6-5 6.5v1a1 1 0 0 1-1 1H9a1 1 0 0 1-1-1v-1c-2.5-.9-5-5-5-6.5V12a1 1 0 0 1 1-1zM18.5 11c.4-1.6-.3-3.3-1.7-4-1.4-.8-3.2-.5-4.3.6M5.5 11c-.4-1.6.3-3.3 1.7-4\"/>", "tools-kitchen-2": "<path d=\"M19 3v12h-5c-.02-3.68.63-7.34 5-12zM19 15v6h-1v-3M8 4v17M5 4v3a3 3 0 1 0 6 0V4\"/>", "file-text": "<path d=\"M14 3v4a1 1 0 0 0 1 1h4\"/><path d=\"M17 21H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7l5 5v11a2 2 0 0 1-2 2zM9 9h1M9 13h6M9 17h6\"/>"};
+function pintarIconos(raiz){
+  (raiz||document).querySelectorAll('i.ti:not([data-ok])').forEach(function(el){
+    var m = (el.className.match(/ti-([a-z0-9-]+)/)||[])[1], d = ICONOS[m];
+    el.setAttribute('data-ok','1'); el.setAttribute('aria-hidden','true');
+    if(d) el.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'+d+'</svg>';
+  });
+}
+new MutationObserver(function(){ pintarIconos(); }).observe(document.documentElement, { childList:true, subtree:true });
+
 window.addEventListener('DOMContentLoaded', function(){
+  pintarIconos();
+  document.querySelectorAll('[data-ig]').forEach(function(a){ a.href = CONFIG.instagram[a.dataset.ig] || '#'; });
+  document.querySelectorAll('[data-ig-handle]').forEach(function(el){ var u = CONFIG.instagram[el.dataset.igHandle]||''; el.textContent = '@'+u.replace(/\/+$/,'').split('/').pop(); });
   var wa = 'https://wa.me/'+CONFIG.whatsapp;
   $('lnk-wa-top').href = wa; $('lnk-wa-info').href = wa;
   $('p-num').addEventListener('input', formatearTarjeta);
